@@ -218,4 +218,4 @@ data class MessageRequest(
 )
 
 @Serializable
-data class SaveOfferRequest(val offer: IdRef)
+data class SaveOfferRequest(val offerId: Long)

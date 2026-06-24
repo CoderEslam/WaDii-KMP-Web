@@ -1,37 +1,43 @@
 package com.wadii.ui
 
 import androidx.compose.runtime.*
-import com.wadii.router.Route
+import com.wadii.navigation.Screen
+import com.wadii.navigation.LocalNavigator
+import com.wadii.navigation.Navigator
+import com.wadii.navigation.currentOrThrow
+import com.wadii.screens.*
 import com.wadii.state.AppState
 import org.jetbrains.compose.web.dom.*
 
-private data class NavLink(val label: String, val icon: String, val route: Route)
+private data class NavLink(val label: String, val icon: String, val screen: Screen)
 
 @Composable
 fun Layout(content: @Composable () -> Unit) {
     val user = AppState.user ?: return
+    val navigator = LocalNavigator.currentOrThrow
+    val darkMode = AppState.darkMode
     var menuOpen by remember { mutableStateOf(false) }
 
     val userLinks = listOf(
-        NavLink("Home", "🏠", Route.HOME),
-        NavLink("Search", "🔍", Route.SEARCH),
-        NavLink("My Orders", "📦", Route.ORDERS),
-        NavLink("Saved Offers", "⭐", Route.SAVED_OFFERS),
-        NavLink("Messages", "💬", Route.CHAT),
-        NavLink("Notifications", "🔔", Route.NOTIFICATIONS),
+        NavLink("Home", "✦", HomeScreen),
+        NavLink("Search", "⊹", SearchScreen),
+        NavLink("My Orders", "◈", OrdersScreen),
+        NavLink("Saved Offers", "◉", SavedOffersScreen),
+        NavLink("Messages", "◎", ChatScreen),
+        NavLink("Notifications", "◇", NotificationsScreen),
     )
     val providerLinks = listOf(
-        NavLink("Dashboard", "📊", Route.PROVIDER_DASHBOARD),
-        NavLink("Orders", "📦", Route.PROVIDER_ORDERS),
-        NavLink("My Offers", "⭐", Route.PROVIDER_OFFERS),
-        NavLink("Messages", "💬", Route.CHAT),
-        NavLink("Notifications", "🔔", Route.NOTIFICATIONS),
+        NavLink("Dashboard", "⬡", ProviderDashboardScreen),
+        NavLink("Orders", "◈", ProviderOrdersScreen),
+        NavLink("My Offers", "◉", ProviderOffersScreen),
+        NavLink("Messages", "◎", ChatScreen),
+        NavLink("Notifications", "◇", NotificationsScreen),
     )
     val adminLinks = listOf(
-        NavLink("Dashboard", "📊", Route.ADMIN_DASHBOARD),
-        NavLink("Provider Requests", "📋", Route.PROVIDER_REQUESTS),
-        NavLink("Advertisements", "📣", Route.ADVERTISEMENTS),
-        NavLink("Services", "🔧", Route.SERVICES),
+        NavLink("Dashboard", "⬡", AdminDashboardScreen),
+        NavLink("Requests", "◈", ProviderRequestsScreen),
+        NavLink("Ads", "◉", AdsScreen),
+        NavLink("Services", "⊹", ServicesScreen),
     )
 
     val links = when (user.role) {
@@ -40,57 +46,69 @@ fun Layout(content: @Composable () -> Unit) {
         else -> userLinks
     }
 
-    Div(attrs = { classes("flex", "min-h-screen", "bg-slate-50") }) {
+    Div(attrs = { classes("flex", "min-h-screen") }) {
         // Desktop Sidebar
         Aside(attrs = {
-            classes("hidden", "md:flex", "flex-col", "w-64", "bg-white",
-                "border-r", "border-slate-200", "fixed", "inset-y-0", "left-0", "z-30")
+            classes("hidden", "md:flex", "flex-col", "w-64", "fixed", "inset-y-0", "left-0", "z-30", "space-sidebar")
         }) {
-            // Logo
-            Div(attrs = { classes("p-6", "border-b", "border-slate-200") }) {
+            // Brand
+            Div(attrs = { classes("px-6", "py-5", "border-b", "border-slate-200") }) {
                 Span(attrs = {
-                    classes("text-2xl", "font-bold", "text-amber-500", "cursor-pointer")
-                    onClick { AppState.navigate(Route.HOME) }
+                    classes("text-2xl", "font-extrabold", "cursor-pointer", "brand-text", "tracking-tight")
+                    onClick { navigator.replaceAll(links.first().screen) }
                 }) { Text("WaDii") }
-                P(attrs = { classes("text-xs", "text-slate-500", "mt-1", "capitalize") }) {
+                P(attrs = { classes("text-xs", "text-slate-400", "mt-0.5", "tracking-widest", "uppercase") }) {
                     Text(user.role.lowercase())
                 }
             }
 
-            // Nav
-            Nav(attrs = { classes("flex-1", "p-4", "space-y-1", "overflow-y-auto") }) {
-                links.forEach { link -> SidebarLink(link) }
+            // Nav links
+            Nav(attrs = { classes("flex-1", "px-3", "py-4", "space-y-0.5", "overflow-y-auto") }) {
+                links.forEach { link -> SpaceNavLink(link, navigator) }
             }
 
-            // Bottom
-            Div(attrs = { classes("p-4", "border-t", "border-slate-200", "space-y-1") }) {
-                SidebarLink(NavLink("Profile", "👤", Route.PROFILE))
+            // Bottom actions
+            Div(attrs = { classes("px-3", "py-4", "border-t", "border-slate-200", "space-y-0.5") }) {
+                SpaceNavLink(NavLink("Profile", "◑", ProfileScreen), navigator)
+
+                // Dark mode toggle
                 Button(attrs = {
-                    classes("w-full", "flex", "items-center", "gap-3", "px-3", "py-2",
-                        "rounded-lg", "text-sm", "text-red-600", "hover:bg-red-50",
-                        "transition-colors", "text-left")
+                    classes("dark-toggle")
+                    onClick { AppState.toggleDarkMode() }
+                }) {
+                    Span(attrs = { classes("text-base", "w-5", "text-center") }) { Text(if (darkMode) "☀️" else "🌙") }
+                    Span { Text(if (darkMode) "Light Mode" else "Dark Mode") }
+                }
+
+                Button(attrs = {
+                    classes("dark-toggle", "text-red-500")
                     onClick { AppState.logout() }
                 }) {
-                    Span { Text("🚪") }
-                    Span { Text("Logout") }
+                    Span(attrs = { classes("text-base", "w-5", "text-center") }) { Text("→") }
+                    Span { Text("Sign Out") }
                 }
             }
         }
 
         // Mobile header
         Header(attrs = {
-            classes("md:hidden", "fixed", "top-0", "left-0", "right-0", "bg-white",
-                "border-b", "border-slate-200", "z-30", "flex", "items-center",
-                "justify-between", "px-4", "h-14")
+            classes("md:hidden", "fixed", "top-0", "left-0", "right-0", "z-30", "space-header",
+                "flex", "items-center", "justify-between", "px-4", "h-14")
         }) {
             Span(attrs = {
-                classes("text-xl", "font-bold", "text-amber-500", "cursor-pointer")
-                onClick { AppState.navigate(Route.HOME) }
+                classes("text-xl", "font-extrabold", "cursor-pointer", "brand-text", "tracking-tight")
+                onClick { navigator.replaceAll(links.first().screen) }
             }) { Text("WaDii") }
-            Button(attrs = {
-                classes("p-2", "text-slate-600")
-                onClick { menuOpen = !menuOpen }
-            }) { Text(if (menuOpen) "✕" else "☰") }
+            Div(attrs = { classes("flex", "items-center", "gap-2") }) {
+                Button(attrs = {
+                    classes("p-2", "text-slate-500", "hover:text-amber-500", "transition-colors", "text-lg")
+                    onClick { AppState.toggleDarkMode() }
+                }) { Text(if (darkMode) "☀️" else "🌙") }
+                Button(attrs = {
+                    classes("p-2", "text-slate-600", "text-xl")
+                    onClick { menuOpen = !menuOpen }
+                }) { Text(if (menuOpen) "✕" else "☰") }
+            }
         }
 
         // Mobile menu overlay
@@ -100,21 +118,19 @@ fun Layout(content: @Composable () -> Unit) {
                 onClick { menuOpen = false }
             }) {
                 Div(attrs = {
-                    classes("absolute", "left-0", "top-14", "bottom-0", "w-64",
-                        "bg-white", "shadow-xl", "p-4", "space-y-1")
+                    classes("absolute", "left-0", "top-14", "bottom-0", "w-64", "space-sidebar", "px-3", "py-4", "space-y-0.5", "overflow-y-auto")
                     onClick { it.stopPropagation() }
                 }) {
                     links.forEach { link ->
-                        SidebarLink(link) { menuOpen = false }
+                        SpaceNavLink(link, navigator) { menuOpen = false }
                     }
-                    SidebarLink(NavLink("Profile", "👤", Route.PROFILE)) { menuOpen = false }
+                    SpaceNavLink(NavLink("Profile", "◑", ProfileScreen), navigator) { menuOpen = false }
                     Button(attrs = {
-                        classes("w-full", "flex", "items-center", "gap-3", "px-3", "py-2",
-                            "rounded-lg", "text-sm", "text-red-600", "hover:bg-red-50")
-                        onClick { AppState.logout() }
+                        classes("dark-toggle", "text-red-500")
+                        onClick { AppState.logout(); menuOpen = false }
                     }) {
-                        Span { Text("🚪") }
-                        Span { Text("Logout") }
+                        Span(attrs = { classes("text-base", "w-5", "text-center") }) { Text("→") }
+                        Span { Text("Sign Out") }
                     }
                 }
             }
@@ -132,18 +148,26 @@ fun Layout(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun SidebarLink(link: NavLink, afterClick: (() -> Unit)? = null) {
-    val active = AppState.route == link.route
-    val base = "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left"
-    val colors = if (active) "bg-amber-50 text-amber-700" else "text-slate-600 hover:bg-slate-100"
+private fun SpaceNavLink(link: NavLink, navigator: Navigator, afterClick: (() -> Unit)? = null) {
+    val active = navigator.lastItem::class == link.screen::class
     Button(attrs = {
-        attr("class", "$base $colors")
+        if (active) {
+            attr("class", "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all text-left bg-amber-50 text-amber-700")
+        } else {
+            attr("class", "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left text-slate-600 hover:bg-slate-50 hover:text-slate-800")
+        }
         onClick {
-            AppState.navigate(link.route)
+            navigator.replaceAll(link.screen)
             afterClick?.invoke()
         }
     }) {
-        Span { Text(link.icon) }
+        Span(attrs = {
+            if (active) attr("class", "text-base w-5 text-center text-amber-500")
+            else attr("class", "text-base w-5 text-center text-slate-400")
+        }) { Text(link.icon) }
         Span { Text(link.label) }
+        if (active) {
+            Span(attrs = { classes("ml-auto", "w-1.5", "h-1.5", "rounded-full", "bg-amber-500") }) {}
+        }
     }
 }

@@ -2,18 +2,22 @@ package com.wadii.state
 
 import androidx.compose.runtime.*
 import com.wadii.model.User
-import com.wadii.router.Route
 import kotlinx.browser.localStorage
+import kotlinx.serialization.json.Json
 
 object AppState {
     var user by mutableStateOf<User?>(null)
     var token by mutableStateOf<String?>(null)
-    var route by mutableStateOf(Route.LOGIN)
-    var routeParam by mutableStateOf<String?>(null)
 
-    // Toast notifications
     var toastMessage by mutableStateOf<String?>(null)
     var toastIsError by mutableStateOf(false)
+
+    var darkMode by mutableStateOf(localStorage.getItem("darkMode") == "true")
+
+    fun toggleDarkMode() {
+        darkMode = !darkMode
+        localStorage.setItem("darkMode", darkMode.toString())
+    }
 
     init {
         val storedToken = localStorage.getItem("token")
@@ -21,16 +25,11 @@ object AppState {
         if (storedToken != null && storedUser != null) {
             token = storedToken
             try {
-                val decoded = kotlinx.serialization.json.Json {
+                val decoded = Json {
                     ignoreUnknownKeys = true
                     coerceInputValues = true
                 }.decodeFromString(User.serializer(), storedUser)
                 user = decoded
-                route = when (decoded.role) {
-                    "ADMIN" -> Route.ADMIN_DASHBOARD
-                    "PROVIDER" -> Route.PROVIDER_DASHBOARD
-                    else -> Route.HOME
-                }
             } catch (_: Exception) {
                 clearStorage()
             }
@@ -42,24 +41,12 @@ object AppState {
         token = t
         localStorage.setItem("token", t)
         localStorage.setItem("user", kotlinx.serialization.json.Json.encodeToString(User.serializer(), u))
-        route = when (u.role) {
-            "ADMIN" -> Route.ADMIN_DASHBOARD
-            "PROVIDER" -> Route.PROVIDER_DASHBOARD
-            else -> Route.HOME
-        }
     }
 
     fun logout() {
         user = null
         token = null
         clearStorage()
-        route = Route.LOGIN
-        routeParam = null
-    }
-
-    fun navigate(r: Route, param: String? = null) {
-        route = r
-        routeParam = param
     }
 
     fun toast(msg: String, isError: Boolean = false) {

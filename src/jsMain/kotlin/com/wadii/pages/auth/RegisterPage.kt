@@ -6,8 +6,9 @@ import com.wadii.model.AuthRequest
 import com.wadii.model.City
 import com.wadii.model.Country
 import com.wadii.model.Province
-import com.wadii.router.Route
 import com.wadii.state.AppState
+import com.wadii.navigation.LocalNavigator
+import com.wadii.navigation.currentOrThrow
 import com.wadii.ui.InputField
 import com.wadii.ui.Spinner
 import org.jetbrains.compose.web.attributes.disabled
@@ -32,6 +33,7 @@ fun RegisterPage() {
     var selectedProvince by remember { mutableStateOf<Long>(0) }
     var selectedCity by remember { mutableStateOf<Long>(0) }
 
+    val navigator = LocalNavigator.currentOrThrow
     var loading by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
@@ -75,23 +77,22 @@ fun RegisterPage() {
         }
     }
 
-    Div(attrs = { classes("min-h-screen", "flex", "items-center", "justify-center",
-        "bg-gradient-to-br", "from-amber-50", "to-slate-100", "p-4", "py-8") }) {
+    Div(attrs = { classes("min-h-screen", "flex", "items-center", "justify-center", "p-4", "py-10") }) {
         Div(attrs = { classes("w-full", "max-w-md") }) {
-            Div(attrs = { classes("text-center", "mb-8") }) {
-                H1(attrs = { classes("text-4xl", "font-bold", "text-amber-500") }) { Text("WaDii") }
-                P(attrs = { classes("text-slate-600", "mt-2") }) { Text("Create your account") }
+            Div(attrs = { classes("text-center", "mb-10") }) {
+                H1(attrs = { classes("text-5xl", "font-extrabold", "brand-text", "tracking-tight", "mb-3") }) { Text("WaDii") }
+                P(attrs = { classes("text-slate-500", "text-sm", "tracking-widest", "uppercase") }) { Text("Create your account") }
             }
 
-            Div(attrs = { classes("bg-white", "rounded-2xl", "shadow-lg", "p-8") }) {
+            Div(attrs = { classes("bg-white", "rounded-3xl", "shadow-lg", "p-8", "border", "border-slate-200") }) {
                 Div(attrs = { classes("space-y-4") }) {
                     // Account type
                     Div(attrs = { classes("flex", "gap-3") }) {
                         listOf("User" to 0, "Provider" to 1).forEach { (label, type) ->
                             Button(attrs = {
                                 attr("type", "button")
-                                classes("flex-1", "py-2", "rounded-xl", "text-sm", "font-medium", "transition-colors",
-                                    if (userType == type) "bg-amber-500 text-white" else "bg-slate-100 text-slate-700 hover:bg-slate-200")
+                                classes("flex-1", "py-2", "rounded-xl", "text-sm", "font-medium", "transition-colors")
+                                if (userType == type) classes("bg-amber-500", "text-white") else classes("bg-slate-100", "text-slate-700", "hover:bg-slate-200")
                                 onClick { userType = type }
                             }) { Text(label) }
                         }
@@ -132,12 +133,12 @@ fun RegisterPage() {
                     }
                 }
 
-                P(attrs = { classes("mt-6", "text-center", "text-sm", "text-slate-600") }) {
+                P(attrs = { classes("mt-6", "text-center", "text-sm", "text-slate-500") }) {
                     Text("Already have an account? ")
                     Span(attrs = {
-                        classes("text-amber-600", "font-medium", "cursor-pointer", "hover:underline")
-                        onClick { AppState.navigate(Route.LOGIN) }
-                    }) { Text("Sign in") }
+                        classes("text-amber-500", "font-semibold", "cursor-pointer", "hover:underline")
+                        onClick { navigator.pop() }
+                    }) { Text("Sign in →") }
                 }
             }
         }

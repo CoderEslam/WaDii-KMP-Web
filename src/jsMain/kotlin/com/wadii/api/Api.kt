@@ -15,6 +15,7 @@ suspend fun apiLogin(email: String, password: String): User? = runCatching {
         setBody(AuthRequest(email = email, password = password))
     }.body()
     r.data
+
 }.getOrNull()
 
 suspend fun apiRegister(req: AuthRequest): User? = runCatching {
@@ -52,6 +53,10 @@ suspend fun apiGetCities(provinceId: Long): List<City> = runCatching {
 
 // ── Providers ─────────────────────────────────────────────────────────────────
 
+suspend fun apiAllProviders(): List<Provider>? = runCatching {
+    httpClient.get("$BASE_URL/providers/show-all") { auth() }.body<ApiResponse<List<Provider>>>().data
+}.getOrNull()
+
 suspend fun apiGetMyProvider(): Provider? = runCatching {
     httpClient.get("$BASE_URL/providers/me") { auth() }.body<ApiResponse<Provider>>().data
 }.getOrNull()
@@ -76,7 +81,7 @@ suspend fun apiUnfollowProvider(id: Long): Boolean = runCatching {
 // ── Offers ────────────────────────────────────────────────────────────────────
 
 suspend fun apiGetAllOffers(): List<Offer> = runCatching {
-    httpClient.get("$BASE_URL/offers/readAll") { auth() }.body<ApiResponse<List<Offer>>>().data ?: emptyList()
+    httpClient.get("$BASE_URL/offers/show-all") { auth() }.body<ApiResponse<List<Offer>>>().data ?: emptyList()
 }.getOrDefault(emptyList())
 
 suspend fun apiInsertOffer(body: Map<String, Any?>): Offer? = runCatching {
@@ -105,7 +110,7 @@ suspend fun apiGetSavedOffers(): List<Offer> = runCatching {
 suspend fun apiSaveOffer(offerId: Long): Boolean = runCatching {
     httpClient.post("$BASE_URL/saved-offers/insert") {
         auth(); contentType(ContentType.Application.Json)
-        setBody(SaveOfferRequest(offer = IdRef(offerId)))
+        setBody(SaveOfferRequest(offerId = offerId))
     }.status.isSuccess()
 }.getOrDefault(false)
 
@@ -200,7 +205,7 @@ suspend fun apiDeleteNotification(id: Long): Boolean = runCatching {
 // ── Advertisements ────────────────────────────────────────────────────────────
 
 suspend fun apiGetAllAds(): List<Advertisement> = runCatching {
-    httpClient.get("$BASE_URL/advertisements/readAll") { auth() }
+    httpClient.get("$BASE_URL/advertisements/show-all") { auth() }
         .body<ApiResponse<List<Advertisement>>>().data ?: emptyList()
 }.getOrDefault(emptyList())
 
@@ -232,7 +237,7 @@ suspend fun apiTrackClick(id: Long) = runCatching {
 // ── Services ──────────────────────────────────────────────────────────────────
 
 suspend fun apiGetAllServices(): List<Service> = runCatching {
-    httpClient.get("$BASE_URL/services/readAll") { auth() }
+    httpClient.get("$BASE_URL/services/show-all") { auth() }
         .body<ApiResponse<List<Service>>>().data ?: emptyList()
 }.getOrDefault(emptyList())
 

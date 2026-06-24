@@ -10,7 +10,7 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
-const val BASE_URL = "http://192.168.1.30:8080"
+const val BASE_URL = "http://172.28.0.134:8080"
 
 val json = Json {
     ignoreUnknownKeys = true

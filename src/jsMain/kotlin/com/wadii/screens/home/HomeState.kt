@@ -12,6 +12,8 @@ data class HomeState(
     val allProviders: List<ProviderModel> = emptyList(),
     val filteredProviders: List<ProviderModel> = emptyList(),
     val services: List<Service> = emptyList(),
+    val isLoading: Boolean = false,
+    val message : String = "",
     val selectedServiceId: Int = -1,
     val filterLoading: Boolean = false
 ) {

@@ -7,7 +7,7 @@ object Constants {
     const val APP_LANGUAGE = "APP_LANGUAGE"
     const val USER_KEY = "USER_KEY"
     const val THEME_KEY = "THEME_KEY"
-    const val IP = "172.28.0.123"
+    const val IP = "192.168.1.7"
     const val BASE_URL = "http://$IP:8080"
     const val BASE_URL_USER_IMAGES = "${BASE_URL}/users"
     const val VERSION = ""

@@ -22,15 +22,10 @@ kotlin {
                 implementation(compose.html.core)
                 implementation(compose.runtime)
                 implementation(compose.runtimeSaveable)
-                implementation(compose.ui)
-                implementation(compose.foundation)
-                implementation(compose.animation)
-                implementation(compose.material)
 
-                val ktor = "2.3.12"
-                implementation("io.ktor:ktor-client-js:$ktor")
-                implementation("io.ktor:ktor-client-content-negotiation:$ktor")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
+                implementation(libs.ktor.client.js)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.kotlinx.json)
 
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
@@ -46,6 +41,11 @@ kotlin {
 //                implementation(libs.koin.compose.viewmodel)
 //                implementation(libs.ktor.client.logging)
                 implementation(libs.multiplatformSettings)
+
+                //            implementation(libs.country.picker.kmp)
+                implementation(libs.sketch.compose)
+                // Provides the ability to load network images
+                implementation(libs.sketch.http)
 
             }
         }

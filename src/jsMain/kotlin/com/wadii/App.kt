@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
+import com.wadii.core.di.initializeKoin
 import com.wadii.pages.admin.dashboard.AdminDashboardScreen
 import com.wadii.pages.provider.dashboard.ProviderDashboardScreen
 import com.wadii.screens.auth.login.LoginScreen
@@ -16,6 +17,7 @@ import kotlinx.browser.window
 import org.jetbrains.compose.web.renderComposable
 
 fun main() {
+    initializeKoin()
     window.addEventListener("unhandledrejection", { event ->
         if (event.asDynamic().reason?.name == "AbortError") event.preventDefault()
     })

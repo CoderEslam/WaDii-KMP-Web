@@ -47,8 +47,8 @@ import io.ktor.client.request.forms.formData
 import io.ktor.client.request.parameter
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
-import io.ktor.util.InternalAPI
 import io.ktor.util.date.GMTDate
+import io.ktor.utils.io.InternalAPI
 
 
 class ApiService(

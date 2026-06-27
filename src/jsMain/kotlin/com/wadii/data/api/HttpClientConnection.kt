@@ -48,7 +48,7 @@ fun createHttpClient(): HttpClient {
             })
         }
         install(DefaultRequest) {
-//            header("Authorization", "Bearer ${settingsManager}")
+            header("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlc2xhbWdoYXp5OUBleGFtcGxlLmNvbSIsImp0aSI6IjQiLCJpYXQiOjE3ODE4Njk3MjYsImV4cCI6MTc4MzczNTk2Nn0.Xk60Srlnd4tw2f6CS2HQmflCVaYxFpIB2OYmlul5Kog")
             contentType(ContentType.Application.Json)
         }
     }
@@ -80,7 +80,7 @@ fun createHttpClientSendFile(): HttpClient {
 
         install(DefaultRequest) {
 //            if (settingsManager.getUser().token.isNotNullOrEmptyString()) {
-//                header("Authorization", "Bearer ${settingsManager.getUser().token}")
+                header("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlc2xhbWdoYXp5OUBleGFtcGxlLmNvbSIsImp0aSI6IjQiLCJpYXQiOjE3ODE4Njk3MjYsImV4cCI6MTc4MzczNTk2Nn0.Xk60Srlnd4tw2f6CS2HQmflCVaYxFpIB2OYmlul5Kog")
 //            }
             contentType(ContentType.Application.Json)
         }

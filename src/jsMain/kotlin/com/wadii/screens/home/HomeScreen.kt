@@ -1,6 +1,5 @@
 package com.wadii.screens.home
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.*
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinNavigatorScreenModel
@@ -15,6 +14,7 @@ import com.wadii.domain.model.provider.ProviderModel
 import com.wadii.screens.providerDetail.ProviderDetailScreen
 import com.wadii.screens.search.SearchScreen
 import com.wadii.state.AppState
+import com.wadii.ui.AnimatedVisibility
 import com.wadii.ui.LoadingScreen
 import com.wadii.ui.LoadingSkeletons
 import com.wadii.viewmodel.UiState

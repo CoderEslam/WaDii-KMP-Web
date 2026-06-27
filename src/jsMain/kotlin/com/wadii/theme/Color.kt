@@ -1,68 +1,31 @@
 package com.wadii.theme
 
-import androidx.compose.ui.graphics.Color
+// Brand color hex strings — used as CSS values in Compose Web HTML.
+// The app renders via DOM/CSS (not Skia), so androidx.compose.ui.graphics.Color
+// is not available. Use these as attr("style", "color: $Yellow") if needed,
+// or prefer Tailwind classes (e.g. text-amber-500) which the index.html already configures.
 
-// === Brand ===
-val Yellow = Color(0xFFFFD300)           // Star gold — primary brand accent
-val Red = Color(0xFFBB0000)
-val Hint = Color(0xFF6B7E99)             // Dim starlight
+const val Yellow   = "#FFD300"   // Star gold — primary brand accent
+const val Red      = "#BB0000"
+const val Hint     = "#6B7E99"   // Dim starlight
 
-// === Space Backgrounds ===
-val SpaceVoid = Color(0xFF000814)        // Deepest background
-val SpaceDeep = Color(0xFF020C1B)        // Deep space
-val SpaceMid = Color(0xFF061224)         // Mid space layer
-val SpaceSurface = Color(0xFF0A1930)     // Surface / card base
-val SpaceCard = Color(0xFF0D1F3C)        // Elevated card
+// Space backgrounds
+const val SpaceVoid    = "#000814"
+const val SpaceDeep    = "#020C1B"
+const val SpaceSurface = "#0A1930"
+const val SpaceCard    = "#0D1F3C"
 
-// === Glassmorphism ===
-val GlassWhite = Color(0x1AFFFFFF)       // Glass fill (10% alpha)
-val GlassBorder = Color(0x33FFFFFF)      // Glass border (20% alpha)
-val GlassHighlight = Color(0x40FFFFFF)   // Glass top-edge highlight (25%)
+// Glassmorphism
+const val GlassWhite     = "rgba(255,255,255,0.10)"
+const val GlassBorder    = "rgba(255,255,255,0.20)"
+const val GlassHighlight = "rgba(255,255,255,0.25)"
 
-// === Navigation (floating glass bar) ===
-val NavBackground = Color(0xFF050E1D)
-val ActiveBg = Color(0x26FFD300)
-val InactiveIcon = Color(0x7FFFFFFF)     // 50% white
-val InactiveLabel = Color(0x7FFFFFFF)
-val DividerColor = Color(0xFF1A2D45)
+// Text
+const val StarWhite  = "#E8F0FE"
+const val StarSilver = "#C8D6E8"
+const val HintColor  = "#6B7E99"
 
-val ActiveIcon = Color(0xFF000814)       // Dark on yellow pill
-val ActiveLabel = Color(0xFFFFD300)
-val ActiveDot = Color(0xFFFFD300)
-
-// === Cosmic Accents ===
-val NebulaBlue = Color(0xFF1E40AF)
-val NebulaPurple = Color(0xFF7C3AED)
-val CosmicTeal = Color(0xFF0891B2)
-val AuroraCyan = Color(0xFF06B6D4)
-val StarWhite = Color(0xFFE8F0FE)        // Primary text (near-white)
-val StarSilver = Color(0xFFC8D6E8)       // Secondary text
-
-// === Semantic (dark-theme adapted) ===
-val HeaderDark = Color(0xFFE8F0FE)       // Inverted: now used as light heading text
-val PurpleBg = Color(0x267C3AED)
-val PurpleFg = Color(0xFFB39DFF)
-val TealBg = Color(0x260891B2)
-val TealFg = Color(0xFF67E8F9)
-val BlueBg = Color(0x261E40AF)
-val BlueFg = Color(0xFF93C5FD)
-val AmberBg = Color(0x26B45309)
-val AmberFg = Color(0xFFFCD34D)
-val GreenBg = Color(0x26065F46)
-val GreenFg = Color(0xFF6EE7B7)
-val GrayBg = Color(0x1AFFFFFF)
-val GrayFg = Color(0xFF94A3B8)
-val RedBg = Color(0x26991B1B)
-val RedFg = Color(0xFFFCA5A5)
-val SurfaceBg = Color(0xFF0D1F3C)
-val HintColor = Color(0xFF6B7E99)
-val BorderColor = Color(0xFF1A2D45)
-val DividerSoft = Color(0xFF0F1E35)
-val YellowAlpha = Color(0x26FFD300)
-
-// === Light Space ("Pearl Cosmos") palette ===
-val LightBg = Color(0xFFF5EEFF)          // Pearl lavender root
-val LightSurface = Color(0xFFEDE6FF)     // Soft violet surface
-val LightCard = Color(0xFFF8F4FF)        // Near-white card
-val LightText = Color(0xFF0E0527)        // Deep cosmic indigo
-val LightTextDim = Color(0xFF7060A0)     // Muted nebula purple
+// Semantic accents
+const val NebulaBlue  = "#1E40AF"
+const val NebulaPurple = "#7C3AED"
+const val CosmicTeal  = "#0891B2"

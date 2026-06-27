@@ -22,6 +22,7 @@ kotlin {
                 implementation(compose.html.core)
                 implementation(compose.runtime)
                 implementation(compose.runtimeSaveable)
+                implementation(compose.material)
 
                 implementation(libs.ktor.client.js)
                 implementation(libs.ktor.client.content.negotiation)

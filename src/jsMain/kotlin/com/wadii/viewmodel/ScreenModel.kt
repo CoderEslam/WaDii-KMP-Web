@@ -1,16 +1,7 @@
 package com.wadii.viewmodel
 
 import androidx.compose.runtime.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-
-abstract class ScreenModel {
-    val screenModelScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-    open fun onDispose() {}
-    fun dispose() { onDispose(); screenModelScope.cancel() }
-}
+import cafe.adriel.voyager.core.model.ScreenModel
 
 sealed class UiState<out T> {
     object Loading : UiState<Nothing>()
@@ -19,8 +10,5 @@ sealed class UiState<out T> {
 }
 
 @Composable
-inline fun <reified T : ScreenModel> rememberScreenModel(crossinline factory: () -> T): T {
-    val model = remember { factory() }
-    DisposableEffect(Unit) { onDispose { model.dispose() } }
-    return model
-}
+inline fun <reified T : ScreenModel> rememberScreenModel(crossinline factory: () -> T): T =
+    remember { factory() }

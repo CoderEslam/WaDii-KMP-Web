@@ -1,6 +1,6 @@
 // Dev-server proxy: forward /api/* → Spring backend (strips /api prefix)
 config.devServer = Object.assign({}, config.devServer, {
-    port: 3001,
+    port: 3002,
     proxy: [
         {
             context: ["/api"],

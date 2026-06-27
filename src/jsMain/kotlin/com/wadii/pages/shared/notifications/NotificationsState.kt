@@ -1,0 +1,6 @@
+package com.wadii.pages.shared.notifications
+
+
+data class NotificationsState(
+    val notifications: List<String> = emptyList()
+)

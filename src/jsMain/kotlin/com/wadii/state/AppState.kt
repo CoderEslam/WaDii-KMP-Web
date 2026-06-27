@@ -1,7 +1,7 @@
 package com.wadii.state
 
 import androidx.compose.runtime.*
-import com.wadii.model.User
+import com.wadii.domain.model.auth.login.User
 import kotlinx.browser.localStorage
 import kotlinx.serialization.json.Json
 
@@ -40,7 +40,11 @@ object AppState {
         user = u
         token = t
         localStorage.setItem("token", t)
-        localStorage.setItem("user", kotlinx.serialization.json.Json.encodeToString(User.serializer(), u))
+        localStorage.setItem(
+            "user", Json.encodeToString(
+                User.serializer(), u
+            )
+        )
     }
 
     fun logout() {
@@ -54,7 +58,9 @@ object AppState {
         toastIsError = isError
     }
 
-    fun clearToast() { toastMessage = null }
+    fun clearToast() {
+        toastMessage = null
+    }
 
     private fun clearStorage() {
         localStorage.removeItem("token")

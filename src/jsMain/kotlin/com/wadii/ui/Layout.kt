@@ -1,11 +1,24 @@
 package com.wadii.ui
 
 import androidx.compose.runtime.*
-import com.wadii.navigation.Screen
-import com.wadii.navigation.LocalNavigator
-import com.wadii.navigation.Navigator
-import com.wadii.navigation.currentOrThrow
-import com.wadii.screens.*
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import com.wadii.pages.admin.ads.AdsScreen
+import com.wadii.pages.admin.dashboard.AdminDashboardScreen
+import com.wadii.pages.admin.provider.ProviderRequestsScreen
+import com.wadii.pages.admin.service.ServicesScreen
+import com.wadii.pages.provider.dashboard.ProviderDashboardScreen
+import com.wadii.pages.provider.offers.ProviderOffersScreen
+import com.wadii.pages.provider.orders.ProviderOrdersScreen
+import com.wadii.pages.shared.chat.ChatScreen
+import com.wadii.pages.shared.notifications.NotificationsScreen
+import com.wadii.pages.shared.profile.ProfileScreen
+import com.wadii.screens.home.HomeScreen
+import com.wadii.screens.orders.list.OrdersScreen
+import com.wadii.screens.savedOffers.SavedOffersScreen
+import com.wadii.screens.search.SearchScreen
 import com.wadii.state.AppState
 import org.jetbrains.compose.web.dom.*
 
@@ -19,25 +32,25 @@ fun Layout(content: @Composable () -> Unit) {
     var menuOpen by remember { mutableStateOf(false) }
 
     val userLinks = listOf(
-        NavLink("Home", "✦", HomeScreen),
-        NavLink("Search", "⊹", SearchScreen),
-        NavLink("My Orders", "◈", OrdersScreen),
-        NavLink("Saved Offers", "◉", SavedOffersScreen),
-        NavLink("Messages", "◎", ChatScreen),
-        NavLink("Notifications", "◇", NotificationsScreen),
+        NavLink("Home", "✦", HomeScreen()),
+        NavLink("Search", "⊹", SearchScreen()),
+        NavLink("My Orders", "◈", OrdersScreen()),
+        NavLink("Saved Offers", "◉", SavedOffersScreen()),
+        NavLink("Messages", "◎", ChatScreen()),
+        NavLink("Notifications", "◇", NotificationsScreen()),
     )
     val providerLinks = listOf(
-        NavLink("Dashboard", "⬡", ProviderDashboardScreen),
-        NavLink("Orders", "◈", ProviderOrdersScreen),
-        NavLink("My Offers", "◉", ProviderOffersScreen),
-        NavLink("Messages", "◎", ChatScreen),
-        NavLink("Notifications", "◇", NotificationsScreen),
+        NavLink("Dashboard", "⬡", ProviderDashboardScreen()),
+        NavLink("Orders", "◈", ProviderOrdersScreen()),
+        NavLink("My Offers", "◉", ProviderOffersScreen()),
+        NavLink("Messages", "◎", ChatScreen()),
+        NavLink("Notifications", "◇", NotificationsScreen()),
     )
     val adminLinks = listOf(
-        NavLink("Dashboard", "⬡", AdminDashboardScreen),
-        NavLink("Requests", "◈", ProviderRequestsScreen),
-        NavLink("Ads", "◉", AdsScreen),
-        NavLink("Services", "⊹", ServicesScreen),
+        NavLink("Dashboard", "⬡", AdminDashboardScreen()),
+        NavLink("Requests", "◈", ProviderRequestsScreen()),
+        NavLink("Ads", "◉", AdsScreen()),
+        NavLink("Services", "⊹", ServicesScreen()),
     )
 
     val links = when (user.role) {
@@ -51,7 +64,6 @@ fun Layout(content: @Composable () -> Unit) {
         Aside(attrs = {
             classes("hidden", "md:flex", "flex-col", "w-64", "fixed", "inset-y-0", "left-0", "z-30", "space-sidebar")
         }) {
-            // Brand
             Div(attrs = { classes("px-6", "py-5", "border-b", "border-slate-200") }) {
                 Span(attrs = {
                     classes("text-2xl", "font-extrabold", "cursor-pointer", "brand-text", "tracking-tight")
@@ -62,16 +74,13 @@ fun Layout(content: @Composable () -> Unit) {
                 }
             }
 
-            // Nav links
             Nav(attrs = { classes("flex-1", "px-3", "py-4", "space-y-0.5", "overflow-y-auto") }) {
                 links.forEach { link -> SpaceNavLink(link, navigator) }
             }
 
-            // Bottom actions
             Div(attrs = { classes("px-3", "py-4", "border-t", "border-slate-200", "space-y-0.5") }) {
-                SpaceNavLink(NavLink("Profile", "◑", ProfileScreen), navigator)
+                SpaceNavLink(NavLink("Profile", "◑", ProfileScreen()), navigator)
 
-                // Dark mode toggle
                 Button(attrs = {
                     classes("dark-toggle")
                     onClick { AppState.toggleDarkMode() }
@@ -124,7 +133,7 @@ fun Layout(content: @Composable () -> Unit) {
                     links.forEach { link ->
                         SpaceNavLink(link, navigator) { menuOpen = false }
                     }
-                    SpaceNavLink(NavLink("Profile", "◑", ProfileScreen), navigator) { menuOpen = false }
+                    SpaceNavLink(NavLink("Profile", "◑", ProfileScreen()), navigator) { menuOpen = false }
                     Button(attrs = {
                         classes("dark-toggle", "text-red-500")
                         onClick { AppState.logout(); menuOpen = false }

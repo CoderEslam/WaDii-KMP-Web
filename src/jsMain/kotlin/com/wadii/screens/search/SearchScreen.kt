@@ -2,14 +2,13 @@ package com.wadii.screens.search
 
 import androidx.compose.runtime.*
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wadii.data.api.to1dp
 import com.wadii.screens.home.OfferCard
 import com.wadii.screens.providerDetail.ProviderDetailScreen
 import com.wadii.ui.Spinner
-import com.wadii.viewmodel.UiState
-import com.wadii.viewmodel.rememberScreenModel
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.*
@@ -18,9 +17,8 @@ class SearchScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val model = rememberScreenModel { SearchScreenModel() }
-        val s = model.state
-        val d = (s as? UiState.Success)?.data ?: return
+        val model = koinScreenModel<SearchViewModel>()
+        val state by model.state.collectAsState()
 
         Div(attrs = { classes("space-y-6") }) {
             H1(attrs = { classes("text-2xl", "font-bold", "text-slate-800") }) { Text("Search") }
@@ -31,7 +29,7 @@ class SearchScreen : Screen {
                     Input(type = InputType.Text, attrs = {
                         classes("w-full", "pl-10", "pr-4", "py-3", "border", "border-slate-300", "rounded-xl", "focus:outline-none", "focus:ring-2", "focus:ring-amber-400", "bg-white")
                         attr("placeholder", "Search providers, offers, services…")
-                        attr("value", d.query)
+                        attr("value", state.query)
                         onInput { model.onEvent(SearchEvent.SetQuery(it.value)) }
                         onKeyDown { if (it.key == "Enter") model.onEvent(SearchEvent.Search) }
                     })
@@ -39,19 +37,19 @@ class SearchScreen : Screen {
                 Button(attrs = {
                     classes("px-6", "py-3", "bg-amber-500", "hover:bg-amber-600", "text-white", "font-semibold", "rounded-xl", "transition-colors", "disabled:opacity-60", "flex", "items-center", "gap-2")
                     onClick { model.onEvent(SearchEvent.Search) }
-                    if (d.searching) disabled()
-                }) { if (d.searching) Spinner() else Text("Search") }
+                    if (state.searching) disabled()
+                }) { if (state.searching) Spinner() else Text("Search") }
             }
 
-            if (d.searching) {
+            if (state.searching) {
                 Div(attrs = { classes("flex", "justify-center", "py-12") }) { Spinner() }
             }
 
-            d.results?.let { r ->
+            state.results?.let { r ->
                 val total = r.providers.size + r.offers.size + r.services.size + r.branches.size
                 if (total == 0) {
                     Div(attrs = { classes("bg-white", "rounded-xl", "p-12", "text-center", "text-slate-500") }) {
-                        Text("No results found for \"${d.query}\"")
+                        Text("No results found for \"${state.query}\"")
                     }
                 }
                 if (r.providers.isNotEmpty()) {

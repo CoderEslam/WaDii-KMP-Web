@@ -1,9 +1,10 @@
 package com.wadii.pages.admin.provider
 
-import com.wadii.domain.model.provider.ProviderRequest
-
+import com.wadii.domain.model.providerRequests.ProviderRequestModel
 
 data class ProviderRequestsState(
-    val requests: List<ProviderRequest> = emptyList(),
-    val acceptingId: Long? = null
+    val requests: List<ProviderRequestModel> = emptyList(),
+    val acceptingId: Long? = null,
+    val isLoading: Boolean = false,
+    val error: String? = null
 )

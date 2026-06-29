@@ -2,28 +2,26 @@ package com.wadii.pages.provider.respond
 
 import androidx.compose.runtime.*
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wadii.pages.provider.orders.ProviderOrdersScreen
 import com.wadii.ui.LoadingScreen
 import com.wadii.ui.Spinner
 import com.wadii.ui.TextArea
-import com.wadii.viewmodel.UiState
-import com.wadii.viewmodel.rememberScreenModel
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.*
+import org.koin.core.parameter.parametersOf
 
 class RespondToOrderScreen(val orderId: Int) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val model = rememberScreenModel { RespondToOrderScreenModel() }
+        val model = koinScreenModel<RespondToOrderViewModel> { parametersOf(orderId) }
+        val state by model.state.collectAsState()
 
-        LaunchedEffect(orderId) { model.onEvent(RespondToOrderEvent.Load(orderId)) }
-
-        val s = model.state
-        if (s is UiState.Success && s.data.submitted) {
+        if (state.submitted) {
             LaunchedEffect(Unit) { navigator.replaceAll(ProviderOrdersScreen()) }
             return
         }
@@ -34,12 +32,11 @@ class RespondToOrderScreen(val orderId: Int) : Screen {
                 onClick { navigator.pop() }
             }) { Text("← Back to orders") }
 
-            when (s) {
-                is UiState.Loading -> LoadingScreen()
-                is UiState.Error -> Div(attrs = { classes("bg-white", "rounded-2xl", "p-12", "text-center", "text-slate-500") }) { Text(s.message) }
-                is UiState.Success -> {
-                    val d = s.data
-                    val o = d.order
+            when {
+                state.isLoading -> LoadingScreen()
+                state.error != null -> Div(attrs = { classes("bg-white", "rounded-2xl", "p-12", "text-center", "text-slate-500") }) { Text(state.error!!) }
+                state.order != null -> {
+                    val o = state.order!!
                     Div(attrs = { classes("bg-white", "rounded-2xl", "p-6", "shadow-sm") }) {
                         H1(attrs = { classes("text-xl", "font-bold", "text-slate-800", "mb-4") }) { Text("Order #${o.id}") }
                         Div(attrs = { classes("space-y-2", "text-sm") }) {
@@ -61,10 +58,10 @@ class RespondToOrderScreen(val orderId: Int) : Screen {
                     Div(attrs = { classes("bg-white", "rounded-2xl", "p-6", "shadow-sm") }) {
                         H2(attrs = { classes("font-semibold", "text-slate-800", "mb-4") }) { Text("Submit Response") }
                         Div(attrs = { classes("space-y-5") }) {
-                            TextArea("Your Comment", d.comment, "Describe your service offer, timeline…", 4) {
+                            TextArea("Your Comment", state.comment, "Describe your service offer, timeline…", 4) {
                                 model.onEvent(RespondToOrderEvent.SetComment(it))
                             }
-                            if (d.prices.isNotEmpty() && o.spareParts != null) {
+                            if (state.prices.isNotEmpty() && o.spareParts != null) {
                                 Div {
                                     P(attrs = { classes("text-sm", "font-medium", "text-slate-700", "mb-2") }) { Text("Spare Parts Pricing") }
                                     Div(attrs = { classes("space-y-2") }) {
@@ -76,7 +73,7 @@ class RespondToOrderScreen(val orderId: Int) : Screen {
                                                     Input(type = InputType.Text, attrs = {
                                                         classes("w-full", "pl-7", "pr-3", "py-2", "border", "border-slate-300", "rounded-lg", "text-sm", "focus:outline-none", "focus:ring-2", "focus:ring-amber-400")
                                                         attr("placeholder", "0.00"); attr("type", "number"); attr("min", "0"); attr("step", "0.01")
-                                                        attr("value", d.prices.getOrNull(i)?.second ?: "")
+                                                        attr("value", state.prices.getOrNull(i)?.second ?: "")
                                                         onInput { model.onEvent(RespondToOrderEvent.SetPrice(i, it.value)) }
                                                     })
                                                 }
@@ -89,8 +86,8 @@ class RespondToOrderScreen(val orderId: Int) : Screen {
                                 classes("w-full", "py-3", "bg-amber-500", "hover:bg-amber-600", "text-white", "font-semibold", "rounded-xl", "disabled:opacity-60", "transition-colors", "flex", "items-center", "justify-center", "gap-2")
                                 attr("type", "button")
                                 onClick { model.onEvent(RespondToOrderEvent.Submit(orderId)) }
-                                if (d.submitting) disabled()
-                            }) { if (d.submitting) Spinner() else Text("Submit Response") }
+                                if (state.submitting) disabled()
+                            }) { if (state.submitting) Spinner() else Text("Submit Response") }
                         }
                     }
                 }

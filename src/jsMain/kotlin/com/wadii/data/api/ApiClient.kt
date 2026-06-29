@@ -23,7 +23,7 @@ import kotlin.math.round
 //}
 //
 fun HttpRequestBuilder.auth() {
-    AppState.token?.let { header(HttpHeaders.Authorization, "Bearer $it") }
+    AppState.token?.let { header(HttpHeaders.Authorization, "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlc2xhbWdoYXp5OUBleGFtcGxlLmNvbSIsImp0aSI6IjQiLCJpYXQiOjE3ODE4Njk3MjYsImV4cCI6MTc4MzczNTk2Nn0.Xk60Srlnd4tw2f6CS2HQmflCVaYxFpIB2OYmlul5Kog") }
 }
 //
 //suspend fun HttpResponse.checkAuth() {

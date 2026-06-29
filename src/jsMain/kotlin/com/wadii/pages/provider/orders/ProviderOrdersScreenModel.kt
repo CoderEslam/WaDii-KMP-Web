@@ -1,29 +1,37 @@
 package com.wadii.pages.provider.orders
 
-import androidx.compose.runtime.*
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.wadii.data.api.apiGetProviderOrders
-import com.wadii.viewmodel.UiState
+import com.wadii.BaseViewModel
+import com.wadii.domain.usecase.OrderUseCase
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class ProviderOrdersScreenModel : ScreenModel {
+class ProviderOrdersViewModel(
+    private val orderUseCase: OrderUseCase
+) : BaseViewModel<ProviderOrdersState, ProviderOrdersEvent>() {
 
-    var state by mutableStateOf<UiState<ProviderOrdersState>>(UiState.Loading)
-        private set
+    override val initialState: ProviderOrdersState get() = ProviderOrdersState()
 
-    init {
-        onEvent(ProviderOrdersEvent.Load)
+    override val state: StateFlow<ProviderOrdersState> = _state
+        .onStart { load() }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), initialState)
+
+    override fun onEvent(event: ProviderOrdersEvent) {
+        when (event) {
+            ProviderOrdersEvent.Load -> load()
+        }
     }
 
-    fun onEvent(event: ProviderOrdersEvent) = when (event) {
-        ProviderOrdersEvent.Load -> load()
-    }
-
-    private fun load() {
-        screenModelScope.launch {
-            state = UiState.Loading
-            state = UiState.Success(ProviderOrdersState(apiGetProviderOrders()))
+    private fun load() = screenModelScope.launch {
+        orderUseCase.showAllOrderOfProvider { r ->
+            r.handelState(
+                onLoading = { updateState { it.copy(isLoading = true) } },
+                onSuccess = { data -> updateState { it.copy(orders = data.data ?: emptyList(), isLoading = false) } },
+                onError = { e, _ -> updateState { it.copy(error = e, isLoading = false) } }
+            )
         }
     }
 }

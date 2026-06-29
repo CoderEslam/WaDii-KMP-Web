@@ -306,7 +306,7 @@ suspend fun apiGetAllRequests(): List<ProviderRequest> = runCatching {
         .body<BaseResponse<List<ProviderRequest>>>().data ?: emptyList()
 }.getOrDefault(emptyList())
 
-suspend fun apiAcceptRequest(id: Long): Boolean = runCatching {
+suspend fun apiAcceptRequest(id: Int): Boolean = runCatching {
     httpClient.post("$BASE_URL/provider-requests/accept/$id") { auth() }.status.isSuccess()
 }.getOrDefault(false)
 

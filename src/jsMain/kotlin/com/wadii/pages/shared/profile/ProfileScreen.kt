@@ -7,8 +7,7 @@ import com.wadii.state.AppState
 import com.wadii.ui.LoadingScreen
 import com.wadii.ui.Spinner
 import com.wadii.utils.Constants.BASE_URL_USER_IMAGES
-import com.wadii.viewmodel.UiState
-import com.wadii.viewmodel.rememberScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import kotlinx.browser.document
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.*
@@ -18,17 +17,17 @@ import org.w3c.dom.asList
 class ProfileScreen : Screen {
     @Composable
     override fun Content() {
-        val model = rememberScreenModel { ProfileScreenModel() }
+        val model = koinScreenModel<ProfileViewModel>()
+        val state by model.state.collectAsState()
 
         Div(attrs = { classes("max-w-2xl", "mx-auto", "space-y-6") }) {
             H1(attrs = { classes("text-2xl", "font-bold", "text-slate-800") }) { Text("Profile") }
 
-            when (val s = model.state) {
-                is UiState.Loading -> LoadingScreen()
-                is UiState.Error -> Div(attrs = { classes("bg-white", "rounded-2xl", "p-12", "text-center", "text-slate-400") }) { Text(s.message) }
-                is UiState.Success -> {
-                    val d = s.data
-                    val u = d.user
+            when {
+                state.isLoading -> LoadingScreen()
+                state.error != null -> Div(attrs = { classes("bg-white", "rounded-2xl", "p-12", "text-center", "text-slate-400") }) { Text(state.error!!) }
+                state.user != null -> {
+                    val u = state.user!!
 
                     fun pickFile(onFile: (org.w3c.files.File) -> Unit) {
                         val input = document.createElement("input") as HTMLInputElement
@@ -45,8 +44,8 @@ class ProfileScreen : Screen {
                             Button(attrs = {
                                 classes("absolute", "bottom-2", "right-2", "px-2.5", "py-1", "bg-black/30", "text-white", "text-xs", "rounded-lg", "hover:bg-black/50", "backdrop-blur-sm", "disabled:opacity-60", "flex", "items-center", "gap-1")
                                 onClick { pickFile { file -> model.onEvent(ProfileEvent.UploadBackground(file)) } }
-                                if (d.uploadingBg) disabled()
-                            }) { if (d.uploadingBg) Spinner() else Text("📷 Change cover") }
+                                if (state.uploadingBg) disabled()
+                            }) { if (state.uploadingBg) Spinner() else Text("📷 Change cover") }
                         }
                         Div(attrs = { classes("px-6", "pb-6") }) {
                             Div(attrs = { classes("flex", "items-end", "gap-4", "-mt-10", "mb-4") }) {
@@ -61,8 +60,8 @@ class ProfileScreen : Screen {
                                     Button(attrs = {
                                         classes("absolute", "-bottom-1", "-right-1", "w-6", "h-6", "bg-amber-500", "text-white", "rounded-full", "text-xs", "flex", "items-center", "justify-center", "hover:bg-amber-600", "disabled:opacity-60", "shadow")
                                         onClick { pickFile { file -> model.onEvent(ProfileEvent.UploadAvatar(file)) } }
-                                        if (d.uploadingAvatar) disabled()
-                                    }) { if (d.uploadingAvatar) Spinner() else Text("✏️") }
+                                        if (state.uploadingAvatar) disabled()
+                                    }) { if (state.uploadingAvatar) Spinner() else Text("✏️") }
                                 }
                             }
                             Div(attrs = { classes("space-y-1") }) {

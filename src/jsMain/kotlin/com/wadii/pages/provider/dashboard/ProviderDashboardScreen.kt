@@ -9,31 +9,31 @@ import com.wadii.pages.provider.orders.ProviderOrdersScreen
 import com.wadii.pages.provider.respond.RespondToOrderScreen
 import com.wadii.ui.LoadingScreen
 import com.wadii.ui.StatCard
-import com.wadii.viewmodel.UiState
-import com.wadii.viewmodel.rememberScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import org.jetbrains.compose.web.dom.*
 
 class ProviderDashboardScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val model = rememberScreenModel { ProviderDashboardScreenModel() }
+        val model = koinScreenModel<ProviderDashboardViewModel>()
+        val state by model.state.collectAsState()
 
         Div(attrs = { classes("space-y-8") }) {
             H1(attrs = { classes("text-2xl", "font-bold", "text-slate-800") }) { Text("Provider Dashboard") }
 
-            when (val s = model.state) {
-                is UiState.Loading -> LoadingScreen()
-                is UiState.Error -> Div(attrs = { classes("bg-white", "rounded-xl", "p-12", "text-center", "text-slate-500") }) { Text(s.message) }
-                is UiState.Success -> {
-                    val (provider, orders) = s.data
+            when {
+                state.isLoading -> LoadingScreen()
+                state.error != null -> Div(attrs = { classes("bg-white", "rounded-xl", "p-12", "text-center", "text-slate-500") }) { Text(state.error!!) }
+                else -> {
+                    val provider = state.provider
+                    val orders = state.orders
                     provider?.let { P(attrs = { classes("text-slate-500", "-mt-6") }) { Text(it.name) } }
 
                     Div(attrs = { classes("grid", "grid-cols-2", "md:grid-cols-4", "gap-4") }) {
                         StatCard("Rating", "${(provider?.rate ?: 0.0).to1dp()}", "⭐", "bg-amber-50")
                         StatCard("Followers", "${provider?.followersCount ?: 0}", "👥", "bg-blue-50")
                         StatCard("Total Orders", "${orders.size}", "📦", "bg-green-50")
-//                        val pending = orders.count { o -> o.responses?.any { it. .state == "PENDING" } == true }
                         StatCard("Pending", "Pending", "⏳", "bg-orange-50")
                     }
 
@@ -82,3 +82,4 @@ class ProviderDashboardScreen : Screen {
         }
     }
 }
+

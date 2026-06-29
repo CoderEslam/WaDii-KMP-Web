@@ -27,4 +27,7 @@ class OrderUseCase(private val orderRepo: OrderRepo) {
 
     suspend fun getCarTypeList(response: (RequestState<BaseResponse<List<CarType>>>) -> Unit) =
         orderRepo.getCarTypeList(response)
+
+    suspend fun getOrderById(id: Int, response: (RequestState<BaseResponse<OrderModel>>) -> Unit) =
+        orderRepo.getOrderById(id, response)
 }

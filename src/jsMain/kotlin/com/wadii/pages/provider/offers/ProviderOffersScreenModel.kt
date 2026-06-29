@@ -1,53 +1,66 @@
 package com.wadii.pages.provider.offers
 
-import androidx.compose.runtime.*
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.wadii.data.api.apiDeleteOffer
+import com.wadii.BaseViewModel
 import com.wadii.data.api.apiGetAllOffers
-import com.wadii.data.api.apiGetAllServices
 import com.wadii.data.api.apiInsertOffer
 import com.wadii.data.api.apiUpdateOffer
 import com.wadii.domain.model.offers.OfferResponse
+import com.wadii.domain.usecase.OfferUseCase
 import com.wadii.state.AppState
-import com.wadii.viewmodel.UiState
+import com.wadii.viewmodel.ServicesUseCase
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class ProviderOffersScreenModel : ScreenModel {
+class ProviderOffersViewModel(
+    private val offerUseCase: OfferUseCase,
+    private val servicesUseCase: ServicesUseCase
+) : BaseViewModel<ProviderOffersState, ProviderOffersEvent>() {
 
-    var state by mutableStateOf<UiState<ProviderOffersState>>(UiState.Loading)
-        private set
+    override val initialState: ProviderOffersState get() = ProviderOffersState()
 
-    init {
-        onEvent(ProviderOffersEvent.Load)
-    }
+    override val state: StateFlow<ProviderOffersState> = _state
+        .onStart { load() }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), initialState)
 
-    fun onEvent(event: ProviderOffersEvent) = when (event) {
-        ProviderOffersEvent.Load -> load()
-        is ProviderOffersEvent.ShowModal -> mutate { copy(showModal = true, editOffer = event.offer) }
-        ProviderOffersEvent.CloseModal -> mutate { copy(showModal = false, editOffer = null) }
-        is ProviderOffersEvent.Delete -> delete(event.offerId)
-        is ProviderOffersEvent.Save -> save(event.offer, event.title, event.description, event.endDate, event.selectedServices)
-    }
-
-    private fun load() {
-        screenModelScope.launch {
-            state = UiState.Loading
-            val offers = apiGetAllOffers()
-            val services = apiGetAllServices()
-            state = UiState.Success(ProviderOffersState(offers, services))
+    override fun onEvent(event: ProviderOffersEvent) {
+        when (event) {
+            ProviderOffersEvent.Load -> load()
+            is ProviderOffersEvent.ShowModal -> updateState { it.copy(showModal = true, editOffer = event.offer) }
+            ProviderOffersEvent.CloseModal -> updateState { it.copy(showModal = false, editOffer = null) }
+            is ProviderOffersEvent.Delete -> delete(event.offerId)
+            is ProviderOffersEvent.Save -> save(event.offer, event.title, event.description, event.endDate, event.selectedServices)
         }
     }
 
-    private fun delete(id: Long) {
-        screenModelScope.launch {
-            if (apiDeleteOffer(id)) { AppState.toast("Deleted"); load() }
-            else AppState.toast("Failed to delete", true)
+    private fun load() = screenModelScope.launch {
+        updateState { it.copy(isLoading = true) }
+        val offers = apiGetAllOffers()
+        updateState { it.copy(offers = offers, isLoading = false) }
+        servicesUseCase.getServiceList { r ->
+            r.handelState(
+                onLoading = {},
+                onSuccess = { data -> updateState { it.copy(services = data.data ?: emptyList()) } },
+                onError = { _, _ -> }
+            )
+        }
+    }
+
+    private fun delete(id: Long) = screenModelScope.launch {
+        offerUseCase.deleteOffer(id.toInt()) { r ->
+            r.handelState(
+                onLoading = {},
+                onSuccess = { _ -> AppState.toast("Deleted"); load() },
+                onError = { _, _ -> AppState.toast("Failed to delete", true) }
+            )
         }
     }
 
     private fun save(offer: OfferResponse?, title: String, description: String, endDate: String, services: Set<Int>) {
-        mutate { copy(saving = true) }
+        updateState { it.copy(saving = true) }
         screenModelScope.launch {
             val body = buildMap<String, Any?> {
                 put("title", title); put("description", description); put("endDate", endDate)
@@ -55,7 +68,7 @@ class ProviderOffersScreenModel : ScreenModel {
                 offer?.let { put("id", it.id) }
             }
             val result = if (offer != null) apiUpdateOffer(body) else apiInsertOffer(body)
-            mutate { copy(saving = false) }
+            updateState { it.copy(saving = false) }
             if (result != null) {
                 AppState.toast(if (offer != null) "Offer updated!" else "Offer created!")
                 load()
@@ -63,10 +76,5 @@ class ProviderOffersScreenModel : ScreenModel {
                 AppState.toast("Failed to save offer", true)
             }
         }
-    }
-
-    private fun mutate(block: ProviderOffersState.() -> ProviderOffersState) {
-        val d = (state as? UiState.Success)?.data ?: return
-        state = UiState.Success(d.block())
     }
 }

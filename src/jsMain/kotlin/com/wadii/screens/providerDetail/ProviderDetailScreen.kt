@@ -2,22 +2,21 @@ package com.wadii.screens.providerDetail
 
 import androidx.compose.runtime.*
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wadii.data.api.to1dp
 import com.wadii.screens.orders.new.NewOrderScreen
 import com.wadii.ui.LoadingScreen
-import com.wadii.viewmodel.UiState
-import com.wadii.viewmodel.rememberScreenModel
 import org.jetbrains.compose.web.dom.*
+import org.koin.core.parameter.parametersOf
 
 class ProviderDetailScreen(val providerId: Int) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val model = rememberScreenModel { ProviderDetailScreenModel() }
-
-        LaunchedEffect(providerId) { model.onEvent(ProviderDetailEvent.Load(providerId)) }
+        val model = koinScreenModel<ProviderDetailViewModel> { parametersOf(providerId) }
+        val state by model.state.collectAsState()
 
         Div(attrs = { classes("space-y-6") }) {
             Button(attrs = {
@@ -25,11 +24,12 @@ class ProviderDetailScreen(val providerId: Int) : Screen {
                 onClick { navigator.pop() }
             }) { Text("← Back") }
 
-            when (val s = model.state) {
-                is UiState.Loading -> LoadingScreen()
-                is UiState.Error -> Div(attrs = { classes("bg-white", "rounded-2xl", "p-12", "text-center", "text-slate-500") }) { Text(s.message) }
-                is UiState.Success -> {
-                    val (provider, following) = s.data
+            when {
+                state.isLoading -> LoadingScreen()
+                state.error != null -> Div(attrs = { classes("bg-white", "rounded-2xl", "p-12", "text-center", "text-slate-500") }) { Text(state.error!!) }
+                state.provider != null -> {
+                    val provider = state.provider!!
+                    val following = state.following
                     Div(attrs = { classes("bg-white", "rounded-2xl", "overflow-hidden", "shadow-sm") }) {
                         Div(attrs = { classes("h-32", "bg-gradient-to-r", "from-amber-400", "to-orange-400") }) {}
                         Div(attrs = { classes("px-6", "pb-6") }) {

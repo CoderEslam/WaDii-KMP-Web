@@ -6,5 +6,7 @@ import com.wadii.domain.model.provider.ProviderModel
 
 data class ProviderDashboardState(
     val provider: ProviderModel? = null,
-    val orders: List<OrderModel> = emptyList()
+    val orders: List<OrderModel> = emptyList(),
+    val isLoading: Boolean = false,
+    val error: String? = null
 )

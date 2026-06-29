@@ -1,46 +1,42 @@
 package com.wadii.screens.orders.detail
 
-import androidx.compose.runtime.*
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.wadii.data.api.apiAcceptResponse
-import com.wadii.data.api.apiCancelResponse
-import com.wadii.data.api.apiGetOrder
+import com.wadii.BaseViewModel
+import com.wadii.domain.usecase.OrderUseCase
 import com.wadii.state.AppState
-import com.wadii.viewmodel.UiState
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class OrderDetailScreenModel : ScreenModel {
+class OrderDetailViewModel(
+    private val orderId: Int,
+    private val orderUseCase: OrderUseCase
+) : BaseViewModel<OrderDetailState, OrderDetailEvent>() {
 
-    var state by mutableStateOf<UiState<OrderDetailState>>(UiState.Loading)
-        private set
+    override val initialState: OrderDetailState
+        get() = OrderDetailState()
 
-    fun onEvent(event: OrderDetailEvent) = when (event) {
-        is OrderDetailEvent.Load -> load(event.orderId)
-        is OrderDetailEvent.AcceptResponse -> acceptResponse(event.responseId, event.orderId)
-        is OrderDetailEvent.DeclineResponse -> declineResponse(event.responseId, event.orderId)
-    }
+    override val state: StateFlow<OrderDetailState> = _state
+        .onStart { load() }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), initialState)
 
-    private fun load(orderId: Int) {
-        screenModelScope.launch {
-            state = UiState.Loading
-            val order = apiGetOrder(orderId)
-            state = if (order != null) UiState.Success(OrderDetailState(order))
-            else UiState.Error("Order not found.")
+    override fun onEvent(event: OrderDetailEvent) {
+        when (event) {
+            is OrderDetailEvent.Load -> load()
+            is OrderDetailEvent.AcceptResponse -> AppState.toast("Accept coming soon")
+            is OrderDetailEvent.DeclineResponse -> AppState.toast("Decline coming soon")
         }
     }
 
-    private fun acceptResponse(responseId: Long, orderId: Int) {
-        screenModelScope.launch {
-            if (apiAcceptResponse(responseId)) { AppState.toast("Response accepted!"); load(orderId) }
-            else AppState.toast("Failed to accept", true)
-        }
-    }
-
-    private fun declineResponse(responseId: Long, orderId: Int) {
-        screenModelScope.launch {
-            if (apiCancelResponse(responseId)) { AppState.toast("Response declined"); load(orderId) }
-            else AppState.toast("Failed", true)
+    private fun load() = screenModelScope.launch {
+        orderUseCase.getOrderById(orderId) { response ->
+            response.handelState(
+                onLoading = { updateState { it.copy(isLoading = true) } },
+                onSuccess = { data -> updateState { it.copy(order = data.data, isLoading = false) } },
+                onError = { error, _ -> updateState { it.copy(error = error, isLoading = false) } }
+            )
         }
     }
 }

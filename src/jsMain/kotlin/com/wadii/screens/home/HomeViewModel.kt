@@ -7,6 +7,7 @@ import com.wadii.BaseViewModel
 import com.wadii.data.api.apiAllProviders
 import com.wadii.data.api.apiFilterProvidersByService
 import com.wadii.data.api.apiGetActiveAds
+import com.wadii.data.api.apiGetAllAds
 import com.wadii.data.api.apiGetAllOffers
 import com.wadii.data.api.apiGetAllServices
 import com.wadii.data.api.apiRemoveSavedOffer
@@ -46,11 +47,20 @@ class HomeViewModel(
             initialState
         )
 
+    //    init {
+//        updateState { it.copy(ads = apiGetAllAds()) }
+//    }
     override fun onEvent(event: HomeEvent) {
 
     }
 
     private fun ads() = screenModelScope.launch {
+//        updateState {
+//            it.copy(isLoading = true)
+//        }
+//        updateState {
+//            it.copy(ads = apiGetAllAds())
+//        }
         adsUseCase.ads { response ->
             response.handelState(
                 onLoading = {
@@ -87,7 +97,7 @@ class HomeViewModel(
     }
 
     private fun service() = screenModelScope.launch {
-        servicesUseCase.getServiceList  { response ->
+        servicesUseCase.getServiceList { response ->
             response.handelState(
                 onLoading = {
                     updateState { it.copy(isLoading = true) }

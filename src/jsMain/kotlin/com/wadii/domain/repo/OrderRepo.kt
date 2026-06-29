@@ -21,4 +21,6 @@ interface OrderRepo {
     )
 
     suspend fun getCarTypeList(response: (RequestState<BaseResponse<List<CarType>>>) -> Unit)
+
+    suspend fun getOrderById(id: Int, response: (RequestState<BaseResponse<OrderModel>>) -> Unit)
 }

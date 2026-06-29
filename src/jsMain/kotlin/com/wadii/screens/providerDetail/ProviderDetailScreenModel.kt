@@ -1,46 +1,62 @@
 package com.wadii.screens.providerDetail
 
-import androidx.compose.runtime.*
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.wadii.data.api.apiFollowProvider
-import com.wadii.data.api.apiGetProvider
-import com.wadii.data.api.apiUnfollowProvider
+import com.wadii.BaseViewModel
+import com.wadii.domain.usecase.ProviderUseCase
 import com.wadii.state.AppState
-import com.wadii.viewmodel.UiState
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class ProviderDetailScreenModel : ScreenModel {
-    var state by mutableStateOf<UiState<ProviderDetailState>>(UiState.Loading)
-        private set
+class ProviderDetailViewModel(
+    private val providerId: Int,
+    private val providerUseCase: ProviderUseCase
+) : BaseViewModel<ProviderDetailState, ProviderDetailEvent>() {
 
-    fun onEvent(event: ProviderDetailEvent) = when (event) {
-        is ProviderDetailEvent.Load -> load(event.providerId)
-        is ProviderDetailEvent.ToggleFollow -> toggleFollow(event.providerId)
-    }
+    override val initialState: ProviderDetailState
+        get() = ProviderDetailState()
 
-    private fun load(id: Int) {
-        screenModelScope.launch {
-            state = UiState.Loading
-            val provider = apiGetProvider(id)
-            state = if (provider != null) UiState.Success(ProviderDetailState(provider))
-                    else UiState.Error("Provider not found.")
+    override val state: StateFlow<ProviderDetailState> = _state
+        .onStart { load() }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), initialState)
+
+    override fun onEvent(event: ProviderDetailEvent) {
+        when (event) {
+            is ProviderDetailEvent.Load -> load()
+            is ProviderDetailEvent.ToggleFollow -> toggleFollow(event.providerId)
         }
     }
 
-    private fun toggleFollow(id: Int) {
-        val d = (state as? UiState.Success)?.data ?: return
-        screenModelScope.launch {
-            if (d.following) {
-                if (apiUnfollowProvider(id)) { mutate { copy(following = false) }; AppState.toast("Unfollowed") }
-            } else {
-                if (apiFollowProvider(id)) { mutate { copy(following = true) }; AppState.toast("Following!") }
+    private fun load() = screenModelScope.launch {
+        providerUseCase.getProviderById(providerId) { response ->
+            response.handelState(
+                onLoading = { updateState { it.copy(isLoading = true) } },
+                onSuccess = { data -> updateState { it.copy(provider = data.data, isLoading = false) } },
+                onError = { error, _ -> updateState { it.copy(error = error, isLoading = false) } }
+            )
+        }
+    }
+
+    private fun toggleFollow(id: Int) = screenModelScope.launch {
+        val following = _state.value.following
+        if (following) {
+            providerUseCase.unfollowProvider(id) { response ->
+                response.handelState(
+                    onLoading = {},
+                    onSuccess = { _ -> updateState { it.copy(following = false) }; AppState.toast("Unfollowed") },
+                    onError = { _, _ -> }
+                )
+            }
+        } else {
+            providerUseCase.followProvider(id) { response ->
+                response.handelState(
+                    onLoading = {},
+                    onSuccess = { _ -> updateState { it.copy(following = true) }; AppState.toast("Following!") },
+                    onError = { _, _ -> }
+                )
             }
         }
-    }
-
-    private fun mutate(block: ProviderDetailState.() -> ProviderDetailState) {
-        val d = (state as? UiState.Success)?.data ?: return
-        state = UiState.Success(d.block())
     }
 }

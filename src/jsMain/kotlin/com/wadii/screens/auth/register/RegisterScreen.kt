@@ -2,11 +2,11 @@ package com.wadii.screens.auth.register
 
 import androidx.compose.runtime.*
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wadii.ui.InputField
 import com.wadii.ui.Spinner
-import com.wadii.viewmodel.rememberScreenModel
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.attributes.selected
 import org.jetbrains.compose.web.dom.*
@@ -15,8 +15,8 @@ class RegisterScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val model = rememberScreenModel { RegisterScreenModel() }
-        val s = model.state
+        val model = koinScreenModel<RegisterViewModel>()
+        val s by model.state.collectAsState()
 
         Div(attrs = { classes("min-h-screen", "flex", "items-center", "justify-center", "p-4", "py-10") }) {
             Div(attrs = { classes("w-full", "max-w-md") }) {

@@ -1,78 +1,88 @@
 package com.wadii.pages.admin.service
 
-import androidx.compose.runtime.*
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.wadii.BaseViewModel
 import com.wadii.data.api.apiDeleteService
-import com.wadii.data.api.apiGetAllServices
 import com.wadii.data.api.apiInsertService
 import com.wadii.data.api.apiUpdateService
 import com.wadii.domain.model.service.Service
 import com.wadii.state.AppState
-import com.wadii.viewmodel.UiState
+import com.wadii.viewmodel.ServicesUseCase
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class ServicesScreenModel : ScreenModel {
+class ServicesViewModel(
+    private val servicesUseCase: ServicesUseCase
+) : BaseViewModel<ServicesState, ServicesEvent>() {
 
-    var state by mutableStateOf<UiState<ServicesState>>(UiState.Loading)
-        private set
+    override val initialState: ServicesState get() = ServicesState()
 
-    init {
-        onEvent(ServicesEvent.Load)
+    override val state: StateFlow<ServicesState> = _state
+        .onStart { load() }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), initialState)
+
+    override fun onEvent(event: ServicesEvent) {
+        when (event) {
+            ServicesEvent.Load -> load()
+            is ServicesEvent.StartEdit -> updateState { it.copy(editingId = event.service.id, editName = event.service.name) }
+            ServicesEvent.CancelEdit -> updateState { it.copy(editingId = 0, editName = "") }
+            is ServicesEvent.SetEditName -> updateState { it.copy(editName = event.name) }
+            is ServicesEvent.SaveEdit -> saveEdit(event.service)
+            is ServicesEvent.Delete -> delete(event.serviceId)
+            is ServicesEvent.SetNewName -> updateState { it.copy(newName = event.name) }
+            ServicesEvent.Add -> add()
+        }
     }
 
-    fun onEvent(event: ServicesEvent) = when (event) {
-        ServicesEvent.Load -> load()
-        is ServicesEvent.StartEdit -> mutate { copy(editingId = event.service.id, editName = event.service.name) }
-        ServicesEvent.CancelEdit -> mutate { copy(editingId = 0, editName = "") }
-        is ServicesEvent.SetEditName -> mutate { copy(editName = event.name) }
-        is ServicesEvent.SaveEdit -> saveEdit(event.service)
-        is ServicesEvent.Delete -> delete(event.serviceId)
-        is ServicesEvent.SetNewName -> mutate { copy(newName = event.name) }
-        ServicesEvent.Add -> add()
-    }
-
-    private fun load() {
-        screenModelScope.launch {
-            val services = apiGetAllServices()
-            val cur = (state as? UiState.Success)?.data
-            state = UiState.Success((cur ?: ServicesState()).copy(services = services))
+    private fun load() = screenModelScope.launch {
+        servicesUseCase.getServiceList { r ->
+            r.handelState(
+                onLoading = { updateState { it.copy(isLoading = true) } },
+                onSuccess = { data -> updateState { it.copy(services = data.data ?: emptyList(), isLoading = false) } },
+                onError = { e, _ -> updateState { it.copy(error = e, isLoading = false) } }
+            )
         }
     }
 
     private fun saveEdit(service: Service) {
-        val d = (state as? UiState.Success)?.data ?: return
-        if (d.saving) return
-        mutate { copy(saving = true) }
+        val current = _state.value
+        if (current.saving) return
+        updateState { it.copy(saving = true) }
         screenModelScope.launch {
-            val result = apiUpdateService(service.id.toLong(), d.editName)
-            mutate { copy(saving = false) }
-            if (result != null) { mutate { copy(editingId = 0) }; AppState.toast("Updated!"); load() }
-            else AppState.toast("Failed to update", true)
+            val result = apiUpdateService(service.id.toLong(), current.editName)
+            updateState { it.copy(saving = false) }
+            if (result != null) {
+                updateState { it.copy(editingId = 0) }
+                AppState.toast("Updated!")
+                load()
+            } else {
+                AppState.toast("Failed to update", true)
+            }
         }
     }
 
-    private fun delete(id: Int) {
-        screenModelScope.launch {
-            if (apiDeleteService(id)) { AppState.toast("Deleted"); load() }
-            else AppState.toast("Failed to delete", true)
-        }
+    private fun delete(id: Int) = screenModelScope.launch {
+        if (apiDeleteService(id)) { AppState.toast("Deleted"); load() }
+        else AppState.toast("Failed to delete", true)
     }
 
     private fun add() {
-        val d = (state as? UiState.Success)?.data ?: return
-        if (d.adding || d.newName.isBlank()) return
-        mutate { copy(adding = true) }
+        val current = _state.value
+        if (current.adding || current.newName.isBlank()) return
+        updateState { it.copy(adding = true) }
         screenModelScope.launch {
-            val result = apiInsertService(d.newName)
-            mutate { copy(adding = false) }
-            if (result != null) { mutate { copy(newName = "") }; AppState.toast("Service added!"); load() }
-            else AppState.toast("Failed to add", true)
+            val result = apiInsertService(current.newName)
+            updateState { it.copy(adding = false) }
+            if (result != null) {
+                updateState { it.copy(newName = "") }
+                AppState.toast("Service added!")
+                load()
+            } else {
+                AppState.toast("Failed to add", true)
+            }
         }
-    }
-
-    private fun mutate(block: ServicesState.() -> ServicesState) {
-        val d = (state as? UiState.Success)?.data ?: return
-        state = UiState.Success(d.block())
     }
 }

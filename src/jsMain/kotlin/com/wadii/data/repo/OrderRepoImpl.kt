@@ -29,4 +29,7 @@ class OrderRepoImpl(private val apiService: ApiService) : OrderRepo {
     override suspend fun getCarTypeList(response: (RequestState<BaseResponse<List<CarType>>>) -> Unit) =
         apiService.getCarTypeList(response)
 
+    override suspend fun getOrderById(id: Int, response: (RequestState<BaseResponse<OrderModel>>) -> Unit) =
+        apiService.getOrderById(id, response)
+
 }

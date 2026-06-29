@@ -1,33 +1,38 @@
 package com.wadii.screens.search
 
-import androidx.compose.runtime.*
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.wadii.data.api.apiSearch
-import com.wadii.viewmodel.UiState
+import com.wadii.BaseViewModel
+import com.wadii.domain.usecase.SearchUseCase
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class SearchScreenModel : ScreenModel {
-    var state by mutableStateOf<UiState<SearchState>>(UiState.Success(SearchState()))
-        private set
+class SearchViewModel(private val searchUseCase: SearchUseCase) : BaseViewModel<SearchState, SearchEvent>() {
 
-    fun onEvent(event: SearchEvent) = when (event) {
-        is SearchEvent.SetQuery -> mutate { copy(query = event.value) }
-        SearchEvent.Search -> search()
-    }
+    override val initialState: SearchState
+        get() = SearchState()
 
-    private fun search() {
-        val d = (state as? UiState.Success)?.data ?: return
-        if (d.query.isBlank() || d.searching) return
-        mutate { copy(searching = true) }
-        screenModelScope.launch {
-            val results = apiSearch(d.query)
-            mutate { copy(results = results, searching = false) }
+    override val state: StateFlow<SearchState> = _state
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), initialState)
+
+    override fun onEvent(event: SearchEvent) {
+        when (event) {
+            is SearchEvent.SetQuery -> updateState { it.copy(query = event.value) }
+            SearchEvent.Search -> search()
         }
     }
 
-    private fun mutate(block: SearchState.() -> SearchState) {
-        val d = (state as? UiState.Success)?.data ?: return
-        state = UiState.Success(d.block())
+    private fun search() = screenModelScope.launch {
+        val current = _state.value
+        if (current.query.isBlank() || current.searching) return@launch
+        updateState { it.copy(searching = true) }
+        searchUseCase.search(current.query) { response ->
+            response.handelState(
+                onLoading = {},
+                onSuccess = { data -> updateState { it.copy(results = data.data, searching = false) } },
+                onError = { _, _ -> updateState { it.copy(searching = false) } }
+            )
+        }
     }
 }

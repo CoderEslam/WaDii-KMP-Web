@@ -2,30 +2,28 @@ package com.wadii.pages.admin.provider
 
 import androidx.compose.runtime.*
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import com.wadii.ui.LoadingScreen
-import com.wadii.ui.Spinner
-import com.wadii.viewmodel.UiState
-import com.wadii.viewmodel.rememberScreenModel
-import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.*
 
 class ProviderRequestsScreen : Screen {
 
     @Composable
     override fun Content() {
-        val model = rememberScreenModel { ProviderRequestsScreenModel() }
+        val model = koinScreenModel<ProviderRequestsViewModel>()
+        val state by model.state.collectAsState()
 
         Div(attrs = { classes("space-y-6") }) {
             H1(attrs = { classes("text-2xl", "font-bold", "text-slate-800") }) { Text("Provider Requests") }
 
-            when (val s = model.state) {
-                is UiState.Loading -> LoadingScreen()
-                is UiState.Error -> Div(attrs = {
+            when {
+                state.isLoading -> LoadingScreen()
+                state.error != null -> Div(attrs = {
                     classes("bg-white", "rounded-xl", "p-12", "text-center", "text-slate-500")
-                }) { Text(s.message) }
+                }) { Text(state.error!!) }
 
-                is UiState.Success -> {
-                    val (requests, acceptingId) = s.data
+                else -> {
+                    val requests = state.requests
                     if (requests.isEmpty()) {
                         Div(attrs = { classes("bg-white", "rounded-2xl", "p-12", "text-center") }) {
                             P(attrs = { classes("text-5xl", "mb-3") }) { Text("📋") }

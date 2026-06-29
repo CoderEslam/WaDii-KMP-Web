@@ -15,6 +15,7 @@ import com.wadii.ui.Toast
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.compose.web.renderComposable
+import org.koin.compose.KoinContext
 
 fun main() {
     initializeKoin()
@@ -22,7 +23,9 @@ fun main() {
         if (event.asDynamic().reason?.name == "AbortError") event.preventDefault()
     })
     renderComposable(rootElementId = "root") {
-        App()
+       KoinContext {
+            App()
+        }
     }
 }
 

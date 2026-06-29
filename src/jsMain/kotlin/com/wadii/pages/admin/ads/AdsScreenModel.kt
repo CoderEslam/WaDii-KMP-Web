@@ -15,63 +15,32 @@ class AdsScreenModel(
     private val adsUseCase: AdsUseCase
 ) : BaseViewModel<AdsState, AdsEvent>() {
 
-    override val initialState: AdsState
-        get() = AdsState()
+    override val initialState: AdsState get() = AdsState()
 
-    override val state: StateFlow<AdsState> = _state.onStart {
-        ads()
-    }.stateIn(
-        screenModelScope,
-        SharingStarted.Companion.WhileSubscribed(5000),
-        AdsState()
-    )
+    override val state: StateFlow<AdsState> = _state
+        .onStart { load() }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), initialState)
 
-    override fun onEvent(event: AdsEvent) = when (event) {
-        is AdsEvent.ShowModal -> {
-
+    override fun onEvent(event: AdsEvent) {
+        when (event) {
+            is AdsEvent.ShowModal -> Unit
+            is AdsEvent.CloseModal -> Unit
+            is AdsEvent.Delete -> delete(event.adId)
         }
-
-        is AdsEvent.CloseModal -> {
-
-        }
-
-        is AdsEvent.Delete -> delete(event.adId)
     }
 
-
-    private fun ads() = screenModelScope.launch {
-        adsUseCase.ads { response ->
-            response.handelState(
-                onLoading = {
-
-                }, onSuccess = {
-
-                }, onError = { error, code ->
-
-                }
+    private fun load() = screenModelScope.launch {
+        adsUseCase.ads { r ->
+            r.handelState(
+                onLoading = { updateState { it.copy(isLoading = true) } },
+                onSuccess = { data -> updateState { it.copy(ads = data.data ?: emptyList(), isLoading = false) } },
+                onError = { _, _ -> updateState { it.copy(isLoading = false) } }
             )
         }
     }
 
-    private fun delete(id: Long) {
-        screenModelScope.launch {
-            if (apiDeleteAd(id)) {
-                AppState.toast("Deleted")
-            } else
-                AppState.toast("Failed to delete", true)
-        }
+    private fun delete(id: Long) = screenModelScope.launch {
+        if (apiDeleteAd(id)) { AppState.toast("Deleted"); load() }
+        else AppState.toast("Failed to delete", true)
     }
-
-//    private fun save(ad: Ads?, fields: Map<String, Any?>) {
-//        screenModelScope.launch {
-//            val result = if (ad != null) apiUpdateAd(fields) else apiInsertAd(fields)
-//            mutate { copy(saving = false) }
-//            if (result != null) {
-//                AppState.toast(if (ad != null) "Ad updated!" else "Ad created!")
-//                load()
-//            } else {
-//                AppState.toast("Failed to save ad", true)
-//            }
-//        }
-//    }
 }

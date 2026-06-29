@@ -2,13 +2,13 @@ package com.wadii.screens.auth.login
 
 import androidx.compose.runtime.*
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wadii.screens.auth.register.RegisterScreen
 import com.wadii.state.AppState
 import com.wadii.ui.InputField
 import com.wadii.ui.Spinner
-import com.wadii.viewmodel.rememberScreenModel
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.*
 
@@ -16,8 +16,8 @@ class LoginScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val model = rememberScreenModel { LoginScreenModel() }
-        val state = model.state
+        val model = koinScreenModel<LoginViewModel>()
+        val state by model.state.collectAsState()
 
         Div(attrs = { classes("min-h-screen", "flex", "items-center", "justify-center", "p-4") }) {
             Div(attrs = { classes("w-full", "max-w-md") }) {

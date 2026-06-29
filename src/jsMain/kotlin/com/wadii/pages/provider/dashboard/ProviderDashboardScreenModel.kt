@@ -1,32 +1,47 @@
 package com.wadii.pages.provider.dashboard
 
-import androidx.compose.runtime.*
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.wadii.data.api.apiGetMyProvider
-import com.wadii.data.api.apiGetProviderOrders
-import com.wadii.viewmodel.UiState
+import com.wadii.BaseViewModel
+import com.wadii.domain.usecase.OrderUseCase
+import com.wadii.domain.usecase.ProviderUseCase
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class ProviderDashboardScreenModel : ScreenModel {
+class ProviderDashboardViewModel(
+    private val providerUseCase: ProviderUseCase,
+    private val orderUseCase: OrderUseCase
+) : BaseViewModel<ProviderDashboardState, ProviderDashboardEvent>() {
 
-    var state by mutableStateOf<UiState<ProviderDashboardState>>(UiState.Loading)
-        private set
+    override val initialState: ProviderDashboardState get() = ProviderDashboardState()
 
-    init {
-        onEvent(ProviderDashboardEvent.Load)
+    override val state: StateFlow<ProviderDashboardState> = _state
+        .onStart { load() }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), initialState)
+
+    override fun onEvent(event: ProviderDashboardEvent) {
+        when (event) {
+            ProviderDashboardEvent.Load -> load()
+        }
     }
 
-    fun onEvent(event: ProviderDashboardEvent) = when (event) {
-        ProviderDashboardEvent.Load -> load()
-    }
-
-    private fun load() {
-        screenModelScope.launch {
-            state = UiState.Loading
-            val provider = apiGetMyProvider()
-            val orders = apiGetProviderOrders()
-            state = UiState.Success(ProviderDashboardState(provider, orders))
+    private fun load() = screenModelScope.launch {
+        updateState { it.copy(isLoading = true, error = null) }
+        providerUseCase.providerMe { r ->
+            r.handelState(
+                onLoading = {},
+                onSuccess = { data -> updateState { it.copy(provider = data.data) } },
+                onError = { e, _ -> updateState { it.copy(error = e, isLoading = false) } }
+            )
+        }
+        orderUseCase.showAllOrderOfProvider { r ->
+            r.handelState(
+                onLoading = {},
+                onSuccess = { data -> updateState { it.copy(orders = data.data ?: emptyList(), isLoading = false) } },
+                onError = { e, _ -> updateState { it.copy(error = e, isLoading = false) } }
+            )
         }
     }
 }

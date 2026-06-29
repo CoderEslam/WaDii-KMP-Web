@@ -2,25 +2,25 @@ package com.wadii.pages.shared.notifications
 
 import androidx.compose.runtime.*
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import com.wadii.ui.LoadingScreen
-import com.wadii.viewmodel.UiState
-import com.wadii.viewmodel.rememberScreenModel
 import org.jetbrains.compose.web.dom.*
 
 class NotificationsScreen : Screen {
     @Composable
     override fun Content() {
-        val model = rememberScreenModel { NotificationsScreenModel() }
+        val model = koinScreenModel<NotificationsViewModel>()
+        val state by model.state.collectAsState()
 
         Div(attrs = { classes("space-y-6") }) {
-            when (val s = model.state) {
-                is UiState.Loading -> {
+            when {
+                state.isLoading -> {
                     H1(attrs = { classes("text-2xl", "font-bold", "text-slate-800") }) { Text("Notifications") }
                     LoadingScreen()
                 }
-                is UiState.Error -> Div(attrs = { classes("bg-white", "rounded-xl", "p-12", "text-center", "text-slate-500") }) { Text(s.message) }
-                is UiState.Success -> {
-                    val notifications = s.data.notifications
+                state.error != null -> Div(attrs = { classes("bg-white", "rounded-xl", "p-12", "text-center", "text-slate-500") }) { Text(state.error!!) }
+                else -> {
+                    val notifications = state.notifications
 //                    val unread = notifications.count { !it.isRead }
                     Div(attrs = { classes("flex", "items-center", "justify-between") }) {
                         Div(attrs = { classes("flex", "items-center", "gap-3") }) {

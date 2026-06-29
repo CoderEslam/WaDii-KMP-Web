@@ -8,5 +8,7 @@ data class ProviderOffersState(
     val services: List<Service> = emptyList(),
     val showModal: Boolean = false,
     val editOffer: OfferResponse? = null,
-    val saving: Boolean = false
+    val saving: Boolean = false,
+    val isLoading: Boolean = false,
+    val error: String? = null
 )

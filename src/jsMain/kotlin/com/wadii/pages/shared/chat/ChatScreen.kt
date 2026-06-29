@@ -2,11 +2,10 @@ package com.wadii.pages.shared.chat
 
 import androidx.compose.runtime.*
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import com.wadii.state.AppState
 import com.wadii.ui.LoadingScreen
 import com.wadii.ui.Spinner
-import com.wadii.viewmodel.UiState
-import com.wadii.viewmodel.rememberScreenModel
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.*
@@ -14,30 +13,30 @@ import org.jetbrains.compose.web.dom.*
 class ChatScreen : Screen {
     @Composable
     override fun Content() {
-        val model = rememberScreenModel { ChatScreenModel() }
+        val model = koinScreenModel<ChatViewModel>()
+        val state by model.state.collectAsState()
         val myId = AppState.user?.id
 
         Div(attrs = { classes("flex", "h-[calc(100vh-8rem)]", "bg-white", "rounded-2xl", "shadow-sm", "overflow-hidden") }) {
-            when (val s = model.state) {
-                is UiState.Loading -> LoadingScreen()
-                is UiState.Error -> Div(attrs = { classes("flex-1", "flex", "items-center", "justify-center", "text-slate-500") }) { Text(s.message) }
-                is UiState.Success -> {
-                    val d = s.data
+            when {
+                state.isLoading -> LoadingScreen()
+                state.error != null -> Div(attrs = { classes("flex-1", "flex", "items-center", "justify-center", "text-slate-500") }) { Text(state.error!!) }
+                else -> {
 
                     Div(attrs = { classes("w-80", "border-r", "border-slate-100", "flex", "flex-col", "flex-shrink-0") }) {
                         Div(attrs = { classes("p-4", "border-b", "border-slate-100") }) {
                             H2(attrs = { classes("font-semibold", "text-slate-800") }) { Text("Chats") }
                         }
                         Div(attrs = { classes("flex-1", "overflow-y-auto") }) {
-                            if (d.contacts.isEmpty()) {
+                            if (state.contacts.isEmpty()) {
                                 Div(attrs = { classes("p-8", "text-center") }) {
                                     P(attrs = { classes("text-3xl", "mb-2") }) { Text("💬") }
                                     P(attrs = { classes("text-slate-500", "text-sm") }) { Text("No conversations yet.") }
                                 }
                             } else {
-                                d.contacts.forEach { chatContact ->
+                                state.contacts.forEach { chatContact ->
                                     val displayName = chatContact.contact?.fullName?.ifBlank { null } ?: "Unknown"
-                                    val isSelected = d.selectedContact?.id == chatContact.id
+                                    val isSelected = state.selectedContact?.id == chatContact.id
                                     Div(attrs = {
                                         classes("flex", "items-center", "gap-3", "px-4", "py-3", "cursor-pointer", "hover:bg-slate-50", "transition-colors")
                                         if (isSelected) classes("bg-amber-50") else classes()
@@ -59,7 +58,7 @@ class ChatScreen : Screen {
                     }
 
                     Div(attrs = { classes("flex-1", "flex", "flex-col") }) {
-                        if (d.selectedContact == null) {
+                        if (state.selectedContact == null) {
                             Div(attrs = { classes("flex-1", "flex", "items-center", "justify-center", "text-center", "text-slate-400") }) {
                                 Div {
                                     P(attrs = { classes("text-6xl", "mb-3") }) { Text("💬") }
@@ -67,7 +66,7 @@ class ChatScreen : Screen {
                                 }
                             }
                         } else {
-                            val contact = d.selectedContact
+                            val contact = state.selectedContact!!
                             val displayName = contact.contact.fullName?.ifBlank { null } ?: "Unknown"
                             Div(attrs = { classes("px-5", "py-4", "border-b", "border-slate-100", "flex", "items-center", "gap-3") }) {
                                 Div(attrs = { classes("w-9", "h-9", "rounded-full", "bg-amber-100", "flex", "items-center", "justify-center", "overflow-hidden") }) {
@@ -77,12 +76,12 @@ class ChatScreen : Screen {
                                 P(attrs = { classes("font-semibold", "text-slate-800") }) { Text(displayName) }
                             }
                             Div(attrs = { classes("flex-1", "overflow-y-auto", "p-5", "space-y-3") }) {
-                                if (d.messagesLoading) {
+                                if (state.messagesLoading) {
                                     Div(attrs = { classes("flex", "justify-center", "py-8") }) { Spinner() }
-                                } else if (d.messages.isEmpty()) {
+                                } else if (state.messages.isEmpty()) {
                                     Div(attrs = { classes("flex", "items-center", "justify-center", "h-full", "text-slate-400", "text-sm") }) { Text("No messages yet. Say hello!") }
                                 } else {
-                                    d.messages.forEach { msg ->
+                                    state.messages.forEach { msg ->
                                         val isMe = msg.fromUser?.id == myId
                                         Div(attrs = { classes("flex", if (isMe) "justify-end" else "justify-start") }) {
                                             Div(attrs = {
@@ -104,15 +103,15 @@ class ChatScreen : Screen {
                                     Input(type = InputType.Text, attrs = {
                                         classes("flex-1", "px-4", "py-2.5", "border", "border-slate-300", "rounded-xl", "text-sm", "focus:outline-none", "focus:ring-2", "focus:ring-amber-400")
                                         attr("placeholder", "Type a message…")
-                                        value(d.messageText)
+                                        value(state.messageText)
                                         onInput { model.onEvent(ChatEvent.SetMessage(it.value)) }
                                         onKeyDown { e -> if (e.key == "Enter" && !e.shiftKey) { e.preventDefault(); model.onEvent(ChatEvent.Send) } }
                                     })
                                     Button(attrs = {
                                         classes("px-4", "py-2.5", "bg-amber-500", "text-white", "rounded-xl", "text-sm", "font-medium", "hover:bg-amber-600", "disabled:opacity-60", "flex", "items-center", "gap-2")
                                         onClick { model.onEvent(ChatEvent.Send) }
-                                        if (d.sending || d.messageText.isBlank()) disabled()
-                                    }) { if (d.sending) Spinner() else Text("Send") }
+                                        if (state.sending || state.messageText.isBlank()) disabled()
+                                    }) { if (state.sending) Spinner() else Text("Send") }
                                 }
                             }
                         }

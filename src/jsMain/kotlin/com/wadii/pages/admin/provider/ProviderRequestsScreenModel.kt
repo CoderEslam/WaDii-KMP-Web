@@ -1,51 +1,54 @@
 package com.wadii.pages.admin.provider
 
-import androidx.compose.runtime.*
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.wadii.BaseViewModel
 import com.wadii.data.api.apiAcceptRequest
-import com.wadii.data.api.apiGetAllRequests
-import com.wadii.domain.model.provider.ProviderRequest
+import com.wadii.domain.model.providerRequests.ProviderRequestModel
+import com.wadii.domain.usecase.AdminDashboardUseCase
 import com.wadii.state.AppState
-import com.wadii.viewmodel.UiState
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class ProviderRequestsScreenModel : ScreenModel {
+class ProviderRequestsViewModel(
+    private val adminDashboardUseCase: AdminDashboardUseCase
+) : BaseViewModel<ProviderRequestsState, ProviderRequestsEvent>() {
 
-    var state by mutableStateOf<UiState<ProviderRequestsState>>(UiState.Loading)
-        private set
+    override val initialState: ProviderRequestsState get() = ProviderRequestsState()
 
-    init {
-        onEvent(ProviderRequestsEvent.Load)
-    }
+    override val state: StateFlow<ProviderRequestsState> = _state
+        .onStart { load() }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), initialState)
 
-    fun onEvent(event: ProviderRequestsEvent) = when (event) {
-        ProviderRequestsEvent.Load -> load()
-        is ProviderRequestsEvent.Accept -> accept(event.request)
-    }
-
-    private fun load() {
-        screenModelScope.launch {
-            state = UiState.Loading
-            state = UiState.Success(ProviderRequestsState(requests = apiGetAllRequests()))
+    override fun onEvent(event: ProviderRequestsEvent) {
+        when (event) {
+            ProviderRequestsEvent.Load -> load()
+            is ProviderRequestsEvent.Accept -> accept(event.request)
         }
     }
 
-    private fun accept(req: ProviderRequest) {
+    private fun load() = screenModelScope.launch {
+        adminDashboardUseCase.requests { r ->
+            r.handelState(
+                onLoading = { updateState { it.copy(isLoading = true) } },
+                onSuccess = { data -> updateState { it.copy(requests = data.data ?: emptyList(), isLoading = false) } },
+                onError = { e, _ -> updateState { it.copy(error = e, isLoading = false) } }
+            )
+        }
+    }
+
+    private fun accept(req: ProviderRequestModel) {
+        updateState { it.copy(acceptingId = req.user.id.toLong()) }
         screenModelScope.launch {
-            mutate { copy(acceptingId = req.userId) }
-            if (apiAcceptRequest(req.userId)) {
-                mutate { copy(requests = requests.filter { it.userId != req.userId }, acceptingId = null) }
+            if (apiAcceptRequest(req.user.id)) {
+                updateState { it.copy(requests = it.requests.filter { r -> r.id != req.id }, acceptingId = null) }
                 AppState.toast("Provider request accepted!")
             } else {
-                mutate { copy(acceptingId = null) }
+                updateState { it.copy(acceptingId = null) }
                 AppState.toast("Failed to accept", true)
             }
         }
-    }
-
-    private fun mutate(block: ProviderRequestsState.() -> ProviderRequestsState) {
-        val d = (state as? UiState.Success)?.data ?: return
-        state = UiState.Success(d.block())
     }
 }

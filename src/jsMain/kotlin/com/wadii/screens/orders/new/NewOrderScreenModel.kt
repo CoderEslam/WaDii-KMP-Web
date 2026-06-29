@@ -1,69 +1,82 @@
 package com.wadii.screens.orders.new
 
-import androidx.compose.runtime.*
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.wadii.data.api.apiGetAllServices
-import com.wadii.data.api.apiInsertOrder
+import com.wadii.BaseViewModel
+import com.wadii.domain.model.order.OrderRequest
+import com.wadii.domain.usecase.OrderUseCase
 import com.wadii.state.AppState
-import com.wadii.viewmodel.UiState
+import com.wadii.viewmodel.ServicesUseCase
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class NewOrderScreenModel : ScreenModel {
-    var state by mutableStateOf<UiState<NewOrderState>>(UiState.Loading)
-        private set
+class NewOrderViewModel(
+    private val orderUseCase: OrderUseCase,
+    private val servicesUseCase: ServicesUseCase
+) : BaseViewModel<NewOrderState, NewOrderEvent>() {
 
-    init { onEvent(NewOrderEvent.Load) }
+    override val initialState: NewOrderState
+        get() = NewOrderState()
 
-    fun onEvent(event: NewOrderEvent) = when (event) {
-        NewOrderEvent.Load -> load()
-        is NewOrderEvent.SetCar -> mutate { copy(carModelYear = event.value) }
-        is NewOrderEvent.SetComment -> mutate { copy(comment = event.value) }
-        is NewOrderEvent.ToggleService -> mutate {
-            copy(selectedServices = if (event.id in selectedServices) selectedServices - event.id else selectedServices + event.id)
-        }
-        is NewOrderEvent.SetSparePart -> mutate {
-            copy(spareParts = spareParts.toMutableList().also { it[event.index] = event.value })
-        }
-        NewOrderEvent.AddSparePart -> mutate { copy(spareParts = spareParts + "") }
-        is NewOrderEvent.RemoveSparePart -> mutate {
-            copy(spareParts = spareParts.toMutableList().also { it.removeAt(event.index) })
-        }
-        NewOrderEvent.Submit -> submit()
-    }
+    override val state: StateFlow<NewOrderState> = _state
+        .onStart { load() }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), initialState)
 
-    private fun load() {
-        screenModelScope.launch {
-            state = UiState.Loading
-            state = UiState.Success(NewOrderState(services = apiGetAllServices()))
-        }
-    }
-
-    private fun submit() {
-        val d = (state as? UiState.Success)?.data ?: return
-        if (d.submitting) return
-        mutate { copy(submitting = true) }
-        screenModelScope.launch {
-            val body = mapOf(
-                "carModelYear" to d.carModelYear,
-                "comment" to d.comment,
-                "date" to js("new Date().toISOString()"),
-                "services" to d.selectedServices.map { mapOf("id" to it) },
-                "spareParts" to d.spareParts.filter { it.isNotBlank() }.map { mapOf("sparePartName" to it) }
-            )
-            val order = apiInsertOrder(body)
-            if (order != null) {
-                AppState.toast("Order created!")
-                mutate { copy(submitting = false, submitted = true) }
-            } else {
-                AppState.toast("Failed to create order", true)
-                mutate { copy(submitting = false) }
+    override fun onEvent(event: NewOrderEvent) {
+        when (event) {
+            NewOrderEvent.Load -> load()
+            is NewOrderEvent.SetCar -> updateState { it.copy(carModelYear = event.value) }
+            is NewOrderEvent.SetComment -> updateState { it.copy(comment = event.value) }
+            is NewOrderEvent.ToggleService -> updateState {
+                it.copy(selectedServices = if (event.id in it.selectedServices) it.selectedServices - event.id else it.selectedServices + event.id)
             }
+            is NewOrderEvent.SetSparePart -> updateState {
+                it.copy(spareParts = it.spareParts.toMutableList().also { list -> list[event.index] = event.value })
+            }
+            NewOrderEvent.AddSparePart -> updateState { it.copy(spareParts = it.spareParts + "") }
+            is NewOrderEvent.RemoveSparePart -> updateState {
+                it.copy(spareParts = it.spareParts.toMutableList().also { list -> list.removeAt(event.index) })
+            }
+            NewOrderEvent.Submit -> submit()
         }
     }
 
-    private fun mutate(block: NewOrderState.() -> NewOrderState) {
-        val d = (state as? UiState.Success)?.data ?: return
-        state = UiState.Success(d.block())
+    private fun load() = screenModelScope.launch {
+        servicesUseCase.getServiceList { response ->
+            response.handelState(
+                onLoading = { updateState { it.copy(isLoading = true) } },
+                onSuccess = { data -> updateState { it.copy(services = data.data ?: emptyList(), isLoading = false) } },
+                onError = { error, _ -> updateState { it.copy(error = error, isLoading = false) } }
+            )
+        }
+    }
+
+    private fun submit() = screenModelScope.launch {
+        val d = _state.value
+        if (d.submitting) return@launch
+        updateState { it.copy(submitting = true) }
+        orderUseCase.insertOrder(
+            OrderRequest(
+                carModelYear = d.carModelYear,
+                comment = d.comment,
+                date = js("new Date().toISOString()").toString(),
+                servicesIds = d.selectedServices.toList(),
+                spareParts = d.spareParts.filter { it.isNotBlank() }.map { OrderRequest.SparePart(it) }
+            )
+        ) { response ->
+            response.handelState(
+                onLoading = {},
+                onSuccess = { _ ->
+                    AppState.toast("Order created!")
+                    updateState { it.copy(submitting = false, submitted = true) }
+                },
+                onError = { _, _ ->
+                    AppState.toast("Failed to create order", true)
+                    updateState { it.copy(submitting = false) }
+                }
+            )
+        }
     }
 }

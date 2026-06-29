@@ -39,6 +39,7 @@ kotlin {
                 implementation(libs.voyager.koin)
 
                 implementation(libs.koin.core)
+                implementation(libs.koin.compose)
 //                implementation(libs.koin.compose.viewmodel)
 //                implementation(libs.ktor.client.logging)
                 implementation(libs.multiplatformSettings)

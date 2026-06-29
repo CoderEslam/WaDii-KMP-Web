@@ -1,34 +1,53 @@
 package com.wadii.screens.auth.login
 
-import androidx.compose.runtime.*
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.wadii.data.api.apiLogin
+import com.wadii.BaseViewModel
+import com.wadii.domain.model.auth.login.LoginRequest
+import com.wadii.domain.usecase.AuthUseCase
 import com.wadii.state.AppState
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class LoginScreenModel : ScreenModel {
-    var state by mutableStateOf(LoginState())
-        private set
+class LoginViewModel(private val authUseCase: AuthUseCase) : BaseViewModel<LoginState, LoginEvent>() {
 
-    fun onEvent(event: LoginEvent) = when (event) {
-        is LoginEvent.SetEmail -> state = state.copy(email = event.value)
-        is LoginEvent.SetPassword -> state = state.copy(password = event.value)
-        LoginEvent.Submit -> submit()
+    override val initialState: LoginState
+        get() = LoginState()
+
+    override val state: StateFlow<LoginState> = _state
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), initialState)
+
+    override fun onEvent(event: LoginEvent) {
+        when (event) {
+            is LoginEvent.SetEmail -> updateState { it.copy(email = event.value) }
+            is LoginEvent.SetPassword -> updateState { it.copy(password = event.value) }
+            LoginEvent.Submit -> submit()
+        }
     }
 
-    private fun submit() {
-        if (state.loading) return
-        state = state.copy(loading = true)
-        screenModelScope.launch {
-            val user = apiLogin(state.email, state.password)
-            state = state.copy(loading = false)
-            if (user != null && user.token != null) {
-                AppState.login(user, user.token!!)
-                AppState.toast("Welcome back, ${user.firstName}!")
-            } else {
-                AppState.toast("Invalid email or password", true)
-            }
+    private fun submit() = screenModelScope.launch {
+        val current = _state.value
+        if (current.loading) return@launch
+        updateState { it.copy(loading = true) }
+        authUseCase.login(LoginRequest(email = current.email, password = current.password)) { response ->
+            response.handelState(
+                onLoading = {},
+                onSuccess = { data ->
+                    val user = data.data
+                    if (user != null && user.token != null) {
+                        AppState.login(user, user.token!!)
+                        AppState.toast("Welcome back, ${user.firstName}!")
+                    } else {
+                        AppState.toast("Invalid email or password", true)
+                    }
+                    updateState { it.copy(loading = false) }
+                },
+                onError = { _, _ ->
+                    AppState.toast("Invalid email or password", true)
+                    updateState { it.copy(loading = false) }
+                }
+            )
         }
     }
 }

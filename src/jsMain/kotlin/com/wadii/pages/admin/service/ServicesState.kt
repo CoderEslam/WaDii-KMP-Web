@@ -9,5 +9,7 @@ data class ServicesState(
     val editName: String = "",
     val newName: String = "",
     val saving: Boolean = false,
-    val adding: Boolean = false
+    val adding: Boolean = false,
+    val isLoading: Boolean = false,
+    val error: String? = null
 )

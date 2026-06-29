@@ -1,6 +1,7 @@
 package com.wadii.utils
 
 import io.ktor.client.HttpClient
+import kotlinx.coroutines.CancellationException
 import io.ktor.client.call.body
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.delete
@@ -41,6 +42,8 @@ suspend inline fun <reified Body, reified Response> HttpClient.postApiResponse(
         } else {
             RequestState.Error(response.bodyAsText(), response.getStatusCode())
         }
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         // Catch IOException, Timeout, etc.
         RequestState.Error("Network error: ${e.message}")
@@ -69,6 +72,8 @@ suspend inline fun <reified Response> HttpClient.postApiResponse(
         } else {
             RequestState.Error(response.bodyAsText(), response.getStatusCode())
         }
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         // Catch IOException, Timeout, etc.
         RequestState.Error("Network error: ${e.message}")
@@ -97,6 +102,8 @@ suspend inline fun <reified Response> HttpClient.getApiResponse(
         } else {
             RequestState.Error(response.bodyAsText(), response.getStatusCode())
         }
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         RequestState.Error("Network error: ${e.message}")
     }
@@ -124,6 +131,8 @@ suspend inline fun <reified Response> HttpClient.deleteApiResponse(
         } else {
             RequestState.Error(response.bodyAsText(), response.getStatusCode())
         }
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         RequestState.Error("Network error: ${e.message}")
     }
@@ -153,6 +162,8 @@ suspend inline fun <reified Body, reified Response> HttpClient.putApiResponse(
         } else {
             RequestState.Error(response.bodyAsText(), response.getStatusCode())
         }
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         RequestState.Error("Network error: ${e.message}")
     }

@@ -590,4 +590,12 @@ class ApiService(
         )
     }
 
+    suspend fun getOrderById(
+        id: Int,
+        response: (RequestState<BaseResponse<OrderModel>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(client.getApiResponse<BaseResponse<OrderModel>>(urlString = Constants.ORDER_SHOW_BY_ID(id)))
+    }
+
 }

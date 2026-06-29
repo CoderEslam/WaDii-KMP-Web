@@ -4,19 +4,18 @@ import androidx.compose.runtime.*
 import cafe.adriel.voyager.core.screen.Screen
 import com.wadii.domain.model.offers.OfferResponse
 import com.wadii.domain.model.service.Service
+import cafe.adriel.voyager.koin.koinScreenModel
 import com.wadii.ui.InputField
 import com.wadii.ui.LoadingScreen
 import com.wadii.ui.Spinner
 import com.wadii.ui.TextArea
-import com.wadii.viewmodel.UiState
-import com.wadii.viewmodel.rememberScreenModel
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.*
 
 class ProviderOffersScreen : Screen {
     @Composable
     override fun Content() {
-        val model = rememberScreenModel { ProviderOffersScreenModel() }
+        val model = koinScreenModel<ProviderOffersViewModel>()
         Div(attrs = { classes("space-y-6") }) {
             Div(attrs = { classes("flex", "items-center", "justify-between") }) {
                 H1(attrs = {
@@ -44,9 +43,10 @@ class ProviderOffersScreen : Screen {
                 }) { Text("+ New Offer") }
             }
 
-            when (val s = model.state) {
-                is UiState.Loading -> LoadingScreen()
-                is UiState.Error -> Div(attrs = {
+            val state by model.state.collectAsState()
+            when {
+                state.isLoading -> LoadingScreen()
+                state.error != null -> Div(attrs = {
                     classes(
                         "bg-white",
                         "rounded-2xl",
@@ -54,18 +54,17 @@ class ProviderOffersScreen : Screen {
                         "text-center",
                         "text-slate-500"
                     )
-                }) { Text(s.message) }
+                }) { Text(state.error!!) }
 
-                is UiState.Success -> {
-                    val d = s.data
-                    if (d.offers.isEmpty()) {
+                else -> {
+                    if (state.offers.isEmpty()) {
                         Div(attrs = { classes("bg-white", "rounded-2xl", "p-12", "text-center") }) {
                             P(attrs = { classes("text-5xl", "mb-3") }) { Text("🏷️") }
                             P(attrs = { classes("text-slate-500") }) { Text("No offers yet. Create your first offer!") }
                         }
                     } else {
                         Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "gap-4") }) {
-                            d.offers.forEach { offer ->
+                            state.offers.forEach { offer ->
                                 Div(attrs = {
                                     classes(
                                         "bg-white",
@@ -143,16 +142,16 @@ class ProviderOffersScreen : Screen {
                             }
                         }
                     }
-                    if (d.showModal) {
+                    if (state.showModal) {
                         OfferModal(
-                            offer = d.editOffer,
-                            services = d.services,
-                            saving = d.saving,
+                            offer = state.editOffer,
+                            services = state.services,
+                            saving = state.saving,
                             onClose = { model.onEvent(ProviderOffersEvent.CloseModal) },
                             onSave = { title, desc, endDate, selectedServices ->
                                 model.onEvent(
                                     ProviderOffersEvent.Save(
-                                        d.editOffer,
+                                        state.editOffer,
                                         title,
                                         desc,
                                         endDate,

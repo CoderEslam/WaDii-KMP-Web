@@ -2,9 +2,12 @@ package com.wadii.pages.shared.chat
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
+import com.wadii.domain.model.Paginator
 import com.wadii.domain.model.chat.ChatContact
 import com.wadii.domain.model.chat.InsertMessage
+import com.wadii.domain.model.chat.PageMessages
 import com.wadii.domain.usecase.MessageUseCase
+import com.wadii.utils.RequestState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onStart
@@ -19,17 +22,16 @@ class ChatViewModel(
 
     override val state: StateFlow<ChatState> = _state
         .onStart { chatList() }
-        .stateIn(
-            screenModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            initialState
-        )
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), initialState)
+
+    private var paginator: Paginator<Int, PageMessages>? = null
 
     override fun onEvent(event: ChatEvent) {
         when (event) {
             is ChatEvent.SelectContact -> selectContact(event.contact)
             is ChatEvent.SetMessage -> updateState { it.copy(messageText = event.text) }
             ChatEvent.Send -> send()
+            ChatEvent.LoadMoreMessages -> loadMoreMessages()
         }
     }
 
@@ -38,52 +40,64 @@ class ChatViewModel(
             r.handelState(
                 onLoading = { updateState { it.copy(isLoading = true) } },
                 onSuccess = { data ->
-                    updateState {
-                        it.copy(
-                            contacts = data.data ?: emptyList(),
-                            isLoading = false
-                        )
-                    }
+                    updateState { it.copy(contacts = data.data, isLoading = false) }
                 },
                 onError = { e, _ -> updateState { it.copy(error = e, isLoading = false) } }
             )
         }
     }
 
-    private fun selectContact(contact: ChatContact) = screenModelScope.launch {
-        messageUseCase.conversation(contact.contact.id, 0) { r ->
-            r.handelState(
-                onLoading = {
-                    updateState { it.copy(messagesLoading = true) }
-                },
-                onSuccess = { data ->
-                    updateState {
-                        it.copy(
-                            messages = data.data.content,
-                            messagesLoading = false
-                        )
-                    }
-                },
-                onError = { _, _ -> updateState { it.copy(messagesLoading = false) } }
-            )
-        }
+    private fun selectContact(contact: ChatContact) {
+        updateState { it.copy(selectedContact = contact, messages = emptyList()) }
+        paginator = buildPaginator(contact.contact.id)
+        loadMoreMessages()
     }
 
+    private fun loadMoreMessages() = screenModelScope.launch {
+        paginator?.loadNextItems()
+    }
+
+    private fun buildPaginator(contactId: Int) = Paginator<Int, PageMessages>(
+        initialKey = 0,
+        onLoadUpdated = { loading ->
+            if (_state.value.messages.isEmpty()) {
+                updateState { it.copy(messagesLoading = loading) }
+            } else {
+                updateState { it.copy(isLoadingMoreMessages = loading) }
+            }
+        },
+        onRequest = { page ->
+            var result: RequestState<PageMessages> = RequestState.Idle
+            messageUseCase.conversation(contactId, page) { r ->
+                when (r) {
+                    is RequestState.Success -> result = RequestState.Success(r.data.data)
+                    is RequestState.Error -> result = RequestState.Error(r.message, r.code)
+                    else -> Unit // skip Loading — Paginator manages it via onLoadUpdated
+                }
+            }
+            result
+        },
+        getNextKey = { currentKey, _ -> currentKey + 1 },
+        onError = { _ ->
+            updateState { it.copy(messagesLoading = false, isLoadingMoreMessages = false) }
+        },
+        onSuccess = { result, _ ->
+            // Each new page contains older messages — prepend them above the existing list
+            updateState { it.copy(messages = result.content + it.messages) }
+        },
+        endReached = { _, result -> result.last }
+    )
 
     private fun send() {
         val current = _state.value
-        val contact = current.selectedContact ?: return
-        if (current.messageText.isBlank() || current.sending) return
+        val contact = current.selectedContact
+        if (contact.contact.id == 0 || current.messageText.isBlank() || current.sending) return
         val text = current.messageText.trim()
         updateState { it.copy(messageText = "", sending = true) }
         screenModelScope.launch {
             var sent = false
             messageUseCase.insertMessage(
-                InsertMessage(
-                    text = text,
-                    type = "TEXT",
-                    toUserId = contact.contact.id
-                )
+                InsertMessage(text = text, type = "TEXT", toUserId = contact.contact.id)
             ) { r ->
                 r.handelState(
                     onLoading = {},
@@ -92,19 +106,9 @@ class ChatViewModel(
                 )
             }
             if (sent) {
-                messageUseCase.conversation(contact.contact.id, 0) { r ->
-                    r.handelState(
-                        onLoading = {},
-                        onSuccess = { data ->
-                            updateState {
-                                it.copy(
-                                    messages = data.data?.content ?: emptyList(), sending = false
-                                )
-                            }
-                        },
-                        onError = { _, _ -> updateState { it.copy(sending = false) } }
-                    )
-                }
+                updateState { it.copy(sending = false, messages = emptyList()) }
+                paginator?.reset()
+                paginator?.loadNextItems()
             }
         }
     }

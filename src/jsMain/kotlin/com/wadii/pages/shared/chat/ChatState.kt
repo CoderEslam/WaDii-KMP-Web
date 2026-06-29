@@ -8,6 +8,7 @@ data class ChatState(
     val selectedContact: ChatContact = ChatContact(),
     val messages: List<PageMessages.Content> = emptyList(),
     val messagesLoading: Boolean = false,
+    val isLoadingMoreMessages: Boolean = false,
     val messageText: String = "",
     val sending: Boolean = false,
     val isLoading: Boolean = false,

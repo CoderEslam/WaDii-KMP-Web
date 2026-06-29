@@ -6,4 +6,5 @@ sealed class ChatEvent {
     data class SelectContact(val contact: ChatContact) : ChatEvent()
     data class SetMessage(val text: String) : ChatEvent()
     object Send : ChatEvent()
+    object LoadMoreMessages : ChatEvent()
 }

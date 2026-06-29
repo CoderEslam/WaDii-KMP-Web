@@ -32,13 +32,20 @@ class NewOrderViewModel(
             is NewOrderEvent.ToggleService -> updateState {
                 it.copy(selectedServices = if (event.id in it.selectedServices) it.selectedServices - event.id else it.selectedServices + event.id)
             }
+
             is NewOrderEvent.SetSparePart -> updateState {
-                it.copy(spareParts = it.spareParts.toMutableList().also { list -> list[event.index] = event.value })
+                it.copy(
+                    spareParts = it.spareParts.toMutableList()
+                        .also { list -> list[event.index] = event.value })
             }
+
             NewOrderEvent.AddSparePart -> updateState { it.copy(spareParts = it.spareParts + "") }
             is NewOrderEvent.RemoveSparePart -> updateState {
-                it.copy(spareParts = it.spareParts.toMutableList().also { list -> list.removeAt(event.index) })
+                it.copy(
+                    spareParts = it.spareParts.toMutableList()
+                        .also { list -> list.removeAt(event.index) })
             }
+
             NewOrderEvent.Submit -> submit()
         }
     }
@@ -47,7 +54,14 @@ class NewOrderViewModel(
         servicesUseCase.getServiceList { response ->
             response.handelState(
                 onLoading = { updateState { it.copy(isLoading = true) } },
-                onSuccess = { data -> updateState { it.copy(services = data.data ?: emptyList(), isLoading = false) } },
+                onSuccess = { data ->
+                    updateState {
+                        it.copy(
+                            services = data.data ?: emptyList(),
+                            isLoading = false
+                        )
+                    }
+                },
                 onError = { error, _ -> updateState { it.copy(error = error, isLoading = false) } }
             )
         }
@@ -63,11 +77,14 @@ class NewOrderViewModel(
                 comment = d.comment,
                 date = js("new Date().toISOString()").toString(),
                 servicesIds = d.selectedServices.toList(),
-                spareParts = d.spareParts.filter { it.isNotBlank() }.map { OrderRequest.SparePart(it) }
+                spareParts = d.spareParts.filter { it.isNotBlank() }
+                    .map { OrderRequest.SparePart(it) }
             )
         ) { response ->
             response.handelState(
-                onLoading = {},
+                onLoading = {
+//                    updateState { it.copy(submitting = true) }
+                },
                 onSuccess = { _ ->
                     AppState.toast("Order created!")
                     updateState { it.copy(submitting = false, submitted = true) }

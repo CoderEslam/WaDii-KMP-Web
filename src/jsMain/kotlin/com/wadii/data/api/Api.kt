@@ -288,7 +288,7 @@ suspend fun apiUpdateService(id: Long, name: String): Service? = runCatching {
     }.body<BaseResponse<Service>>().data
 }.getOrNull()
 
-suspend fun apiDeleteService(id: Int): Boolean = runCatching {
+suspend fun apiDeleteService(id: Long): Boolean = runCatching {
     httpClient.delete("$BASE_URL/services/$id") { auth() }.status.isSuccess()
 }.getOrDefault(false)
 

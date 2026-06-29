@@ -13,6 +13,6 @@ sealed class ProviderOffersEvent {
         val title: String,
         val description: String,
         val endDate: String,
-        val selectedServices: Set<Int>
+        val selectedServices: Set<Long>
     ) : ProviderOffersEvent()
 }

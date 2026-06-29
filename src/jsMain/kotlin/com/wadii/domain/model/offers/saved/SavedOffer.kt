@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SavedOffer(
     @SerialName("id")
-    val id: Int = 0,
+    val id: Long = 0,
     @SerialName("offer")
     val offer: Offer = Offer(),
     @SerialName("user")
@@ -23,7 +23,7 @@ data class SavedOffer(
         @SerialName("endDate")
         val endDate: String = "",
         @SerialName("id")
-        val id: Int = 0,
+        val id: Long = 0,
         @SerialName("title")
         val title: String = "",
         @SerialName("provider")

@@ -20,7 +20,7 @@ interface OfferRepo {
     )
 
     suspend fun removeSavedOffer(
-        offerId: Int,
+        offerId: Long,
         response: (RequestState<BaseResponse<String>>) -> Unit
     )
 

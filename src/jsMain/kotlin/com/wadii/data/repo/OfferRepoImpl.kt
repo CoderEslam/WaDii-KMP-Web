@@ -23,7 +23,7 @@ class OfferRepoImpl(private val apiService: ApiService) : OfferRepo {
     ) = apiService.getOffersByServiceId(id, response)
 
     override suspend fun removeSavedOffer(
-        offerId: Int,
+        offerId: Long,
         response: (RequestState<BaseResponse<String>>) -> Unit
     ) = apiService.removeSavedOffer(offerId, response)
 

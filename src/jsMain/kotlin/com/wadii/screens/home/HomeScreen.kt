@@ -22,6 +22,7 @@ import kotlinx.browser.window
 import org.jetbrains.compose.web.dom.*
 
 class HomeScreen : Screen {
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -105,7 +106,7 @@ class HomeScreen : Screen {
                                     "hover:text-amber-600",
                                     "hover:bg-amber-50"
                                 )
-                                onClick { homeViewModel.onEvent(HomeEvent.SelectService(if (active) null else service.id)) }
+                                onClick { homeViewModel.onEvent(HomeEvent.SelectService(service.id)) }
                             }) { Text(service.name) }
                         }
                     }

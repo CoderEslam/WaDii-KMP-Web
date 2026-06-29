@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Service(
     @SerialName("id")
-    val id: Int = 0,
+    val id: Long = 0,
     @SerialName("name")
     val name: String = "",
     @SerialName("providers")

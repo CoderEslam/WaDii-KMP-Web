@@ -5,7 +5,7 @@ import com.wadii.domain.model.service.Service
 
 data class ServicesState(
     val services: List<Service> = emptyList(),
-    val editingId: Int = 0,
+    val editingId: Long = 0,
     val editName: String = "",
     val newName: String = "",
     val saving: Boolean = false,

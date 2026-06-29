@@ -34,24 +34,39 @@ class ChatViewModel(
         messageUseCase.chatList { r ->
             r.handelState(
                 onLoading = { updateState { it.copy(isLoading = true) } },
-                onSuccess = { data -> updateState { it.copy(contacts = data.data ?: emptyList(), isLoading = false) } },
+                onSuccess = { data ->
+                    updateState {
+                        it.copy(
+                            contacts = data.data ?: emptyList(),
+                            isLoading = false
+                        )
+                    }
+                },
                 onError = { e, _ -> updateState { it.copy(error = e, isLoading = false) } }
             )
         }
     }
 
-    private fun selectContact(contact: ChatContact) {
-        updateState { it.copy(selectedContact = contact, messagesLoading = true, messages = emptyList()) }
+    private fun selectContact(contact: ChatContact) =
         screenModelScope.launch {
             messageUseCase.conversation(contact.contact.id, 0) { r ->
                 r.handelState(
-                    onLoading = {},
-                    onSuccess = { data -> updateState { it.copy(messages = data.data?.content ?: emptyList(), messagesLoading = false) } },
+                    onLoading = {
+                        updateState { it.copy(messagesLoading = true) }
+                    },
+                    onSuccess = { data ->
+                        updateState {
+                            it.copy(
+                                messages = data.data?.content ?: emptyList(),
+                                messagesLoading = false
+                            )
+                        }
+                    },
                     onError = { _, _ -> updateState { it.copy(messagesLoading = false) } }
                 )
             }
         }
-    }
+
 
     private fun send() {
         val current = _state.value
@@ -61,7 +76,13 @@ class ChatViewModel(
         updateState { it.copy(messageText = "", sending = true) }
         screenModelScope.launch {
             var sent = false
-            messageUseCase.insertMessage(InsertMessage(text = text, type = "TEXT", toUserId = contact.contact.id)) { r ->
+            messageUseCase.insertMessage(
+                InsertMessage(
+                    text = text,
+                    type = "TEXT",
+                    toUserId = contact.contact.id
+                )
+            ) { r ->
                 r.handelState(
                     onLoading = {},
                     onSuccess = { _ -> sent = true },
@@ -72,7 +93,13 @@ class ChatViewModel(
                 messageUseCase.conversation(contact.contact.id, 0) { r ->
                     r.handelState(
                         onLoading = {},
-                        onSuccess = { data -> updateState { it.copy(messages = data.data?.content ?: emptyList(), sending = false) } },
+                        onSuccess = { data ->
+                            updateState {
+                                it.copy(
+                                    messages = data.data?.content ?: emptyList(), sending = false
+                                )
+                            }
+                        },
                         onError = { _, _ -> updateState { it.copy(sending = false) } }
                     )
                 }

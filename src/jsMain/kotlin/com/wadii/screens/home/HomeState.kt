@@ -14,7 +14,7 @@ data class HomeState(
     val services: List<Service> = emptyList(),
     val isLoading: Boolean = false,
     val message : String = "",
-    val selectedServiceId: Int = -1,
+    val selectedServiceId: Long = 0,
     val filterLoading: Boolean = false
 ) {
 //    val visibleOffers: List<OfferResponse>

@@ -47,20 +47,19 @@ class HomeViewModel(
             initialState
         )
 
-    //    init {
-//        updateState { it.copy(ads = apiGetAllAds()) }
-//    }
     override fun onEvent(event: HomeEvent) {
+        when(event){
 
+            is HomeEvent.SelectService ->{
+                updateState { it.copy(selectedServiceId = event.id) }
+            }
+            is HomeEvent.ToggleSaveOffer -> {
+//                toggleSave(event.offer)
+            }
+        }
     }
 
     private fun ads() = screenModelScope.launch {
-//        updateState {
-//            it.copy(isLoading = true)
-//        }
-//        updateState {
-//            it.copy(ads = apiGetAllAds())
-//        }
         adsUseCase.ads { response ->
             response.handelState(
                 onLoading = {

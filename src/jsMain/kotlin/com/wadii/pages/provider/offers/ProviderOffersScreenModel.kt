@@ -59,7 +59,7 @@ class ProviderOffersViewModel(
         }
     }
 
-    private fun save(offer: OfferResponse?, title: String, description: String, endDate: String, services: Set<Int>) {
+    private fun save(offer: OfferResponse?, title: String, description: String, endDate: String, services: Set<Long>) {
         updateState { it.copy(saving = true) }
         screenModelScope.launch {
             val body = buildMap<String, Any?> {

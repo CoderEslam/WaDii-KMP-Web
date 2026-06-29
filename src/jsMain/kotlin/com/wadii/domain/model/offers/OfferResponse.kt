@@ -16,7 +16,7 @@ data class OfferResponse(
     @SerialName("endDate")
     val endDate: String = "",
     @SerialName("id")
-    val id: Int = 0,
+    val id: Long = 0,
     @SerialName("provider")
     val provider: ProviderModel = ProviderModel(),
     @SerialName("title")

@@ -471,7 +471,7 @@ class ApiService(
     }
 
     suspend fun removeSavedOffer(
-        offerId: Int,
+        offerId: Long,
         response: (RequestState<BaseResponse<String>>) -> Unit
     ) {
         response(RequestState.Loading)

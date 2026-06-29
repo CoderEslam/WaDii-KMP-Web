@@ -173,7 +173,7 @@ private fun OfferModal(
     services: List<Service>,
     saving: Boolean,
     onClose: () -> Unit,
-    onSave: (String, String, String, Set<Int>) -> Unit
+    onSave: (String, String, String, Set<Long>) -> Unit
 ) {
     var title by remember(offer?.id) { mutableStateOf(offer?.title ?: "") }
     var description by remember(offer?.id) { mutableStateOf(offer?.description ?: "") }

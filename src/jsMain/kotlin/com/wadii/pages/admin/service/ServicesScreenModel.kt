@@ -27,7 +27,13 @@ class ServicesViewModel(
     override fun onEvent(event: ServicesEvent) {
         when (event) {
             ServicesEvent.Load -> load()
-            is ServicesEvent.StartEdit -> updateState { it.copy(editingId = event.service.id, editName = event.service.name) }
+            is ServicesEvent.StartEdit -> updateState {
+                it.copy(
+                    editingId = event.service.id,
+                    editName = event.service.name
+                )
+            }
+
             ServicesEvent.CancelEdit -> updateState { it.copy(editingId = 0, editName = "") }
             is ServicesEvent.SetEditName -> updateState { it.copy(editName = event.name) }
             is ServicesEvent.SaveEdit -> saveEdit(event.service)
@@ -41,7 +47,14 @@ class ServicesViewModel(
         servicesUseCase.getServiceList { r ->
             r.handelState(
                 onLoading = { updateState { it.copy(isLoading = true) } },
-                onSuccess = { data -> updateState { it.copy(services = data.data ?: emptyList(), isLoading = false) } },
+                onSuccess = { data ->
+                    updateState {
+                        it.copy(
+                            services = data.data,
+                            isLoading = false
+                        )
+                    }
+                },
                 onError = { e, _ -> updateState { it.copy(error = e, isLoading = false) } }
             )
         }
@@ -52,7 +65,7 @@ class ServicesViewModel(
         if (current.saving) return
         updateState { it.copy(saving = true) }
         screenModelScope.launch {
-            val result = apiUpdateService(service.id.toLong(), current.editName)
+            val result = apiUpdateService(service.id, current.editName)
             updateState { it.copy(saving = false) }
             if (result != null) {
                 updateState { it.copy(editingId = 0) }
@@ -64,9 +77,10 @@ class ServicesViewModel(
         }
     }
 
-    private fun delete(id: Int) = screenModelScope.launch {
-        if (apiDeleteService(id)) { AppState.toast("Deleted"); load() }
-        else AppState.toast("Failed to delete", true)
+    private fun delete(id: Long) = screenModelScope.launch {
+        if (apiDeleteService(id)) {
+            AppState.toast("Deleted"); load()
+        } else AppState.toast("Failed to delete", true)
     }
 
     private fun add() {

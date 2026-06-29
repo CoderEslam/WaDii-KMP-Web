@@ -6,7 +6,7 @@ data class NewOrderState(
     val services: List<Service> = emptyList(),
     val carModelYear: String = "",
     val comment: String = "",
-    val selectedServices: Set<Int> = emptySet(),
+    val selectedServices: Set<Long> = emptySet(),
     val spareParts: List<String> = listOf(""),
     val submitting: Boolean = false,
     val submitted: Boolean = false,

@@ -22,7 +22,7 @@ class OfferUseCase(private val offerRepo: OfferRepo) {
     ) = offerRepo.getOffersByServiceId(id, response)
 
     suspend fun removeSavedOffer(
-        offerId: Int,
+        offerId: Long,
         response: (RequestState<BaseResponse<String>>) -> Unit
     ) = offerRepo.removeSavedOffer(offerId, response)
 

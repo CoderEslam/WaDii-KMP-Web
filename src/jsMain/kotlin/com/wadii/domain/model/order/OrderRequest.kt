@@ -19,7 +19,7 @@ data class OrderRequest(
     @SerialName("longitude")
     val longitude: Double = 0.0,
     @SerialName("servicesIds")
-    val servicesIds: List<Int> = listOf(),
+    val servicesIds: List<Long> = listOf(),
     @SerialName("spareParts")
     val spareParts: List<SparePart> = listOf(),
     @SerialName("userId")

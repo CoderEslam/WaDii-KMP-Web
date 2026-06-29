@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
+import com.wadii.components.MessageType
 import com.wadii.data.api.apiAllProviders
 import com.wadii.data.api.apiFilterProvidersByService
 import com.wadii.data.api.apiGetActiveAds
@@ -13,6 +14,7 @@ import com.wadii.data.api.apiGetAllServices
 import com.wadii.data.api.apiRemoveSavedOffer
 import com.wadii.data.api.apiSaveOffer
 import com.wadii.domain.model.offers.OfferResponse
+import com.wadii.domain.model.offers.SavedOfferRequest
 import com.wadii.domain.usecase.AdsUseCase
 import com.wadii.domain.usecase.OfferUseCase
 import com.wadii.domain.usecase.ProviderUseCase
@@ -23,7 +25,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.text.set
 
 class HomeViewModel(
     private val adsUseCase: AdsUseCase,
@@ -41,6 +45,7 @@ class HomeViewModel(
             ads()
             provider()
             service()
+            offers()
         }.stateIn(
             screenModelScope,
             SharingStarted.WhileSubscribed(5000),
@@ -48,14 +53,90 @@ class HomeViewModel(
         )
 
     override fun onEvent(event: HomeEvent) {
-        when(event){
+        when (event) {
 
-            is HomeEvent.SelectService ->{
+            is HomeEvent.SelectService -> {
                 updateState { it.copy(selectedServiceId = event.id) }
             }
-            is HomeEvent.ToggleSaveOffer -> {
-//                toggleSave(event.offer)
+
+            is HomeEvent.ClearMessage -> {
+                updateState { it.copy(message = "") }
             }
+
+            is HomeEvent.ToggleSaveOffer -> {
+                val found = _state.value.offers.findWithIndex { it.id == event.offer.id }
+                found?.let { (index, offer) ->
+                    val isSaved = offer.saved
+                    updateState {
+                        it.copy(
+                            offers = _state.value.offers.toMutableList().apply {
+                                set(index, offer.copy(saved = !isSaved))
+                            }
+                        )
+                    }
+                    if (isSaved) {
+                        removeSavedOffer(event.offer.id)
+                    } else {
+                        insertOffer(event.offer.id)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun insertOffer(offerId: Long) = screenModelScope.launch {
+        offerUseCase.insertOffer(SavedOfferRequest(offerId = offerId)) { response ->
+            response.handelState(
+                onLoading = {
+                    updateState { it.copy(isLoading = true) }
+                },
+                onSuccess = { data ->
+                    updateState {
+                        it.copy(
+                            isLoading = false,
+                            message = data.message,
+                            messageType = MessageType.SUCCESS
+                        )
+                    }
+                },
+                onError = { error, _ ->
+                    updateState {
+                        it.copy(
+                            isLoading = false,
+                            message = error,
+                            messageType = MessageType.ERROR
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    private fun removeSavedOffer(offerId: Long) = screenModelScope.launch {
+        offerUseCase.removeSavedOffer(offerId) { response ->
+            response.handelState(
+                onLoading = {
+                    _state.update { it.copy(isLoading = true) }
+                },
+                onSuccess = { _ ->
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            message = "Offer removed",
+                            messageType = MessageType.SUCCESS
+                        )
+                    }
+                },
+                onError = { error, _ ->
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            message = error,
+                            messageType = MessageType.ERROR
+                        )
+                    }
+                }
+            )
         }
     }
 
@@ -112,13 +193,16 @@ class HomeViewModel(
     }
 
     private fun offers() = screenModelScope.launch {
-        adsUseCase.ads { response ->
+        offerUseCase.offersList { response ->
             response.handelState(
                 onLoading = {
                     updateState { it.copy(isLoading = true) }
                 }, onSuccess = { data ->
                     updateState {
-                        it.copy(ads = data.data, isLoading = false)
+                        it.copy(
+                            offers = data.data,
+                            isLoading = false
+                        )
                     }
                 }, onError = { error, code ->
                     updateState { it.copy(isLoading = false) }
@@ -127,53 +211,22 @@ class HomeViewModel(
         }
     }
 
-//
-//    var state by mutableStateOf<UiState<HomeState>>(UiState.Loading)
-//        private set
+    private fun toggleSave(offer: OfferResponse) = screenModelScope.launch {
 
-//    init {
-//        onEvent(HomeEvent.Load)
-//    }
-
-//    fun onEvent(event: HomeEvent) = when (event) {
-//        HomeEvent.Load -> load()
-//        is HomeEvent.SelectService -> selectService(event.id)
-//        is HomeEvent.ToggleSaveOffer -> toggleSave(event.offer)
-//    }
-
-//    private fun load() {
-//        screenModelScope.launch {
-//            state = UiState.Loading
-//            val offers = apiGetAllOffers().take(6)
-//            val ads = apiGetActiveAds().take(3)
-//            val providers = apiAllProviders() ?: emptyList()
-//            val services = apiGetAllServices()
-//            state = UiState.Success(HomeState(offers, ads, providers, providers, services))
-//        }
-//    }
-
-//    private fun selectService(id: Int?) {
-//        val d = (state as? UiState.Success)?.data ?: return
-//        if (id == null) {
-//            state =
-//                UiState.Success(d.copy(selectedServiceId = 0, filteredProviders = d.allProviders))
-//            return
-//        }
-//        state = UiState.Success(d.copy(selectedServiceId = id, filterLoading = true))
-//        screenModelScope.launch {
-//            val filtered = apiFilterProvidersByService(id)
-//            val cur = (state as? UiState.Success)?.data ?: return@launch
-//            state = UiState.Success(cur.copy(filteredProviders = filtered, filterLoading = false))
-//        }
-//    }
-//
-//    private fun toggleSave(offer: OfferResponse) {
-//        screenModelScope.launch {
 //            if (offer.saved) apiRemoveSavedOffer(offer.id) else apiSaveOffer(offer.id)
 //            val updated = apiGetAllOffers().take(6)
 //            val cur = (state as? UiState.Success)?.data ?: return@launch
 //            state = UiState.Success(cur.copy(offers = updated))
 //            AppState.toast(if (offer.saved) "Offer removed" else "Offer saved!")
-//        }
-//    }
+    }
+}
+
+
+private inline fun <T> Iterable<T>.findWithIndex(
+    predicate: (T) -> Boolean
+): Pair<Int, T>? {
+    for ((index, element) in this.withIndex()) {
+        if (predicate(element)) return index to element
+    }
+    return null
 }

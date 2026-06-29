@@ -229,24 +229,49 @@ class HomeScreen : Screen {
             }
 
 
-//                    Div {
-//                        P(attrs = { classes("text-lg", "font-semibold", "text-slate-800", "mb-4") }) { Text("🏷️ Latest Offers") }
-//                        val visible = d.visibleOffers
-//                        if (visible.isEmpty()) {
-//                            Div(attrs = { classes("bg-white", "rounded-xl", "p-12", "text-center", "text-slate-500") }) {
-//                                Text(if (d.selectedServiceId != null) "No offers for this service." else "No offers available yet.")
-//                            }
-//                        } else {
-//                            Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-3", "gap-4") }) {
-//                                visible.forEach { offer ->
-//                                    OfferCard(navigator = navigator, offer = offer, onSaveToggle = { model.onEvent(HomeEvent.ToggleSaveOffer(offer)) })
-//                                }
-//                            }
-//                        }
-//                    }
+            Div {
+                P(attrs = { classes("text-lg", "font-semibold", "text-slate-800", "mb-4") }) {
+                    Text(
+                        "🏷️ Latest Offers"
+                    )
+                }
+                val visible = state.offers
+                if (visible.isEmpty()) {
+                    Div(attrs = {
+                        classes(
+                            "bg-white",
+                            "rounded-xl",
+                            "p-12",
+                            "text-center",
+                            "text-slate-500"
+                        )
+                    }) {
+                        Text(if (state.selectedServiceId != 0L) "No offers for this service." else "No offers available yet.")
+                    }
+                } else {
+                    Div(attrs = {
+                        classes(
+                            "grid",
+                            "grid-cols-1",
+                            "md:grid-cols-2",
+                            "lg:grid-cols-3",
+                            "gap-4"
+                        )
+                    }) {
+                        visible.forEach { offer ->
+                            OfferCard(
+                                navigator = navigator,
+                                offer = offer,
+                                onSaveToggle = { homeViewModel.onEvent(HomeEvent.ToggleSaveOffer(offer)) })
+                        }
+                    }
+                }
+            }
 
             AnimatedVisibility(state.message.isNotNullOrEmptyString()) {
-                SnakBar(message = state.message)
+                SnakBar(message = state.message, durationMs = 2000){
+                    homeViewModel.onEvent(HomeEvent.ClearMessage)
+                }
             }
 
 

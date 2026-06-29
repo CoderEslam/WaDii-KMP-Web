@@ -21,6 +21,10 @@ class OfferUseCase(private val offerRepo: OfferRepo) {
         response: (RequestState<BaseResponse<List<OfferResponse>>>) -> Unit
     ) = offerRepo.getOffersByServiceId(id, response)
 
+    suspend fun offersList(
+        response: (RequestState<BaseResponse<List<OfferResponse>>>) -> Unit
+    ) = offerRepo.offersList(response)
+
     suspend fun removeSavedOffer(
         offerId: Long,
         response: (RequestState<BaseResponse<String>>) -> Unit

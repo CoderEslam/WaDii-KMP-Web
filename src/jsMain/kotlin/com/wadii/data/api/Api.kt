@@ -137,14 +137,14 @@ suspend fun apiGetSavedOffers(): List<SavedOffer> = runCatching {
         .body<BaseResponse<List<SavedOffer>>>().data ?: emptyList()
 }.getOrDefault(emptyList())
 
-suspend fun apiSaveOffer(offerId: Int): Boolean = runCatching {
+suspend fun apiSaveOffer(offerId: Long): Boolean = runCatching {
     httpClient.post("$BASE_URL/saved-offers/insert") {
         auth(); contentType(ContentType.Application.Json)
         setBody(SavedOfferRequest(offerId = offerId))
     }.status.isSuccess()
 }.getOrDefault(false)
 
-suspend fun apiRemoveSavedOffer(offerId: Int): Boolean = runCatching {
+suspend fun apiRemoveSavedOffer(offerId: Long): Boolean = runCatching {
     httpClient.delete("$BASE_URL/saved-offers/remove/$offerId") { auth() }.status.isSuccess()
 }.getOrDefault(false)
 

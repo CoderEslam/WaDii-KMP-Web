@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SavedOfferRequest(
     @SerialName("offerId")
-    val offerId: Int = 0
+    val offerId: Long = 0
 )

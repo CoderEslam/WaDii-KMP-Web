@@ -18,19 +18,22 @@ class ChatViewModel(
     override val initialState: ChatState get() = ChatState()
 
     override val state: StateFlow<ChatState> = _state
-        .onStart { load() }
-        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), initialState)
+        .onStart { chatList() }
+        .stateIn(
+            screenModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            initialState
+        )
 
     override fun onEvent(event: ChatEvent) {
         when (event) {
-            ChatEvent.Load -> load()
             is ChatEvent.SelectContact -> selectContact(event.contact)
             is ChatEvent.SetMessage -> updateState { it.copy(messageText = event.text) }
             ChatEvent.Send -> send()
         }
     }
 
-    private fun load() = screenModelScope.launch {
+    private fun chatList() = screenModelScope.launch {
         messageUseCase.chatList { r ->
             r.handelState(
                 onLoading = { updateState { it.copy(isLoading = true) } },
@@ -47,25 +50,24 @@ class ChatViewModel(
         }
     }
 
-    private fun selectContact(contact: ChatContact) =
-        screenModelScope.launch {
-            messageUseCase.conversation(contact.contact.id, 0) { r ->
-                r.handelState(
-                    onLoading = {
-                        updateState { it.copy(messagesLoading = true) }
-                    },
-                    onSuccess = { data ->
-                        updateState {
-                            it.copy(
-                                messages = data.data?.content ?: emptyList(),
-                                messagesLoading = false
-                            )
-                        }
-                    },
-                    onError = { _, _ -> updateState { it.copy(messagesLoading = false) } }
-                )
-            }
+    private fun selectContact(contact: ChatContact) = screenModelScope.launch {
+        messageUseCase.conversation(contact.contact.id, 0) { r ->
+            r.handelState(
+                onLoading = {
+                    updateState { it.copy(messagesLoading = true) }
+                },
+                onSuccess = { data ->
+                    updateState {
+                        it.copy(
+                            messages = data.data.content,
+                            messagesLoading = false
+                        )
+                    }
+                },
+                onError = { _, _ -> updateState { it.copy(messagesLoading = false) } }
+            )
         }
+    }
 
 
     private fun send() {

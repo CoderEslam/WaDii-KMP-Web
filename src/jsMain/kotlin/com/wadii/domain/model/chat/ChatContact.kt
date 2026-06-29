@@ -22,5 +22,24 @@ data class ChatContact(
     @SerialName("unreadCount")
     val unreadCount: Int = 0
 ) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class.js != other::class.js) return false
+
+        other as ChatContact
+
+        if (id != other.id) return false
+        if (contact != other.contact) return false
+        if (user != other.user) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + contact.hashCode()
+        result = 31 * result + user.hashCode()
+        return result
+    }
 
 }

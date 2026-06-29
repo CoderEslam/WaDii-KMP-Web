@@ -1,33 +1,20 @@
 package com.wadii.screens.home
 
-import androidx.compose.runtime.*
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
 import com.wadii.components.MessageType
-import com.wadii.data.api.apiAllProviders
-import com.wadii.data.api.apiFilterProvidersByService
-import com.wadii.data.api.apiGetActiveAds
-import com.wadii.data.api.apiGetAllAds
-import com.wadii.data.api.apiGetAllOffers
-import com.wadii.data.api.apiGetAllServices
-import com.wadii.data.api.apiRemoveSavedOffer
-import com.wadii.data.api.apiSaveOffer
-import com.wadii.domain.model.offers.OfferResponse
+import com.wadii.core.isNotNullOrEmptyString
 import com.wadii.domain.model.offers.SavedOfferRequest
 import com.wadii.domain.usecase.AdsUseCase
 import com.wadii.domain.usecase.OfferUseCase
 import com.wadii.domain.usecase.ProviderUseCase
-import com.wadii.state.AppState
 import com.wadii.viewmodel.ServicesUseCase
-import com.wadii.viewmodel.UiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.text.set
 
 class HomeViewModel(
     private val adsUseCase: AdsUseCase,
@@ -43,7 +30,7 @@ class HomeViewModel(
     override val state: StateFlow<HomeState> = _state
         .onStart {
             ads()
-            provider()
+            providers()
             service()
             offers()
         }.stateIn(
@@ -56,7 +43,14 @@ class HomeViewModel(
         when (event) {
 
             is HomeEvent.SelectService -> {
-                updateState { it.copy(selectedServiceId = event.id) }
+                updateState { it.copy(selectedService = event.service) }
+                if (event.service.toString().isNotNullOrEmptyString()) {
+                    getOffersByServiceId(event.service.id)
+                    providersByServiceId(event.service.id)
+                } else {
+                    offers()
+                    providers()
+                }
             }
 
             is HomeEvent.ClearMessage -> {
@@ -156,7 +150,7 @@ class HomeViewModel(
         }
     }
 
-    private fun provider() = screenModelScope.launch {
+    private fun providers() = screenModelScope.launch {
         providerUseCase.providersList { response ->
             response.handelState(
                 onLoading = {
@@ -183,7 +177,10 @@ class HomeViewModel(
                     updateState { it.copy(isLoading = true) }
                 }, onSuccess = { data ->
                     updateState {
-                        it.copy(services = data.data, isLoading = false)
+                        it.copy(
+                            services = data.data,
+                            isLoading = false
+                        )
                     }
                 }, onError = { error, code ->
                     updateState { it.copy(isLoading = false) }
@@ -211,14 +208,59 @@ class HomeViewModel(
         }
     }
 
-    private fun toggleSave(offer: OfferResponse) = screenModelScope.launch {
-
-//            if (offer.saved) apiRemoveSavedOffer(offer.id) else apiSaveOffer(offer.id)
-//            val updated = apiGetAllOffers().take(6)
-//            val cur = (state as? UiState.Success)?.data ?: return@launch
-//            state = UiState.Success(cur.copy(offers = updated))
-//            AppState.toast(if (offer.saved) "Offer removed" else "Offer saved!")
+    fun providersByServiceId(id: Long) = screenModelScope.launch {
+        providerUseCase.providersListByServiceId(id = id) { response ->
+            response.handelState(
+                onLoading = {
+                    updateState { it.copy(isLoading = true) }
+                }, onSuccess = { data ->
+                    updateState {
+                        it.copy(
+                            isLoading = false,
+                            allProviders = data.data,
+                            filteredProviders = data.data,
+                            message = data.message,
+                            messageType = MessageType.SUCCESS
+                        )
+                    }
+                }, onError = { error, code ->
+                    updateState {
+                        it.copy(
+                            isLoading = false,
+                            message = error,
+                            messageType = MessageType.ERROR
+                        )
+                    }
+                }
+            )
+        }
     }
+
+    private fun getOffersByServiceId(id: Long) = screenModelScope.launch {
+        offerUseCase.getOffersByServiceId(id = id) { response ->
+            response.handelState(
+                onLoading = {
+                    updateState { it.copy(isLoading = true) }
+                },
+                onSuccess = { data ->
+                    updateState {
+                        it.copy(
+                            isLoading = false,
+                            offers = data.data,
+                            message = data.message,
+                            messageType = MessageType.SUCCESS
+                        )
+                    }
+                },
+                onError = { error, _ ->
+                    updateState {
+                        it.copy(isLoading = false, message = error, messageType = MessageType.ERROR)
+                    }
+                }
+            )
+        }
+    }
+
 }
 
 

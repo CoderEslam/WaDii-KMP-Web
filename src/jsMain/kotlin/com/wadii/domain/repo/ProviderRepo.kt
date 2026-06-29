@@ -17,10 +17,11 @@ interface ProviderRepo {
     suspend fun providerMe(
         response: (RequestState<BaseResponse<ProviderModel>>) -> Unit
     )
+
     suspend fun providersList(response: (RequestState<BaseResponse<List<ProviderModel>>>) -> Unit)
 
     suspend fun providersListByServiceId(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<List<ProviderModel>>>) -> Unit
     )
 
@@ -58,6 +59,7 @@ interface ProviderRepo {
         id: Int,
         response: (RequestState<BaseResponse<User>>) -> Unit
     )
+
     suspend fun getFollowerList(
         id: Int,
         response: (RequestState<BaseResponse<List<Followers>>>) -> Unit

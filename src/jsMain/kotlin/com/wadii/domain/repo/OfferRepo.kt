@@ -16,7 +16,7 @@ interface OfferRepo {
     )
 
     suspend fun getOffersByServiceId(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<List<OfferResponse>>>) -> Unit
     )
 

@@ -27,6 +27,10 @@ class MessageUseCase(private val messageRepo: MessagesRepo) {
         userId: Int,
         page: Int = 0,
         response: (RequestState<BaseResponse<PageMessages>>) -> Unit
-    ) = messageRepo.conversation(userId = userId, page = page, response)
+    ) = messageRepo.conversation(
+        userId = userId,
+        page = page,
+        response
+    )
 
 }

@@ -11,13 +11,13 @@ import com.wadii.core.isNotNullOrEmptyString
 import com.wadii.data.api.to1dp
 import com.wadii.domain.model.offers.OfferResponse
 import com.wadii.domain.model.provider.ProviderModel
+import com.wadii.domain.model.service.Service
 import com.wadii.screens.providerDetail.ProviderDetailScreen
 import com.wadii.screens.search.SearchScreen
 import com.wadii.state.AppState
 import com.wadii.ui.AnimatedVisibility
 import com.wadii.ui.LoadingScreen
 import com.wadii.ui.LoadingSkeletons
-import com.wadii.viewmodel.UiState
 import kotlinx.browser.window
 import org.jetbrains.compose.web.dom.*
 
@@ -80,8 +80,18 @@ class HomeScreen : Screen {
                         )
                     }) { Text("🛠️ Our Services") }
                     Div(attrs = { classes("flex", "flex-wrap", "gap-2") }) {
+                        if (state.selectedService.name.isNotNullOrEmptyString()) {
+                            Button(attrs = {
+                                classes(
+                                    "w-8", "h-8", "flex", "items-center", "justify-center",
+                                    "rounded-full", "bg-amber-100", "text-amber-700",
+                                    "hover:bg-amber-200", "transition-colors", "text-sm", "font-bold"
+                                )
+                                onClick { homeViewModel.onEvent(HomeEvent.SelectService(Service())) }
+                            }) { Text("×") }
+                        }
                         state.services.forEach { service ->
-                            val active = state.selectedServiceId == service.id
+                            val active = state.selectedService.id == service.id
                             Button(attrs = {
                                 classes(
                                     "px-4",
@@ -106,7 +116,7 @@ class HomeScreen : Screen {
                                     "hover:text-amber-600",
                                     "hover:bg-amber-50"
                                 )
-                                onClick { homeViewModel.onEvent(HomeEvent.SelectService(service.id)) }
+                                onClick { homeViewModel.onEvent(HomeEvent.SelectService(service)) }
                             }) { Text(service.name) }
                         }
                     }
@@ -211,7 +221,7 @@ class HomeScreen : Screen {
                             "text-sm"
                         )
                     }) {
-                        Text(if (state.selectedServiceId != null) "No providers for this service." else "No providers available yet.")
+                        Text(if (state.selectedService.name.isNotNullOrEmptyString()) "No providers for this service." else "No providers available yet.")
                     }
                 } else {
                     Div(attrs = {
@@ -246,7 +256,7 @@ class HomeScreen : Screen {
                             "text-slate-500"
                         )
                     }) {
-                        Text(if (state.selectedServiceId != 0L) "No offers for this service." else "No offers available yet.")
+                        Text(if (state.selectedService.name.isNotNullOrEmptyString()) "No offers for this service." else "No offers available yet.")
                     }
                 } else {
                     Div(attrs = {
@@ -262,18 +272,23 @@ class HomeScreen : Screen {
                             OfferCard(
                                 navigator = navigator,
                                 offer = offer,
-                                onSaveToggle = { homeViewModel.onEvent(HomeEvent.ToggleSaveOffer(offer)) })
+                                onSaveToggle = {
+                                    homeViewModel.onEvent(
+                                        HomeEvent.ToggleSaveOffer(
+                                            offer
+                                        )
+                                    )
+                                })
                         }
                     }
                 }
             }
 
             AnimatedVisibility(state.message.isNotNullOrEmptyString()) {
-                SnakBar(message = state.message, durationMs = 2000){
+                SnakBar(message = state.message, durationMs = 2000) {
                     homeViewModel.onEvent(HomeEvent.ClearMessage)
                 }
             }
-
 
             AnimatedVisibility(state.isLoading) {
                 LoadingScreen()

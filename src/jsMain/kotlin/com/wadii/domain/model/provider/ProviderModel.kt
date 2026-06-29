@@ -21,7 +21,7 @@ data class ProviderModel(
     @SerialName("id")
     val id: Int = 0,
     @SerialName("links")
-    val links: List<com.wadii.domain.model.link.Link> = listOf(),
+    val links: List<Link> = listOf(),
     @SerialName("name")
     val name: String = "",
     @SerialName("offers")
@@ -31,9 +31,9 @@ data class ProviderModel(
     @SerialName("rates")
     val rates: List<Rate> = listOf(),
     @SerialName("services")
-    val services: List<com.wadii.domain.model.service.Service> = listOf(),
+    val services: List<Service> = listOf(),
     @SerialName("user")
-    val user: com.wadii.domain.model.auth.login.User = _root_ide_package_.com.wadii.domain.model.auth.login.User()
+    val user: User = User()
 ) {
 
     @Serializable

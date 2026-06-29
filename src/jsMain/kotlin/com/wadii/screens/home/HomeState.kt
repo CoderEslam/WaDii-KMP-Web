@@ -16,7 +16,7 @@ data class HomeState(
     val isLoading: Boolean = false,
     val messageType: MessageType = MessageType.SUCCESS,
     val message : String = "",
-    val selectedServiceId: Long = 0,
+    val selectedService: Service = Service(),
     val filterLoading: Boolean = false
 ) {
 //    val visibleOffers: List<OfferResponse>

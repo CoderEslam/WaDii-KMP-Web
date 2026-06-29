@@ -23,7 +23,7 @@ class ProviderRepoImpl(private val apiService: ApiService) : ProviderRepo {
         apiService.providersList(response)
 
     override suspend fun providersListByServiceId(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<List<ProviderModel>>>) -> Unit
     ) = apiService.providersListByServiceId(id, response)
 

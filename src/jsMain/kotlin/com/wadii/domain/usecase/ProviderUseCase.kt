@@ -23,7 +23,7 @@ class ProviderUseCase(private val providerRepo: ProviderRepo) {
         providerRepo.providersList(response)
 
     suspend fun providersListByServiceId(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<List<ProviderModel>>>) -> Unit
     ) = providerRepo.providersListByServiceId(id, response)
 

@@ -17,7 +17,7 @@ class OfferUseCase(private val offerRepo: OfferRepo) {
     ) = offerRepo.insertOffer(request, response)
 
     suspend fun getOffersByServiceId(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<List<OfferResponse>>>) -> Unit
     ) = offerRepo.getOffersByServiceId(id, response)
 

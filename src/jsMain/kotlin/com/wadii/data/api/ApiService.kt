@@ -177,7 +177,7 @@ class ApiService(
     }
 
     suspend fun providersListByServiceId(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<List<ProviderModel>>>) -> Unit
     ) {
         response(RequestState.Loading)
@@ -450,7 +450,7 @@ class ApiService(
     }
 
     suspend fun getOffersByServiceId(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<List<OfferResponse>>>) -> Unit
     ) {
         response(RequestState.Loading)

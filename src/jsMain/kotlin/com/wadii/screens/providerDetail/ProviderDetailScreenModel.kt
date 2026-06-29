@@ -33,8 +33,24 @@ class ProviderDetailViewModel(
         providerUseCase.getProviderById(providerId) { response ->
             response.handelState(
                 onLoading = { updateState { it.copy(isLoading = true) } },
-                onSuccess = { data -> updateState { it.copy(provider = data.data, isLoading = false) } },
-                onError = { error, _ -> updateState { it.copy(error = error, isLoading = false) } }
+                onSuccess = { data ->
+                    println("getProviderById: $data")
+                    updateState {
+                        it.copy(
+                            provider = data.data,
+                            isLoading = false,
+                            following = AppState.user?.id != null && data.data.followers.any { it.user.id == AppState.user?.id }
+                        )
+                    }
+                },
+                onError = { error, _ ->
+                    updateState {
+                        it.copy(
+                            error = error,
+                            isLoading = false
+                        )
+                    }
+                }
             )
         }
     }
@@ -45,7 +61,10 @@ class ProviderDetailViewModel(
             providerUseCase.unfollowProvider(id) { response ->
                 response.handelState(
                     onLoading = {},
-                    onSuccess = { _ -> updateState { it.copy(following = false) }; AppState.toast("Unfollowed") },
+                    onSuccess = { _ ->
+                        updateState { it.copy(following = false) };
+                        AppState.toast("Unfollowed")
+                    },
                     onError = { _, _ -> }
                 )
             }
@@ -53,7 +72,10 @@ class ProviderDetailViewModel(
             providerUseCase.followProvider(id) { response ->
                 response.handelState(
                     onLoading = {},
-                    onSuccess = { _ -> updateState { it.copy(following = true) }; AppState.toast("Following!") },
+                    onSuccess = { _ ->
+                        updateState { it.copy(following = true) };
+                        AppState.toast("Following!")
+                    },
                     onError = { _, _ -> }
                 )
             }

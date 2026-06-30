@@ -1,5 +1,6 @@
 package com.wadii.data.api
 
+import com.wadii.state.AppState
 import com.wadii.utils.SettingsManager
 import com.wadii.utils.SettingsRepository
 import io.ktor.client.HttpClient
@@ -7,10 +8,10 @@ import io.ktor.client.engine.js.Js
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-//import io.ktor.client.plugins.logging.LogLevel
-//import io.ktor.client.plugins.logging.Logger
-//import io.ktor.client.plugins.logging.Logging
-//import io.ktor.client.plugins.logging.SIMPLE
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.request.header
 import io.ktor.http.ContentType
@@ -32,10 +33,10 @@ fun createHttpClient(): HttpClient {
             connectTimeoutMillis = 10_000
             socketTimeoutMillis = 10_000
         }
-//        install(Logging) {
-//            level = LogLevel.ALL // Choose the level of detail (BODY, HEADERS, INFO, ALL)
-//            logger = Logger.SIMPLE // You can also use Logger.DEFAULT or a custom logger
-//        }
+        install(Logging) {
+            level = LogLevel.ALL // Choose the level of detail (BODY, HEADERS, INFO, ALL)
+            logger = Logger.SIMPLE // You can also use Logger.DEFAULT or a custom logger
+        }
         install(WebSockets) {
             contentConverter = KotlinxWebsocketSerializationConverter(Json)
         }
@@ -48,7 +49,7 @@ fun createHttpClient(): HttpClient {
             })
         }
         install(DefaultRequest) {
-            header("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlc2xhbWdoYXp5OUBleGFtcGxlLmNvbSIsImp0aSI6IjQiLCJpYXQiOjE3ODE4Njk3MjYsImV4cCI6MTc4MzczNTk2Nn0.Xk60Srlnd4tw2f6CS2HQmflCVaYxFpIB2OYmlul5Kog")
+            header("Authorization", "Bearer ${AppState.token}")
             contentType(ContentType.Application.Json)
         }
     }
@@ -70,17 +71,17 @@ fun createHttpClientSendFile(): HttpClient {
                 }
             )
         }
-//        install(Logging) {
-//            level = LogLevel.ALL // Choose the level of detail (BODY, HEADERS, INFO, ALL)
-//            logger = Logger.SIMPLE // You can also use Logger.DEFAULT or a custom logger
-//        }
+        install(Logging) {
+            level = LogLevel.ALL // Choose the level of detail (BODY, HEADERS, INFO, ALL)
+            logger = Logger.SIMPLE // You can also use Logger.DEFAULT or a custom logger
+        }
         install(WebSockets) {
             contentConverter = KotlinxWebsocketSerializationConverter(Json)
         }
 
         install(DefaultRequest) {
 //            if (settingsManager.getUser().token.isNotNullOrEmptyString()) {
-                header("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlc2xhbWdoYXp5OUBleGFtcGxlLmNvbSIsImp0aSI6IjQiLCJpYXQiOjE3ODE4Njk3MjYsImV4cCI6MTc4MzczNTk2Nn0.Xk60Srlnd4tw2f6CS2HQmflCVaYxFpIB2OYmlul5Kog")
+                header("Authorization", "Bearer ${AppState.token}")
 //            }
             contentType(ContentType.Application.Json)
         }
@@ -98,10 +99,10 @@ fun json(): Json {
 
 fun clientWebSocket(): HttpClient {
     return HttpClient() {
-//        install(Logging) {
-//            level = LogLevel.ALL // Choose the level of detail (BODY, HEADERS, INFO, ALL)
-//            logger = Logger.SIMPLE // You can also use Logger.DEFAULT or a custom logger
-//        }
+        install(Logging) {
+            level = LogLevel.ALL // Choose the level of detail (BODY, HEADERS, INFO, ALL)
+            logger = Logger.SIMPLE // You can also use Logger.DEFAULT or a custom logger
+        }
         install(WebSockets) {
             contentConverter = KotlinxWebsocketSerializationConverter(Json)
         }

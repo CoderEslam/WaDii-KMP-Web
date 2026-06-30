@@ -1,6 +1,8 @@
 package com.wadii.state
 
 import androidx.compose.runtime.*
+import com.wadii.core.fromJson
+import com.wadii.core.toJson
 import com.wadii.domain.model.auth.login.User
 import kotlinx.browser.localStorage
 import kotlinx.serialization.json.Json
@@ -25,11 +27,7 @@ object AppState {
         if (storedToken != null && storedUser != null) {
             token = storedToken
             try {
-                val decoded = Json {
-                    ignoreUnknownKeys = true
-                    coerceInputValues = true
-                }.decodeFromString(User.serializer(), storedUser)
-                user = decoded
+                user = storedUser.fromJson<User>()
             } catch (_: Exception) {
                 clearStorage()
             }
@@ -40,11 +38,7 @@ object AppState {
         user = u
         token = t
         localStorage.setItem("token", t)
-        localStorage.setItem(
-            "user", Json.encodeToString(
-                User.serializer(), u
-            )
-        )
+        localStorage.setItem("user", u.toJson())
     }
 
     fun logout() {

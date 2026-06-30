@@ -9,6 +9,7 @@ import com.wadii.domain.model.chat.ChatContact
 import com.wadii.domain.model.chat.InsertMessage
 import com.wadii.domain.model.chat.PageMessages
 import com.wadii.domain.usecase.MessageUseCase
+import com.wadii.domain.model.auth.login.User
 import com.wadii.state.AppState
 import com.wadii.utils.RequestState
 import kotlinx.coroutines.Job
@@ -71,9 +72,8 @@ class ChatViewModel(
         val userId = AppState.user?.id ?: return
         wsJob = screenModelScope.launch {
             wsService.connect(userId, token).collect { message ->
-//                AppState.toast("$TAG   --------------------- ${message.toJson()}")
                 updateState {
-                    it.copy(messages = it.messages.apply {
+                    it.copy(messages = it.messages.toMutableList().apply {
                         add(message)
                     })
                 }
@@ -130,7 +130,18 @@ class ChatViewModel(
                 InsertMessage(text = text, type = "text", toUserId = contact.contact.id)
             )
             if (sentViaWs) {
-                updateState { it.copy(sending = false) }
+                val optimistic = PageMessages.Content(
+                    text = text,
+                    type = "text",
+                    fromUser = AppState.user ?: User(),
+                    toUser = contact.contact
+                )
+                updateState {
+                    it.copy(
+                        sending = false,
+                        messages = it.messages.toMutableList().apply { add(optimistic) }
+                    )
+                }
             } else {
                 // WS not connected — fall back to REST and reload the conversation
                 var restSent = false

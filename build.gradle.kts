@@ -41,7 +41,7 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose)
 //                implementation(libs.koin.compose.viewmodel)
-//                implementation(libs.ktor.client.logging)
+                implementation(libs.ktor.client.logging)
                 implementation(libs.multiplatformSettings)
 
                 //            implementation(libs.country.picker.kmp)

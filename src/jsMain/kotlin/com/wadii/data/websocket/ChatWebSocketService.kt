@@ -50,7 +50,6 @@ class ChatWebSocketService(private val client: HttpClient) {
                                         runCatching {
                                             content
                                         }.onSuccess { trySend(it) }
-//                                        AppState.toast(content.toJson())
                                     }
 
                                     null -> {}

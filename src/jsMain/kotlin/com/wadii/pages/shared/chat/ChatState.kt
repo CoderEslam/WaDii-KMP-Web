@@ -6,7 +6,7 @@ import com.wadii.domain.model.chat.PageMessages
 data class ChatState(
     val contacts: List<ChatContact> = emptyList(),
     val selectedContact: ChatContact = ChatContact(),
-    val messages: List<PageMessages.Content> = emptyList(),
+    val messages: MutableList<PageMessages.Content> = mutableListOf(),
     val messagesLoading: Boolean = false,
     val isLoadingMoreMessages: Boolean = false,
     val messageText: String = "",

@@ -49,6 +49,8 @@ import com.wadii.pages.provider.dashboard.ProviderDashboardViewModel
 import com.wadii.pages.provider.offers.ProviderOffersViewModel
 import com.wadii.pages.provider.orders.ProviderOrdersViewModel
 import com.wadii.pages.provider.respond.RespondToOrderViewModel
+import com.wadii.data.api.clientWebSocket
+import com.wadii.data.websocket.ChatWebSocketService
 import com.wadii.pages.shared.chat.ChatViewModel
 import com.wadii.pages.shared.notifications.NotificationsViewModel
 import com.wadii.pages.shared.profile.ProfileViewModel
@@ -63,6 +65,7 @@ import com.wadii.screens.savedOffers.SavedOffersViewModel
 import com.wadii.screens.search.SearchViewModel
 import com.wadii.viewmodel.ServicesUseCase
 import io.ktor.client.HttpClient
+import org.koin.core.qualifier.named
 import org.koin.core.context.startKoin
 import org.koin.core.error.KoinApplicationAlreadyStartedException
 import org.koin.core.logger.Level
@@ -73,6 +76,8 @@ val appModule = module {
 
     single<HttpClient> { createHttpClient() }
     single<ApiService> { ApiService(get(), createHttpClientSendFile()) }
+    single(named("wsClient")) { clientWebSocket() }
+    single { ChatWebSocketService(get(named("wsClient"))) }
 
     // Repos
     single<AuthRepo> { AuthRepoImpl(get()) }
@@ -122,7 +127,7 @@ val appModule = module {
     factory { NotificationsViewModel(get()) }
     factory { ProviderRequestsViewModel(get()) }
     factory { ServicesViewModel(get()) }
-    factory { ChatViewModel(get()) }
+    factory { ChatViewModel(get(), get()) }
     factory { ProviderOffersViewModel(get(), get()) }
     factory { (orderId: Int) -> RespondToOrderViewModel(orderId, get()) }
     factory { AdminDashboardScreenModel(get(), get(), get()) }

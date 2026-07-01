@@ -13,6 +13,7 @@ import com.wadii.utils.Constants
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.*
+import org.w3c.dom.HTMLDivElement
 
 class ChatScreen : Screen {
     @Composable
@@ -215,6 +216,10 @@ class ChatScreen : Screen {
                             )
                         }
                     }
+                    var messagesContainer by remember { mutableStateOf<HTMLDivElement?>(null) }
+                    LaunchedEffect(state.messages.size, state.selectedContact.id) {
+                        messagesContainer?.let { it.scrollTop = it.scrollHeight.toDouble() }
+                    }
                     Div(attrs = {
                         classes(
                             "flex-1",
@@ -222,6 +227,10 @@ class ChatScreen : Screen {
                             "p-5",
                             "space-y-3"
                         )
+                        ref { element ->
+                            messagesContainer = element
+                            onDispose { messagesContainer = null }
+                        }
                     }) {
                         if (state.messagesLoading) {
                             Div(attrs = {

@@ -130,18 +130,18 @@ class ChatViewModel(
                 InsertMessage(text = text, type = "text", toUserId = contact.contact.id)
             )
             if (sentViaWs) {
-                val optimistic = PageMessages.Content(
-                    text = text,
-                    type = "text",
-                    fromUser = AppState.user ?: User(),
-                    toUser = contact.contact
-                )
-                updateState {
-                    it.copy(
-                        sending = false,
-                        messages = it.messages.toMutableList().apply { add(optimistic) }
-                    )
-                }
+//                val optimistic = PageMessages.Content(
+//                    text = text,
+//                    type = "text",
+//                    fromUser = AppState.user ?: User(),
+//                    toUser = contact.contact
+//                )
+//                updateState {
+//                    it.copy(
+//                        sending = false,
+//                        messages = it.messages.toMutableList().apply { add(optimistic) }
+//                    )
+//                }
             } else {
                 // WS not connected — fall back to REST and reload the conversation
                 var restSent = false

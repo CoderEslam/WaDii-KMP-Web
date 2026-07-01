@@ -7,7 +7,7 @@ object Constants {
     const val APP_LANGUAGE = "APP_LANGUAGE"
     const val USER_KEY = "USER_KEY"
     const val THEME_KEY = "THEME_KEY"
-    const val IP = "172.28.0.177"
+    const val IP = "172.28.0.34"
     const val BASE_URL = "http://$IP:8080"
     const val WS_URL = "ws://$IP:8080/web-socket"
     const val BASE_URL_USER_IMAGES = "${BASE_URL}/users"
@@ -64,7 +64,8 @@ object Constants {
 
     //response
     const val RESPONSE_SHOW_ALL = "${BASE_URL}$VERSION/responses/show-all"
-    const val RESPONSE_SHOW_ALL_RESPONSES_OF_USER = "${BASE_URL}$VERSION/responses/get-all-response-of-user"
+    const val RESPONSE_SHOW_ALL_RESPONSES_OF_USER =
+        "${BASE_URL}$VERSION/responses/get-all-response-of-user"
     const val ACCEPT_RESPONSE = "${BASE_URL}$VERSION/responses/accept-response"
     const val REJECT_RESPONSE = "${BASE_URL}$VERSION/responses/cancel-response"
     const val CREATE_RESPONSE = "${BASE_URL}$VERSION/responses/insert"

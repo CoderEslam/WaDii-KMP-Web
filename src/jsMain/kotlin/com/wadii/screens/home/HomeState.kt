@@ -1,6 +1,5 @@
 package com.wadii.screens.home
 
-import com.wadii.components.MessageType
 import com.wadii.domain.model.ads.Ads
 import com.wadii.domain.model.offers.OfferResponse
 import com.wadii.domain.model.provider.ProviderModel
@@ -14,8 +13,6 @@ data class HomeState(
     val filteredProviders: List<ProviderModel> = emptyList(),
     val services: List<Service> = emptyList(),
     val isLoading: Boolean = false,
-    val messageType: MessageType = MessageType.SUCCESS,
-    val message : String = "",
     val selectedService: Service = Service(),
     val filterLoading: Boolean = false
 ) {

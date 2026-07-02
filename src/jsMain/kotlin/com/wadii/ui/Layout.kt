@@ -64,12 +64,12 @@ fun Layout(content: @Composable () -> Unit) {
         Aside(attrs = {
             classes("hidden", "md:flex", "flex-col", "w-64", "fixed", "inset-y-0", "left-0", "z-30", "space-sidebar")
         }) {
-            Div(attrs = { classes("px-6", "py-5", "border-b", "border-slate-200") }) {
+            Div(attrs = { classes("px-6", "py-5", "border-b", "border-default") }) {
                 Span(attrs = {
                     classes("text-2xl", "font-extrabold", "cursor-pointer", "brand-text", "tracking-tight")
                     onClick { navigator.replaceAll(links.first().screen) }
                 }) { Text("WaDii") }
-                P(attrs = { classes("text-xs", "text-slate-400", "mt-0.5", "tracking-widest", "uppercase") }) {
+                P(attrs = { classes("text-xs", "text-body-subtle", "mt-0.5", "tracking-widest", "uppercase") }) {
                     Text(user.role.lowercase())
                 }
             }
@@ -78,7 +78,7 @@ fun Layout(content: @Composable () -> Unit) {
                 links.forEach { link -> SpaceNavLink(link, navigator) }
             }
 
-            Div(attrs = { classes("px-3", "py-4", "border-t", "border-slate-200", "space-y-0.5") }) {
+            Div(attrs = { classes("px-3", "py-4", "border-t", "border-default", "space-y-0.5") }) {
                 SpaceNavLink(NavLink("Profile", "◑", ProfileScreen()), navigator)
 
                 Button(attrs = {
@@ -90,7 +90,7 @@ fun Layout(content: @Composable () -> Unit) {
                 }
 
                 Button(attrs = {
-                    classes("dark-toggle", "text-red-500")
+                    classes("dark-toggle", "text-fg-danger")
                     onClick { AppState.logout() }
                 }) {
                     Span(attrs = { classes("text-base", "w-5", "text-center") }) { Text("→") }
@@ -110,11 +110,11 @@ fun Layout(content: @Composable () -> Unit) {
             }) { Text("WaDii") }
             Div(attrs = { classes("flex", "items-center", "gap-2") }) {
                 Button(attrs = {
-                    classes("p-2", "text-slate-500", "hover:text-amber-500", "transition-colors", "text-lg")
+                    classes("p-2", "text-body-subtle", "hover:text-fg-brand", "transition-colors", "text-lg")
                     onClick { AppState.toggleDarkMode() }
                 }) { Text(if (darkMode) "☀️" else "🌙") }
                 Button(attrs = {
-                    classes("p-2", "text-slate-600", "text-xl")
+                    classes("p-2", "text-body", "text-xl")
                     onClick { menuOpen = !menuOpen }
                 }) { Text(if (menuOpen) "✕" else "☰") }
             }
@@ -135,7 +135,7 @@ fun Layout(content: @Composable () -> Unit) {
                     }
                     SpaceNavLink(NavLink("Profile", "◑", ProfileScreen()), navigator) { menuOpen = false }
                     Button(attrs = {
-                        classes("dark-toggle", "text-red-500")
+                        classes("dark-toggle", "text-fg-danger")
                         onClick { AppState.logout(); menuOpen = false }
                     }) {
                         Span(attrs = { classes("text-base", "w-5", "text-center") }) { Text("→") }
@@ -161,9 +161,9 @@ private fun SpaceNavLink(link: NavLink, navigator: Navigator, afterClick: (() ->
     val active = navigator.lastItem::class == link.screen::class
     Button(attrs = {
         if (active) {
-            attr("class", "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all text-left bg-amber-50 text-amber-700")
+            attr("class", "w-full flex items-center gap-3 px-3 py-2.5 rounded-neu-base text-sm font-semibold transition-all text-left bg-surface shadow-neu-inset text-fg-brand")
         } else {
-            attr("class", "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left text-slate-600 hover:bg-slate-50 hover:text-slate-800")
+            attr("class", "w-full flex items-center gap-3 px-3 py-2.5 rounded-neu-base text-sm font-medium transition-all text-left bg-surface text-body hover:shadow-neu-sm hover:text-heading")
         }
         onClick {
             navigator.replaceAll(link.screen)
@@ -171,12 +171,12 @@ private fun SpaceNavLink(link: NavLink, navigator: Navigator, afterClick: (() ->
         }
     }) {
         Span(attrs = {
-            if (active) attr("class", "text-base w-5 text-center text-amber-500")
-            else attr("class", "text-base w-5 text-center text-slate-400")
+            if (active) attr("class", "text-base w-5 text-center text-fg-brand")
+            else attr("class", "text-base w-5 text-center text-body-subtle")
         }) { Text(link.icon) }
         Span { Text(link.label) }
         if (active) {
-            Span(attrs = { classes("ml-auto", "w-1.5", "h-1.5", "rounded-full", "bg-amber-500") }) {}
+            Span(attrs = { classes("ml-auto", "w-1.5", "h-1.5", "rounded-full", "bg-brand") }) {}
         }
     }
 }

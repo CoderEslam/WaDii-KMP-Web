@@ -7,12 +7,14 @@ import com.wadii.domain.model.auth.login.User
 import kotlinx.browser.localStorage
 import kotlinx.serialization.json.Json
 
+enum class ToastVariant { Success, Warning, Error }
+
 object AppState {
     var user by mutableStateOf<User?>(null)
     var token by mutableStateOf<String?>(null)
 
     var toastMessage by mutableStateOf<String?>(null)
-    var toastIsError by mutableStateOf(false)
+    var toastVariant by mutableStateOf(ToastVariant.Success)
 
     var darkMode by mutableStateOf(localStorage.getItem("darkMode") == "true")
 
@@ -48,8 +50,12 @@ object AppState {
     }
 
     fun toast(msg: String, isError: Boolean = false) {
+        toast(msg, if (isError) ToastVariant.Error else ToastVariant.Success)
+    }
+
+    fun toast(msg: String, variant: ToastVariant) {
         toastMessage = msg
-        toastIsError = isError
+        toastVariant = variant
     }
 
     fun clearToast() {

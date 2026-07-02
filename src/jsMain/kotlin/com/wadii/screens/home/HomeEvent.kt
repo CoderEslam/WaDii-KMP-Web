@@ -9,5 +9,4 @@ sealed class HomeEvent {
     data class SelectService(val service: Service) : HomeEvent()
 
     data class ToggleSaveOffer(val offer: OfferResponse) : HomeEvent()
-    object ClearMessage : HomeEvent()
 }

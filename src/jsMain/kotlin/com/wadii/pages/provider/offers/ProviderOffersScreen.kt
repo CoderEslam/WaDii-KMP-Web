@@ -5,11 +5,21 @@ import cafe.adriel.voyager.core.screen.Screen
 import com.wadii.domain.model.offers.OfferResponse
 import com.wadii.domain.model.service.Service
 import cafe.adriel.voyager.koin.koinScreenModel
+import com.wadii.ui.Alert
+import com.wadii.ui.AlertVariant
+import com.wadii.ui.Badge
+import com.wadii.ui.BadgeVariant
+import com.wadii.ui.Card
+import com.wadii.ui.EmptyState
+import com.wadii.ui.GhostButton
 import com.wadii.ui.InputField
 import com.wadii.ui.LoadingScreen
-import com.wadii.ui.Spinner
+import com.wadii.ui.Modal
+import com.wadii.ui.ModalVariant
+import com.wadii.ui.PageHeader
+import com.wadii.ui.PrimaryButton
+import com.wadii.ui.SecondaryButton
 import com.wadii.ui.TextArea
-import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.*
 
 class ProviderOffersScreen : Screen {
@@ -17,133 +27,42 @@ class ProviderOffersScreen : Screen {
     override fun Content() {
         val model = koinScreenModel<ProviderOffersViewModel>()
         Div(attrs = { classes("space-y-6") }) {
-            Div(attrs = { classes("flex", "items-center", "justify-between") }) {
-                H1(attrs = {
-                    classes(
-                        "text-2xl",
-                        "font-bold",
-                        "text-slate-800"
-                    )
-                }) { Text("My Offers") }
-                Button(attrs = {
-                    classes(
-                        "flex",
-                        "items-center",
-                        "gap-2",
-                        "px-4",
-                        "py-2",
-                        "bg-amber-500",
-                        "text-white",
-                        "rounded-xl",
-                        "text-sm",
-                        "font-medium",
-                        "hover:bg-amber-600"
-                    )
-                    onClick { model.onEvent(ProviderOffersEvent.ShowModal(null)) }
-                }) { Text("+ New Offer") }
-            }
+            PageHeader("My Offers", "+ New Offer") { model.onEvent(ProviderOffersEvent.ShowModal(null)) }
 
             val state by model.state.collectAsState()
             when {
                 state.isLoading -> LoadingScreen()
-                state.error != null -> Div(attrs = {
-                    classes(
-                        "bg-white",
-                        "rounded-2xl",
-                        "p-12",
-                        "text-center",
-                        "text-slate-500"
-                    )
-                }) { Text(state.error!!) }
+                state.error != null -> Alert(variant = AlertVariant.Danger, body = state.error!!)
 
                 else -> {
                     if (state.offers.isEmpty()) {
-                        Div(attrs = { classes("bg-white", "rounded-2xl", "p-12", "text-center") }) {
-                            P(attrs = { classes("text-5xl", "mb-3") }) { Text("🏷️") }
-                            P(attrs = { classes("text-slate-500") }) { Text("No offers yet. Create your first offer!") }
-                        }
+                        EmptyState("🏷️", "No offers yet. Create your first offer!")
                     } else {
                         Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "gap-4") }) {
                             state.offers.forEach { offer ->
-                                Div(attrs = {
-                                    classes(
-                                        "bg-white",
-                                        "border",
-                                        "border-slate-200",
-                                        "rounded-xl",
-                                        "p-5"
-                                    )
-                                }) {
-                                    Div(attrs = {
-                                        classes(
-                                            "flex",
-                                            "items-start",
-                                            "justify-between"
-                                        )
-                                    }) {
+                                Card(classes = "p-5") {
+                                    Div(attrs = { classes("flex", "items-start", "justify-between") }) {
                                         Div(attrs = { classes("flex-1") }) {
-                                            P(attrs = {
-                                                classes(
-                                                    "font-semibold",
-                                                    "text-slate-800"
-                                                )
-                                            }) { Text(offer.title) }
-                                            P(attrs = {
-                                                classes(
-                                                    "text-sm",
-                                                    "text-slate-500",
-                                                    "mt-1"
-                                                )
-                                            }) { Text(offer.description) }
-                                            P(attrs = {
-                                                classes(
-                                                    "text-xs",
-                                                    "text-slate-400",
-                                                    "mt-2"
-                                                )
-                                            }) { Text("Expires: ${offer.endDate.take(10)}") }
+                                            P(attrs = { classes("font-semibold", "text-heading") }) { Text(offer.title) }
+                                            P(attrs = { classes("text-sm", "text-body-subtle", "mt-1") }) { Text(offer.description) }
+                                            P(attrs = { classes("text-xs", "text-body-subtle", "mt-2") }) { Text("Expires: ${offer.endDate.take(10)}") }
                                         }
                                         Div(attrs = { classes("flex", "gap-1", "ml-3") }) {
-                                            Button(attrs = {
-                                                classes(
-                                                    "p-2",
-                                                    "text-slate-400",
-                                                    "hover:text-amber-500",
-                                                    "hover:bg-amber-50",
-                                                    "rounded-lg"
-                                                )
-                                                onClick {
-                                                    model.onEvent(
-                                                        ProviderOffersEvent.ShowModal(
-                                                            offer
-                                                        )
-                                                    )
-                                                }
-                                            }) { Text("✏️") }
-                                            Button(attrs = {
-                                                classes(
-                                                    "p-2",
-                                                    "text-slate-400",
-                                                    "hover:text-red-500",
-                                                    "hover:bg-red-50",
-                                                    "rounded-lg"
-                                                )
-                                                onClick {
-                                                    model.onEvent(
-                                                        ProviderOffersEvent.Delete(
-                                                            offer.id.toLong()
-                                                        )
-                                                    )
-                                                }
-                                            }) { Text("🗑️") }
+                                            GhostButton("✏️") { model.onEvent(ProviderOffersEvent.ShowModal(offer)) }
+                                            GhostButton("🗑️") { model.onEvent(ProviderOffersEvent.Delete(offer.id.toLong())) }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                    if (state.showModal) {
-                        OfferModal(
+                    Modal(
+                        open = state.showModal,
+                        title = if (state.editOffer != null) "Edit Offer" else "New Offer",
+                        variant = ModalVariant.Form,
+                        onDismiss = { model.onEvent(ProviderOffersEvent.CloseModal) }
+                    ) {
+                        OfferModalContent(
                             offer = state.editOffer,
                             services = state.services,
                             saving = state.saving,
@@ -168,7 +87,7 @@ class ProviderOffersScreen : Screen {
 }
 
 @Composable
-private fun OfferModal(
+private fun OfferModalContent(
     offer: OfferResponse?,
     services: List<Service>,
     saving: Boolean,
@@ -182,102 +101,27 @@ private fun OfferModal(
         mutableStateOf(services.map { it.id }.toSet())
     }
 
-    Div(attrs = {
-        classes(
-            "fixed",
-            "inset-0",
-            "z-50",
-            "bg-black/50",
-            "flex",
-            "items-center",
-            "justify-center",
-            "p-4"
-        )
-    }) {
-        Div(attrs = { classes("bg-white", "rounded-2xl", "w-full", "max-w-md", "p-6") }) {
-            H2(attrs = { classes("text-lg", "font-semibold", "text-slate-800", "mb-4") }) {
-                Text(if (offer != null) "Edit Offer" else "New Offer")
-            }
-            Div(attrs = { classes("space-y-4") }) {
-                InputField("Title", title, required = true) { title = it }
-                TextArea("Description", description, rows = 3) { description = it }
-                InputField("End Date", endDate, type = "date", required = true) { endDate = it }
-                if (services.isNotEmpty()) {
-                    Div {
-                        P(attrs = {
-                            classes(
-                                "text-sm",
-                                "font-medium",
-                                "text-slate-700",
-                                "mb-2"
-                            )
-                        }) { Text("Services") }
-                        Div(attrs = { classes("flex", "flex-wrap", "gap-2") }) {
-                            services.forEach { s ->
-                                val sel = s.id in selectedServices
-                                Button(attrs = {
-                                    attr("type", "button")
-                                    classes(
-                                        "px-3",
-                                        "py-1",
-                                        "rounded-full",
-                                        "text-sm",
-                                        "transition-colors"
-                                    )
-                                    if (sel) classes(
-                                        "bg-amber-500",
-                                        "text-white"
-                                    ) else classes(
-                                        "bg-slate-100",
-                                        "text-slate-700",
-                                        "hover:bg-slate-200"
-                                    )
-                                    onClick {
-                                        selectedServices =
-                                            if (sel) selectedServices - s.id else selectedServices + s.id
-                                    }
-                                }) { Text(s.name) }
-                            }
-                        }
+    InputField("Title", title, required = true) { title = it }
+    TextArea("Description", description, rows = 3) { description = it }
+    InputField("End Date", endDate, type = "date", required = true) { endDate = it }
+    if (services.isNotEmpty()) {
+        Div {
+            P(attrs = { classes("text-sm", "font-medium", "text-heading", "mb-2") }) { Text("Services") }
+            Div(attrs = { classes("flex", "flex-wrap", "gap-2") }) {
+                services.forEach { s ->
+                    val sel = s.id in selectedServices
+                    Span(attrs = {
+                        style { property("cursor", "pointer") }
+                        onClick { selectedServices = if (sel) selectedServices - s.id else selectedServices + s.id }
+                    }) {
+                        Badge(s.name, variant = if (sel) BadgeVariant.Brand else BadgeVariant.Alternative, pill = true)
                     }
-                }
-                Div(attrs = { classes("flex", "gap-3", "pt-2") }) {
-                    Button(attrs = {
-                        attr("type", "button")
-                        classes(
-                            "flex-1",
-                            "py-2.5",
-                            "border",
-                            "border-slate-300",
-                            "text-slate-700",
-                            "rounded-xl",
-                            "text-sm",
-                            "hover:bg-slate-50"
-                        )
-                        onClick { onClose() }
-                    }) { Text("Cancel") }
-                    Button(attrs = {
-                        classes(
-                            "flex-1",
-                            "py-2.5",
-                            "bg-amber-500",
-                            "text-white",
-                            "font-semibold",
-                            "rounded-xl",
-                            "text-sm",
-                            "hover:bg-amber-600",
-                            "disabled:opacity-60",
-                            "flex",
-                            "items-center",
-                            "justify-center",
-                            "gap-2"
-                        )
-                        attr("type", "button")
-                        onClick { onSave(title, description, endDate, selectedServices) }
-                        if (saving) disabled()
-                    }) { if (saving) Spinner() else Text("Save") }
                 }
             }
         }
+    }
+    Div(attrs = { classes("flex", "gap-3", "pt-2") }) {
+        SecondaryButton("Cancel", fullWidth = true) { onClose() }
+        PrimaryButton("Save", loading = saving, fullWidth = true) { onSave(title, description, endDate, selectedServices) }
     }
 }

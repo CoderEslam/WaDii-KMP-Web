@@ -8,8 +8,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wadii.screens.auth.register.RegisterScreen
 import com.wadii.state.AppState
 import com.wadii.ui.InputField
-import com.wadii.ui.Spinner
-import org.jetbrains.compose.web.attributes.disabled
+import com.wadii.ui.PrimaryButton
 import org.jetbrains.compose.web.dom.*
 
 class LoginScreen : Screen {
@@ -23,29 +22,24 @@ class LoginScreen : Screen {
             Div(attrs = { classes("w-full", "max-w-md") }) {
                 Div(attrs = { classes("text-center", "mb-10") }) {
                     H1(attrs = { classes("text-5xl", "font-extrabold", "brand-text", "tracking-tight", "mb-3") }) { Text("WaDii") }
-                    P(attrs = { classes("text-slate-500", "text-sm", "tracking-widest", "uppercase") }) { Text("Your service universe") }
+                    P(attrs = { classes("text-body-subtle", "text-sm", "tracking-widest", "uppercase") }) { Text("Your service universe") }
                 }
 
-                Div(attrs = { classes("bg-white", "rounded-3xl", "shadow-lg", "p-8", "border", "border-slate-200") }) {
-                    H2(attrs = { classes("text-xl", "font-bold", "text-slate-800", "mb-6") }) { Text("Sign In") }
+                Div(attrs = { classes("bg-surface", "rounded-neu-base", "shadow-neu-lg", "p-8", "border", "border-default") }) {
+                    H2(attrs = { classes("text-xl", "font-semibold", "text-heading", "mb-6") }) { Text("Sign In") }
                     Div(attrs = { classes("space-y-5") }) {
                         InputField("Email", state.email, "you@example.com", "email", true) { model.onEvent(LoginEvent.SetEmail(it)) }
                         InputField("Password", state.password, "••••••••", "password", true) { model.onEvent(LoginEvent.SetPassword(it)) }
 
-                        Button(attrs = {
-                            classes("w-full", "py-3", "bg-amber-500", "hover:bg-amber-600", "text-white", "font-bold", "rounded-xl", "transition-all", "disabled:opacity-60", "flex", "items-center", "justify-center", "gap-2", "tracking-wide")
-                            attr("type", "button")
-                            onClick { model.onEvent(LoginEvent.Submit) }
-                            if (state.loading) disabled()
-                        }) {
-                            if (state.loading) Spinner() else Text("Sign In")
+                        PrimaryButton("Sign In", loading = state.loading, fullWidth = true) {
+                            model.onEvent(LoginEvent.Submit)
                         }
                     }
 
-                    P(attrs = { classes("mt-6", "text-center", "text-sm", "text-slate-500") }) {
+                    P(attrs = { classes("mt-6", "text-center", "text-sm", "text-body-subtle") }) {
                         Text("No account yet? ")
                         Span(attrs = {
-                            classes("text-amber-500", "font-semibold", "cursor-pointer", "hover:underline")
+                            classes("text-fg-brand", "font-semibold", "cursor-pointer", "hover:underline")
                             onClick { navigator.push(RegisterScreen()) }
                         }) { Text("Create one →") }
                     }
@@ -53,7 +47,7 @@ class LoginScreen : Screen {
 
                 Div(attrs = { classes("flex", "justify-center", "mt-6") }) {
                     Button(attrs = {
-                        classes("text-xs", "text-slate-400", "hover:text-slate-600", "flex", "items-center", "gap-2", "transition-colors")
+                        classes("text-xs", "text-body-subtle", "hover:text-heading", "flex", "items-center", "gap-2", "transition-colors")
                         onClick { AppState.toggleDarkMode() }
                     }) {
                         val dm = AppState.darkMode

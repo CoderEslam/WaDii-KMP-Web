@@ -5,9 +5,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.wadii.ui.Card
 import com.wadii.ui.InputField
-import com.wadii.ui.Spinner
-import org.jetbrains.compose.web.attributes.disabled
+import com.wadii.ui.PrimaryButton
+import com.wadii.ui.TabVariant
+import com.wadii.ui.Tabs
 import org.jetbrains.compose.web.attributes.selected
 import org.jetbrains.compose.web.dom.*
 
@@ -22,22 +24,17 @@ class RegisterScreen : Screen {
             Div(attrs = { classes("w-full", "max-w-md") }) {
                 Div(attrs = { classes("text-center", "mb-10") }) {
                     H1(attrs = { classes("text-5xl", "font-extrabold", "brand-text", "tracking-tight", "mb-3") }) { Text("WaDii") }
-                    P(attrs = { classes("text-slate-500", "text-sm", "tracking-widest", "uppercase") }) { Text("Create your account") }
+                    P(attrs = { classes("text-body-subtle", "text-sm", "tracking-widest", "uppercase") }) { Text("Create your account") }
                 }
 
-                Div(attrs = { classes("bg-white", "rounded-3xl", "shadow-lg", "p-8", "border", "border-slate-200") }) {
+                Card(classes = "p-8") {
                     Div(attrs = { classes("space-y-4") }) {
-                        Div(attrs = { classes("flex", "gap-3") }) {
-                            listOf("User" to 0, "Provider" to 1).forEach { (label, type) ->
-                                Button(attrs = {
-                                    attr("type", "button")
-                                    classes("flex-1", "py-2", "rounded-xl", "text-sm", "font-medium", "transition-colors")
-                                    if (s.userType == type) classes("bg-amber-500", "text-white")
-                                    else classes("bg-slate-100", "text-slate-700", "hover:bg-slate-200")
-                                    onClick { model.onEvent(RegisterEvent.SetUserType(type)) }
-                                }) { Text(label) }
-                            }
-                        }
+                        Tabs(
+                            tabs = listOf("User", "Provider"),
+                            selected = s.userType,
+                            onSelect = { model.onEvent(RegisterEvent.SetUserType(it)) },
+                            variant = TabVariant.Pills
+                        )
 
                         Div(attrs = { classes("grid", "grid-cols-2", "gap-3") }) {
                             InputField("First Name", s.firstName, "John", required = true) { model.onEvent(RegisterEvent.SetFirstName(it)) }
@@ -53,7 +50,7 @@ class RegisterScreen : Screen {
                         }
 
                         Div(attrs = { classes("space-y-3") }) {
-                            P(attrs = { classes("text-sm", "font-medium", "text-slate-700") }) { Text("Location") }
+                            P(attrs = { classes("text-sm", "font-medium", "text-heading") }) { Text("Location") }
                             SelectField("Country", s.countries.map { it.id to it.name }, s.selectedCountry) { model.onEvent(RegisterEvent.SelectCountry(it)) }
                             if (s.provinces.isNotEmpty())
                                 SelectField("Province", s.provinces.map { it.id to it.name }, s.selectedProvince) { model.onEvent(RegisterEvent.SelectProvince(it)) }
@@ -61,20 +58,15 @@ class RegisterScreen : Screen {
                                 SelectField("City", s.cities.map { it.id to it.name }, s.selectedCity) { model.onEvent(RegisterEvent.SelectCity(it)) }
                         }
 
-                        Button(attrs = {
-                            classes("w-full", "py-3", "bg-amber-500", "hover:bg-amber-600", "text-white", "font-semibold", "rounded-xl", "transition-colors", "disabled:opacity-60", "flex", "items-center", "justify-center", "gap-2")
-                            attr("type", "button")
-                            onClick { model.onEvent(RegisterEvent.Submit) }
-                            if (s.loading) disabled()
-                        }) {
-                            if (s.loading) Spinner() else Text("Create Account")
+                        PrimaryButton("Create Account", loading = s.loading, fullWidth = true) {
+                            model.onEvent(RegisterEvent.Submit)
                         }
                     }
 
-                    P(attrs = { classes("mt-6", "text-center", "text-sm", "text-slate-500") }) {
+                    P(attrs = { classes("mt-6", "text-center", "text-sm", "text-body-subtle") }) {
                         Text("Already have an account? ")
                         Span(attrs = {
-                            classes("text-amber-500", "font-semibold", "cursor-pointer", "hover:underline")
+                            classes("text-fg-brand", "font-semibold", "cursor-pointer", "hover:underline")
                             onClick { navigator.pop() }
                         }) { Text("Sign in →") }
                     }
@@ -86,10 +78,14 @@ class RegisterScreen : Screen {
 
 @Composable
 private fun SelectField(label: String, options: List<Pair<Int, String>>, selectedId: Int, onChange: (Int) -> Unit) {
-    Div(attrs = { classes("flex", "flex-col", "gap-1") }) {
-        Label(attrs = { classes("text-xs", "text-slate-500") }) { Text(label) }
+    Div(attrs = { classes("flex", "flex-col", "gap-2") }) {
+        Label(attrs = { classes("text-sm", "font-medium", "text-heading") }) { Text(label) }
         Select(attrs = {
-            classes("w-full", "px-3", "py-2", "border", "border-slate-300", "rounded-lg", "text-sm", "focus:outline-none", "focus:ring-2", "focus:ring-amber-400", "bg-white")
+            classes(
+                "w-full", "px-4", "py-2.5", "border", "border-default-medium", "rounded-neu-base",
+                "bg-surface", "shadow-neu-inset", "text-sm", "text-heading",
+                "focus:outline-none", "focus:ring-1", "focus:ring-brand", "focus:border-brand"
+            )
             onChange { event -> onChange((event.value ?: "").toIntOrNull() ?: 0) }
         }) {
             Option(value = "0", attrs = { if (selectedId == 0) selected() }) { Text("Select $label") }

@@ -2,12 +2,12 @@ package com.wadii.screens.home
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
-import com.wadii.components.MessageType
 import com.wadii.core.isNotNullOrEmptyString
 import com.wadii.domain.model.offers.SavedOfferRequest
 import com.wadii.domain.usecase.AdsUseCase
 import com.wadii.domain.usecase.OfferUseCase
 import com.wadii.domain.usecase.ProviderUseCase
+import com.wadii.state.AppState
 import com.wadii.viewmodel.ServicesUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -53,10 +53,6 @@ class HomeViewModel(
                 }
             }
 
-            is HomeEvent.ClearMessage -> {
-                updateState { it.copy(message = "") }
-            }
-
             is HomeEvent.ToggleSaveOffer -> {
                 val found = _state.value.offers.findWithIndex { it.id == event.offer.id }
                 found?.let { (index, offer) ->
@@ -85,22 +81,12 @@ class HomeViewModel(
                     updateState { it.copy(isLoading = true) }
                 },
                 onSuccess = { data ->
-                    updateState {
-                        it.copy(
-                            isLoading = false,
-                            message = data.message,
-                            messageType = MessageType.SUCCESS
-                        )
-                    }
+                    updateState { it.copy(isLoading = false) }
+                    AppState.toast(data.message)
                 },
                 onError = { error, _ ->
-                    updateState {
-                        it.copy(
-                            isLoading = false,
-                            message = error,
-                            messageType = MessageType.ERROR
-                        )
-                    }
+                    updateState { it.copy(isLoading = false) }
+                    AppState.toast(error, isError = true)
                 }
             )
         }
@@ -113,22 +99,12 @@ class HomeViewModel(
                     _state.update { it.copy(isLoading = true) }
                 },
                 onSuccess = { _ ->
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            message = "Offer removed",
-                            messageType = MessageType.SUCCESS
-                        )
-                    }
+                    _state.update { it.copy(isLoading = false) }
+                    AppState.toast("Offer removed")
                 },
                 onError = { error, _ ->
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            message = error,
-                            messageType = MessageType.ERROR
-                        )
-                    }
+                    _state.update { it.copy(isLoading = false) }
+                    AppState.toast(error, isError = true)
                 }
             )
         }
@@ -218,19 +194,13 @@ class HomeViewModel(
                         it.copy(
                             isLoading = false,
                             allProviders = data.data,
-                            filteredProviders = data.data,
-                            message = data.message,
-                            messageType = MessageType.SUCCESS
+                            filteredProviders = data.data
                         )
                     }
+                    AppState.toast(data.message)
                 }, onError = { error, code ->
-                    updateState {
-                        it.copy(
-                            isLoading = false,
-                            message = error,
-                            messageType = MessageType.ERROR
-                        )
-                    }
+                    updateState { it.copy(isLoading = false) }
+                    AppState.toast(error, isError = true)
                 }
             )
         }
@@ -243,19 +213,12 @@ class HomeViewModel(
                     updateState { it.copy(isLoading = true) }
                 },
                 onSuccess = { data ->
-                    updateState {
-                        it.copy(
-                            isLoading = false,
-                            offers = data.data,
-                            message = data.message,
-                            messageType = MessageType.SUCCESS
-                        )
-                    }
+                    updateState { it.copy(isLoading = false, offers = data.data) }
+                    AppState.toast(data.message)
                 },
                 onError = { error, _ ->
-                    updateState {
-                        it.copy(isLoading = false, message = error, messageType = MessageType.ERROR)
-                    }
+                    updateState { it.copy(isLoading = false) }
+                    AppState.toast(error, isError = true)
                 }
             )
         }

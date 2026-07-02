@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WaDii</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -13,11 +13,102 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                        poppins: ['Poppins', 'system-ui', 'sans-serif'],
+                        sans: ['Nunito Sans', 'system-ui', 'sans-serif'],
                     },
                     colors: {
-                        primary: { DEFAULT: '#f59e0b', dark: '#d97706', light: '#fef3c7' }
+                        // ===== Neumorphism design tokens (see SKILL.md) =====
+                        // All resolve via CSS custom properties, so light/dark switching
+                        // needs no separate dark: classes — see the :root / html.dark block below.
+                        //
+                        // Module-spelling -> class cheatsheet (SKILL.md's modules use slightly
+                        // different token names for the same concept; don't invent duplicates):
+                        //   neutral-primary-soft / neutral-primary   -> bg-surface
+                        //   neutral-secondary-soft                   -> bg-surface-secondary
+                        //   neutral-secondary-medium                 -> bg-surface-secondary-medium
+                        //   neutral-tertiary-soft / neutral-tertiary -> bg-surface-tertiary
+                        //   neutral-tertiary-medium                  -> bg-surface-tertiary-medium
+                        //   neutral-quaternary                       -> bg-surface-quaternary
+                        //   neutral-primary-medium (tooltip light)   -> bg-surface-primary-medium
+                        //   border-success / border-danger / border-brand (solid) -> already
+                        //     auto-generated since success/danger/brand are registered colors.
+                        surface: 'var(--surface)',
+                        'surface-secondary': 'var(--surface-secondary)',
+                        'surface-secondary-medium': 'var(--surface-secondary-medium)',
+                        'surface-primary-medium': 'var(--surface-primary-medium)',
+                        'surface-tertiary': 'var(--surface-tertiary)',
+                        'surface-tertiary-medium': 'var(--surface-tertiary-medium)',
+                        'surface-quaternary': 'var(--surface-quaternary)',
+
+                        heading: 'var(--heading)',
+                        body: 'var(--body)',
+                        'body-subtle': 'var(--body-subtle)',
+
+                        brand: 'var(--brand)',
+                        'brand-soft': 'var(--brand-soft)',
+                        'brand-softer': 'var(--brand-softer)',
+                        'fg-brand': 'var(--fg-brand)',
+                        'fg-brand-strong': 'var(--fg-brand-strong)',
+
+                        secondary: 'var(--secondary)',
+                        'secondary-soft': 'var(--secondary-soft)',
+
+                        'fg-disabled': 'var(--fg-disabled)',
+                        disabled: 'var(--bg-disabled)',
+                        'toggle-thumb': 'var(--white)',
+
+                        // Named without a redundant "border-" prefix so the generated
+                        // Tailwind utility reads as border-default / border-brand-subtle
+                        // / border-success-subtle etc. (matching SKILL.md's own token
+                        // names) instead of border-border-default.
+                        default: 'var(--border-default)',
+                        'default-medium': 'var(--border-default-medium)',
+                        'default-strong': 'var(--border-default-strong)',
+                        light: 'var(--border-light)',
+                        'light-medium': 'var(--border-light-medium)',
+                        buffer: 'var(--border-buffer)',
+                        'brand-subtle': 'var(--border-brand-subtle)',
+
+                        success: 'var(--success)',
+                        'success-soft': 'var(--success-soft)',
+                        'success-medium': 'var(--success-medium)',
+                        'success-subtle': 'var(--border-success-subtle)',
+                        'fg-success': 'var(--fg-success)',
+                        'fg-success-strong': 'var(--fg-success-strong)',
+
+                        danger: 'var(--danger)',
+                        'danger-soft': 'var(--danger-soft)',
+                        'danger-medium': 'var(--danger-medium)',
+                        'danger-subtle': 'var(--border-danger-subtle)',
+                        'fg-danger': 'var(--fg-danger)',
+                        'fg-danger-strong': 'var(--fg-danger-strong)',
+
+                        warning: 'var(--warning)',
+                        'warning-soft': 'var(--warning-soft)',
+                        'warning-medium': 'var(--warning-medium)',
+                        'warning-subtle': 'var(--border-warning-subtle)',
+                        'fg-warning': 'var(--fg-warning)',
+
+                        dark: 'var(--dark)',
+                        'dark-strong': 'var(--dark-strong)',
+                    },
+                    boxShadow: {
+                        // Namespaced so the existing Tailwind shadow-sm/md/lg/xl/2xl scale
+                        // (still used by un-migrated screens) is left completely alone.
+                        'neu-2xs': 'var(--shadow-2xs)',
+                        'neu-xs': 'var(--shadow-xs)',
+                        'neu-sm': 'var(--shadow-sm)',
+                        'neu-md': 'var(--shadow-md)',
+                        'neu-lg': 'var(--shadow-lg)',
+                        'neu-xl': 'var(--shadow-xl)',
+                        'neu-2xl': 'var(--shadow-2xl)',
+                        'neu-inset': 'var(--shadow-inset)',
+                    },
+                    borderRadius: {
+                        // Namespaced so rounded-lg/xl/2xl/3xl (still used by un-migrated
+                        // screens) keep their current Tailwind-default values.
+                        'neu-sm': '2px',
+                        'neu-default': '6px',
+                        'neu-base': '8px',
                     }
                 }
             }
@@ -30,293 +121,201 @@
         })();
     </script>
     <style>
-        /* ===== CUSTOM FONTS ===== */
-        @font-face {
-            font-family: 'Poppins';
-            src: url('fonts/Poppins-Regular.woff2') format('woff2');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
-        }
-        @font-face {
-            font-family: 'Poppins';
-            src: url('fonts/Poppins-Bold.woff2') format('woff2');
-            font-weight: 700;
-            font-style: normal;
-            font-display: swap;
-        }
-
         /* ===== BASE ===== */
         *, *::before, *::after { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
 
+        /* =====================================================================
+           NEUMORPHISM DESIGN TOKENS
+           Values taken directly from SKILL.md's colors.md/shadows.md where a
+           table is given (surface, heading, body, body-subtle, fg-disabled,
+           brand, secondary, and all shadow tokens). Every other token below
+           (surface-secondary/tertiary/quaternary steps, border-*, brand-soft/
+           softer, success/danger/warning palettes, dark/dark-strong) is left
+           agnostic by SKILL.md ("you choose how to implement the styles"), so
+           these are authored choices, not spec values. `dark` / `dark-strong` /
+           `white` are intentionally constant across themes (always-dark chips
+           like dark tooltips, stacked-avatar counters, dark badges).
+           ===================================================================== */
+        :root {
+            --surface: #ECF0F3;
+            --surface-secondary: #E4E9EE;
+            --surface-secondary-medium: #E0E6E9;
+            --surface-primary-medium: #E8EDF0;
+            --surface-tertiary: #DCE3E9;
+            --surface-tertiary-medium: #D3DCE4;
+            --surface-quaternary: #CDD7E0;
+
+            --heading: #31344B;
+            --body: #44476A;
+            --body-subtle: #66799E;
+            --fg-disabled: #93A5BE;
+            --bg-disabled: var(--surface-secondary);
+
+            --brand: #128759;
+            --brand-soft: #D9F0E4;
+            --brand-softer: #EAF7F0;
+            --fg-brand: #128759;
+            --fg-brand-strong: #0E6E47;
+            --border-brand: #128759;
+            --border-brand-subtle: #9AD9BE;
+
+            --secondary: #389DC6;
+            --secondary-soft: #DCEFF6;
+
+            --border-default: #D1D9E6;
+            --border-default-medium: #C3CEDD;
+            --border-default-strong: #AAB8CC;
+            --border-light: #E2E7EE;
+            --border-light-medium: #D8DFE9;
+            --border-buffer: var(--surface);
+
+            --success: #1F9D55;
+            --success-soft: #E1F5E9;
+            --success-medium: #C3ECD3;
+            --border-success-subtle: #9EDBB7;
+            --fg-success: #1F9D55;
+            --fg-success-strong: #167A42;
+
+            --danger: #D92D2D;
+            --danger-soft: #FBE7E7;
+            --danger-medium: #F6C6C6;
+            --border-danger-subtle: #F0A8A8;
+            --fg-danger: #D92D2D;
+            --fg-danger-strong: #B71C1C;
+
+            --warning: #B36B00;
+            --warning-soft: #FDF0DA;
+            --warning-medium: #FBDFB0;
+            --border-warning-subtle: #F0C27D;
+            --fg-warning: #B36B00;
+
+            --dark: #31344B;
+            --dark-strong: #23253A;
+            --white: #FFFFFF;
+
+            /* Dual-directional shadow pairs — light-mode neutrals per shadows.md */
+            --shadow-2xs: 1px 1px 2px #b8b9be, -1px -1px 2px #ffffff;
+            --shadow-xs: 2px 2px 4px #b8b9be, -2px -2px 4px #ffffff;
+            --shadow-sm: 3px 3px 6px #b8b9be, -3px -3px 6px #ffffff;
+            --shadow-md: 6px 6px 12px #b8b9be, -6px -6px 12px #ffffff;
+            --shadow-lg: 8px 8px 16px #b8b9be, -8px -8px 16px #ffffff;
+            --shadow-xl: 10px 10px 20px #b8b9be, -10px -10px 20px #ffffff;
+            --shadow-2xl: 12px 12px 24px #b8b9be, -12px -12px 24px #ffffff;
+            --shadow-inset: inset 2px 2px 5px #b8b9be, inset -3px -3px 7px #ffffff;
+        }
+
+        html.dark {
+            --surface: #262833;
+            --surface-secondary: #2C2F3B;
+            --surface-secondary-medium: #2F3240;
+            --surface-primary-medium: #292B37;
+            --surface-tertiary: #333647;
+            --surface-tertiary-medium: #3A3E52;
+            --surface-quaternary: #40445B;
+
+            --heading: #ECF0F3;
+            --body: #93A5BE;
+            --body-subtle: #93A5BE;
+            --fg-disabled: #66799E;
+            --bg-disabled: var(--surface-secondary);
+
+            --brand: #20B27A;
+            --brand-soft: #1C3B31;
+            --brand-softer: #17302A;
+            --fg-brand: #20B27A;
+            --fg-brand-strong: #3FD69A;
+            --border-brand: #20B27A;
+            --border-brand-subtle: #2A6E55;
+
+            --secondary: #389DC6;
+            --secondary-soft: #163648;
+
+            --border-default: #33364A;
+            --border-default-medium: #3D4157;
+            --border-default-strong: #4A4F68;
+            --border-light: #2C2F3F;
+            --border-light-medium: #333748;
+            --border-buffer: var(--surface);
+
+            --success: #2FBE72;
+            --success-soft: #163A26;
+            --success-medium: #1F4E33;
+            --border-success-subtle: #2C6B44;
+            --fg-success: #2FBE72;
+            --fg-success-strong: #4ED88C;
+
+            --danger: #F0605F;
+            --danger-soft: #3A2020;
+            --danger-medium: #4E2626;
+            --border-danger-subtle: #6B3232;
+            --fg-danger: #F0605F;
+            --fg-danger-strong: #FF8A89;
+
+            --warning: #F0A63C;
+            --warning-soft: #3A2E14;
+            --warning-medium: #4E3C1A;
+            --border-warning-subtle: #6B5424;
+            --fg-warning: #F0A63C;
+
+            /* Dual-directional shadow pairs — dark neutrals derived from the
+               dark surface (#262833) instead of #b8b9be/#ffffff, per shadows.md */
+            --shadow-2xs: 1px 1px 2px #1c1e26, -1px -1px 2px #2f323f;
+            --shadow-xs: 2px 2px 4px #1c1e26, -2px -2px 4px #2f323f;
+            --shadow-sm: 3px 3px 6px #1c1e26, -3px -3px 6px #2f323f;
+            --shadow-md: 6px 6px 12px #1c1e26, -6px -6px 12px #2f323f;
+            --shadow-lg: 8px 8px 16px #1c1e26, -8px -8px 16px #2f323f;
+            --shadow-xl: 10px 10px 20px #1c1e26, -10px -10px 20px #2f323f;
+            --shadow-2xl: 12px 12px 24px #1c1e26, -12px -12px 24px #2f323f;
+            --shadow-inset: inset 2px 2px 5px #1c1e26, inset -3px -3px 7px #2f323f;
+        }
+
         body {
             margin: 0;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Nunito Sans', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
-            background: linear-gradient(145deg, #eef2ff 0%, #f8faff 25%, #fff9f5 65%, #fffbf0 100%);
-            background-attachment: fixed;
-            color: #1e293b;
+            background: var(--surface);
+            color: var(--body);
             -webkit-font-smoothing: antialiased;
-        }
-
-        /* Nebula overlay – light */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            background:
-                radial-gradient(ellipse 70% 50% at 10% 40%, rgba(167,139,250,.07) 0%, transparent 100%),
-                radial-gradient(ellipse 55% 40% at 88% 18%, rgba(251,191,36,.06) 0%, transparent 100%),
-                radial-gradient(ellipse 60% 50% at 55% 88%, rgba(96,165,250,.06) 0%, transparent 100%);
-            animation: nebulaDrift 30s ease-in-out infinite alternate;
-        }
-
-        /* ===== DARK MODE ===== */
-        html.dark body {
-            background: radial-gradient(ellipse at 15% 25%, #0d1b3e 0%, #020817 45%, #040b1a 80%, #010408 100%);
-            color: #e2e8f0;
-        }
-
-        html.dark body::before {
-            background:
-                radial-gradient(ellipse 65% 50% at 10% 40%, rgba(139,92,246,.18) 0%, transparent 100%),
-                radial-gradient(ellipse 50% 40% at 88% 18%, rgba(251,191,36,.1) 0%, transparent 100%),
-                radial-gradient(ellipse 55% 48% at 55% 88%, rgba(56,189,248,.1) 0%, transparent 100%);
-        }
-
-        /* Stars – dark mode */
-        html.dark body::after {
-            content: '';
-            position: fixed;
-            width: 1px;
-            height: 1px;
-            background: transparent;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 0;
-            animation: starPulse 10s ease-in-out infinite alternate;
-            box-shadow:
-                12px 34px 0 rgba(255,255,255,.7), 89px 234px 1px rgba(220,230,255,.5),
-                234px 56px 0 rgba(255,255,255,.6), 456px 789px 0 rgba(200,215,255,.5),
-                678px 123px 1px rgba(255,255,255,.8), 890px 345px 0 rgba(255,255,255,.4),
-                1024px 567px 0 rgba(220,230,255,.6), 1200px 89px 1px rgba(255,255,255,.7),
-                1450px 678px 0 rgba(255,255,255,.5), 1567px 234px 0 rgba(200,215,255,.8),
-                1789px 456px 1px rgba(255,255,255,.6), 1890px 23px 0 rgba(255,255,255,.4),
-                2100px 345px 0 rgba(220,230,255,.5), 2234px 567px 1px rgba(255,255,255,.7),
-                345px 890px 0 rgba(220,230,255,.5), 567px 1024px 1px rgba(255,255,255,.8),
-                789px 1156px 0 rgba(255,255,255,.4), 1024px 1234px 0 rgba(200,215,255,.6),
-                1234px 1456px 1px rgba(255,255,255,.7), 1456px 1567px 0 rgba(255,255,255,.5),
-                1678px 1234px 0 rgba(220,230,255,.6), 1890px 1456px 1px rgba(255,255,255,.4),
-                2100px 1023px 0 rgba(255,255,255,.8), 2256px 1567px 0 rgba(200,215,255,.5),
-                67px 567px 0 rgba(255,255,255,.6), 123px 789px 1px rgba(220,230,255,.4),
-                345px 345px 0 rgba(255,255,255,.7), 567px 456px 0 rgba(255,255,255,.5),
-                789px 678px 1px rgba(200,215,255,.6), 901px 890px 0 rgba(255,255,255,.4),
-                1123px 456px 0 rgba(220,230,255,.8), 1345px 234px 1px rgba(255,255,255,.6),
-                1567px 890px 0 rgba(255,255,255,.5), 1789px 678px 0 rgba(200,215,255,.4),
-                2012px 234px 1px rgba(255,255,255,.7), 2234px 890px 0 rgba(220,230,255,.5),
-                34px 1234px 1px rgba(255,255,255,.8), 123px 1456px 0 rgba(200,215,255,.4),
-                345px 1678px 0 rgba(255,255,255,.6), 567px 1234px 1px rgba(220,230,255,.5),
-                789px 1456px 0 rgba(255,255,255,.7), 1012px 1678px 0 rgba(255,255,255,.4),
-                1234px 1234px 1px rgba(200,215,255,.6), 1456px 1678px 0 rgba(255,255,255,.5),
-                1678px 1456px 0 rgba(220,230,255,.8), 1890px 1678px 1px rgba(255,255,255,.6),
-                2012px 1456px 0 rgba(255,255,255,.4), 2234px 1234px 0 rgba(200,215,255,.7),
-                78px 890px 0 rgba(255,255,255,.7), 234px 678px 1px rgba(220,230,255,.5),
-                456px 890px 0 rgba(255,255,255,.6), 678px 345px 0 rgba(255,255,255,.4),
-                900px 567px 1px rgba(200,215,255,.8), 1123px 123px 0 rgba(255,255,255,.5),
-                1345px 456px 0 rgba(220,230,255,.6), 1567px 678px 1px rgba(255,255,255,.7),
-                1789px 345px 0 rgba(255,255,255,.4), 2012px 567px 0 rgba(200,215,255,.8),
-                56px 1678px 1px rgba(255,255,255,.6), 234px 1567px 0 rgba(255,255,255,.5),
-                456px 1456px 0 rgba(220,230,255,.4), 234px 1123px 1px rgba(255,255,255,.7),
-                890px 1123px 0 rgba(255,255,255,.6), 1680px 789px 0 rgba(200,215,255,.5),
-                1456px 89px 0 rgba(255,255,255,.7), 333px 1344px 1px rgba(220,230,255,.5),
-                1800px 900px 0 rgba(255,255,255,.6), 999px 444px 0 rgba(200,215,255,.4),
-                700px 1800px 1px rgba(255,255,255,.5), 1300px 1100px 0 rgba(220,230,255,.8),
-                55px 444px 0 rgba(255,255,255,.4), 1900px 1600px 1px rgba(200,215,255,.6),
-                600px 700px 0 rgba(255,255,255,.7), 1100px 800px 0 rgba(220,230,255,.5),
-                2000px 100px 1px rgba(255,255,255,.6), 400px 1100px 0 rgba(255,255,255,.4),
-                1600px 1300px 0 rgba(200,215,255,.7), 800px 1700px 1px rgba(255,255,255,.5),
-                150px 1800px 0 rgba(220,230,255,.6), 1750px 650px 0 rgba(255,255,255,.8),
-                500px 50px 1px rgba(200,215,255,.5), 1250px 1750px 0 rgba(255,255,255,.6);
         }
 
         /* ===== ROOT Z-INDEX ===== */
         #root { position: relative; z-index: 1; }
 
-        /* ===== GLASS MORPHISM – bg-white in both modes ===== */
-        .bg-white {
-            background: rgba(255,255,255,.88) !important;
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            box-shadow: 0 4px 24px rgba(100,120,200,.08), inset 0 1px 0 rgba(255,255,255,.6) !important;
-        }
-
-        html.dark .bg-white {
-            background: rgba(8,18,50,.78) !important;
-            border-color: rgba(100,130,230,.18) !important;
-            box-shadow: 0 4px 32px rgba(0,8,40,.5), inset 0 1px 0 rgba(255,255,255,.05) !important;
-        }
-
-        /* ===== DARK: SURFACE OVERRIDES ===== */
-        html.dark .bg-slate-50  { background: rgba(4,10,30,.7) !important; }
-        html.dark .bg-slate-100 { background: rgba(10,20,55,.75) !important; }
-        html.dark .bg-slate-200 { background: rgba(18,32,75,.75) !important; }
-
-        html.dark .bg-amber-50  { background: rgba(38,26,5,.85) !important; }
-        html.dark .bg-amber-100 { background: rgba(55,38,5,.85) !important; }
-        html.dark .bg-green-50  { background: rgba(5,32,18,.85) !important; }
-        html.dark .bg-red-50    { background: rgba(32,5,5,.85) !important; }
-        html.dark .bg-blue-50   { background: rgba(5,18,45,.85) !important; }
-        html.dark .bg-yellow-50 { background: rgba(38,30,5,.85) !important; }
-        html.dark .bg-purple-50 { background: rgba(28,8,45,.85) !important; }
-
-        /* ===== DARK: TEXT OVERRIDES ===== */
-        html.dark .text-slate-800 { color: #e2e8f0 !important; }
-        html.dark .text-slate-700 { color: #cbd5e1 !important; }
-        html.dark .text-slate-600 { color: #94a3b8 !important; }
-        html.dark .text-slate-500 { color: #64748b !important; }
-        html.dark .text-slate-400 { color: #4b6080 !important; }
-        html.dark .text-green-700 { color: #4ade80 !important; }
-        html.dark .text-red-600   { color: #f87171 !important; }
-        html.dark .text-red-700   { color: #ef4444 !important; }
-        html.dark .text-amber-700 { color: #fbbf24 !important; }
-        html.dark .text-amber-600 { color: #f59e0b !important; }
-        html.dark .text-amber-500 { color: #fbbf24 !important; }
-        html.dark .text-blue-700  { color: #60a5fa !important; }
-        html.dark .text-purple-700{ color: #c084fc !important; }
-        html.dark .text-yellow-700{ color: #fde047 !important; }
-
-        /* ===== DARK: BORDER OVERRIDES ===== */
-        html.dark .border-slate-200 { border-color: rgba(100,130,230,.2) !important; }
-        html.dark .border-slate-300 { border-color: rgba(100,130,230,.3) !important; }
-        html.dark .border-slate-100 { border-color: rgba(100,130,230,.12) !important; }
-        html.dark .border-red-200   { border-color: rgba(239,68,68,.35) !important; }
-        html.dark .border-amber-500 { border-color: rgba(245,158,11,.8) !important; }
-        html.dark .divide-slate-100 > * + * { border-color: rgba(100,130,230,.12) !important; }
-
-        /* ===== DARK: HOVER OVERRIDES ===== */
-        html.dark .hover\:bg-slate-50:hover  { background: rgba(12,24,65,.65) !important; }
-        html.dark .hover\:bg-slate-100:hover { background: rgba(18,35,80,.72) !important; }
-        html.dark .hover\:bg-slate-200:hover { background: rgba(25,48,95,.72) !important; }
-        html.dark .hover\:bg-amber-50:hover  { background: rgba(55,38,5,.6) !important; }
-        html.dark .hover\:bg-red-50:hover    { background: rgba(50,8,8,.6) !important; }
-        html.dark .hover\:bg-red-200:hover   { background: rgba(80,18,18,.7) !important; }
-        html.dark .hover\:bg-amber-200:hover { background: rgba(85,58,5,.7) !important; }
-
-        /* ===== DARK: INPUTS ===== */
-        html.dark input, html.dark textarea, html.dark select {
-            background: rgba(6,14,40,.85) !important;
-            color: #e2e8f0 !important;
-            border-color: rgba(100,130,230,.3) !important;
-        }
-        html.dark input::placeholder, html.dark textarea::placeholder { color: #374060 !important; }
-        html.dark select option { background: #0d1b3e; color: #e2e8f0; }
-
-        /* ===== ACTIVE NAV DARK ===== */
-        html.dark .bg-amber-50.text-amber-700 {
-            background: rgba(251,191,36,.12) !important;
-            color: #fbbf24 !important;
-            box-shadow: inset 0 0 0 1px rgba(251,191,36,.22), 0 0 16px rgba(251,191,36,.08) !important;
-        }
-
-        /* ===== BUTTON GLOW ===== */
-        .bg-amber-500, button.bg-amber-500 { transition: box-shadow .25s ease, transform .2s ease !important; }
-        .bg-amber-500:hover, button.bg-amber-500:hover {
-            box-shadow: 0 0 22px rgba(245,158,11,.45), 0 4px 16px rgba(245,158,11,.25) !important;
-            transform: translateY(-1px) !important;
-        }
-        html.dark .bg-amber-500:hover {
-            box-shadow: 0 0 32px rgba(251,191,36,.55), 0 4px 20px rgba(251,191,36,.3) !important;
-        }
-
-        /* ===== CARD HOVER LIFT ===== */
-        .hover\:shadow-md { transition: box-shadow .25s ease, transform .2s ease !important; }
-        .hover\:shadow-md:hover {
-            box-shadow: 0 10px 32px rgba(100,120,200,.16) !important;
-            transform: translateY(-2px);
-        }
-        html.dark .hover\:shadow-md:hover {
-            box-shadow: 0 10px 40px rgba(0,15,70,.6), 0 0 24px rgba(100,130,255,.1) !important;
-        }
-
         /* ===== MODAL BACKDROP DARK ===== */
         html.dark .bg-black\/50 { background: rgba(0,5,25,.75) !important; backdrop-filter: blur(4px); }
-
-        /* ===== GRADIENT HERO – keep as-is (no override needed, bg-image wins) ===== */
 
         /* ===== TOAST ===== */
         .toast-enter { animation: slideIn .35s cubic-bezier(.34,1.56,.64,1); }
 
-        /* ===== SNACKBAR ===== */
-        .snackbar-enter { animation: snackbarSlideUp .35s cubic-bezier(.34,1.56,.64,1); }
-        @keyframes snackbarSlideUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-        html.dark .bg-green-500 {
-            background: rgba(22,163,74,.92) !important;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 0 24px rgba(22,163,74,.35) !important;
-        }
-        html.dark .bg-red-500 {
-            background: rgba(220,38,38,.92) !important;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 0 24px rgba(220,38,38,.35) !important;
-        }
-
-        /* ===== LOADING SKELETON DARK ===== */
-        html.dark .animate-pulse { background: rgba(18,32,75,.75) !important; }
-
         /* ===== DARK: LOADING SPINNER ===== */
-        html.dark .border-amber-500 { border-color: #fbbf24 !important; }
         html.dark .border-t-transparent { border-top-color: transparent !important; }
 
-        /* ===== SIDEBAR SPACE STYLING ===== */
+        /* ===== SIDEBAR / HEADER / NAV — neumorphic shell chrome =====
+           Flat surface, no blur/translucency; the sidebar is separated from
+           content by a hairline border only (per sidebars.md, shadows are
+           optional for the sidebar container itself). */
         .space-sidebar {
-            background: rgba(255,255,255,.82) !important;
-            backdrop-filter: blur(28px) saturate(200%);
-            -webkit-backdrop-filter: blur(28px) saturate(200%);
-            border-right: 1px solid rgba(226,232,240,.7) !important;
-            box-shadow: 4px 0 32px rgba(100,120,200,.06) !important;
+            background: var(--surface);
+            border-right: 1px solid var(--border-default);
         }
-        html.dark .space-sidebar {
-            background: rgba(6,14,42,.82) !important;
-            border-right: 1px solid rgba(100,130,230,.15) !important;
-            box-shadow: 4px 0 40px rgba(0,8,40,.5) !important;
-        }
-
-        /* Mobile header glass */
         .space-header {
-            background: rgba(255,255,255,.85) !important;
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border-bottom: 1px solid rgba(226,232,240,.7) !important;
-            box-shadow: 0 2px 20px rgba(100,120,200,.07) !important;
-        }
-        html.dark .space-header {
-            background: rgba(6,14,42,.85) !important;
-            border-bottom: 1px solid rgba(100,130,230,.15) !important;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border-default);
         }
 
-        /* Brand gradient text */
+        /* Brand wordmark — solid brand color, no gradient (structural elements
+           don't get decorative gradients under neumorphism). */
         .brand-text {
-            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 60%, #8b5cf6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        html.dark .brand-text {
-            background: linear-gradient(135deg, #fbbf24 0%, #f97316 55%, #a78bfa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--brand);
         }
 
         /* ===== GLOBAL TRANSITIONS ===== */
-        body, aside, header, nav, main, .bg-white, input, textarea, select, button {
+        body, aside, header, nav, main, input, textarea, select, button {
             transition: background-color .3s ease, border-color .3s ease, color .25s ease, box-shadow .3s ease;
         }
         /* Don't transition animations */
-        .animate-spin, .spinner, .animate-pulse { transition: none !important; }
+        .animate-spin, .spinner { transition: none !important; }
 
         /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -347,22 +346,35 @@
         /* ===== KEYFRAMES ===== */
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes nebulaDrift { 0% { transform: scale(1) rotate(0deg); opacity: .7; } 100% { transform: scale(1.06) rotate(3deg); opacity: 1; } }
-        @keyframes starPulse { 0% { opacity: .45; } 100% { opacity: .95; } }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Dark mode toggle button */
+        /* Dark mode toggle button / sidebar footer item — flat by default,
+           raised on hover, matching the sidebar nav item states. */
         .dark-toggle {
             display: flex; align-items: center; gap: 10px;
-            padding: 8px 12px; border-radius: 10px; width: 100%;
+            padding: 8px 12px; border-radius: 8px; width: 100%;
             font-size: 14px; font-weight: 500; cursor: pointer;
-            background: transparent; border: none;
-            color: #64748b;
-            transition: background .2s ease, color .2s ease;
+            background: var(--surface); border: none;
+            color: var(--body);
+            transition: box-shadow .2s ease, color .2s ease;
         }
-        .dark-toggle:hover { background: rgba(100,120,200,.08); }
-        html.dark .dark-toggle { color: #94a3b8; }
-        html.dark .dark-toggle:hover { background: rgba(100,130,230,.15); }
+        .dark-toggle:hover { box-shadow: var(--shadow-sm); color: var(--heading); }
+        .dark-toggle:active { box-shadow: var(--shadow-inset); }
+
+        /* Button group wrapper — strips individual shadows/radius from child
+           buttons so only the wrapper reads as elevated, per button-group.md. */
+        .neu-button-group {
+            display: inline-flex;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        .neu-button-group > button {
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            margin-left: -1px;
+        }
+        .neu-button-group > button:first-child { margin-left: 0; }
 
         /* Tag / pill default */
         .pill {

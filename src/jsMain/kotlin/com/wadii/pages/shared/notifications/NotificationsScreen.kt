@@ -3,6 +3,10 @@ package com.wadii.pages.shared.notifications
 import androidx.compose.runtime.*
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
+import com.wadii.ui.Alert
+import com.wadii.ui.AlertVariant
+import com.wadii.ui.Card
+import com.wadii.ui.EmptyState
 import com.wadii.ui.LoadingScreen
 import org.jetbrains.compose.web.dom.*
 
@@ -15,16 +19,16 @@ class NotificationsScreen : Screen {
         Div(attrs = { classes("space-y-6") }) {
             when {
                 state.isLoading -> {
-                    H1(attrs = { classes("text-2xl", "font-bold", "text-slate-800") }) { Text("Notifications") }
+                    H1(attrs = { classes("text-2xl", "font-semibold", "text-heading") }) { Text("Notifications") }
                     LoadingScreen()
                 }
-                state.error != null -> Div(attrs = { classes("bg-white", "rounded-xl", "p-12", "text-center", "text-slate-500") }) { Text(state.error!!) }
+                state.error != null -> Alert(variant = AlertVariant.Danger, body = state.error!!)
                 else -> {
                     val notifications = state.notifications
 //                    val unread = notifications.count { !it.isRead }
                     Div(attrs = { classes("flex", "items-center", "justify-between") }) {
                         Div(attrs = { classes("flex", "items-center", "gap-3") }) {
-                            H1(attrs = { classes("text-2xl", "font-bold", "text-slate-800") }) { Text("Notifications") }
+                            H1(attrs = { classes("text-2xl", "font-semibold", "text-heading") }) { Text("Notifications") }
 //                            if (unread > 0) Span(attrs = { classes("px-2.5", "py-0.5", "bg-red-500", "text-white", "text-xs", "font-bold", "rounded-full") }) { Text(unread.toString()) }
                         }
 //                        if (unread > 0) Button(attrs = {
@@ -33,17 +37,11 @@ class NotificationsScreen : Screen {
 //                        }) { Text("Mark all as read") }
                     }
                     if (notifications.isEmpty()) {
-                        Div(attrs = { classes("bg-white", "rounded-2xl", "p-12", "text-center") }) {
-                            P(attrs = { classes("text-5xl", "mb-3") }) { Text("🔔") }
-                            P(attrs = { classes("text-slate-500") }) { Text("No notifications yet.") }
-                        }
+                        EmptyState("🔔", "No notifications yet.")
                     } else {
                         Div(attrs = { classes("space-y-2") }) {
                             notifications.forEach { notif ->
-                                Div(attrs = {
-                                    classes("flex", "items-start", "gap-4", "bg-white", "border", "rounded-xl", "px-5", "py-4")
-//                                    if (!notif.isRead) classes("border-amber-200", "bg-amber-50") else classes("border-slate-200")
-                                }) {
+                                Card(classes = "flex items-start gap-4 px-5 py-4") {
                                     Div(attrs = {
 //                                        classes("w-10", "h-10", "rounded-full", "flex-shrink-0", "flex", "items-center", "justify-center",
 //                                            if (!notif.isRead) "bg-amber-100" else "bg-slate-100")

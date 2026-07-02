@@ -24,12 +24,12 @@ class SavedOffersScreen : Screen {
         val state by model.state.collectAsState()
 
         Div(attrs = { classes("space-y-6") }) {
-            H1(attrs = { classes("text-2xl", "font-semibold", "text-heading") }) { Text("Saved Offers") }
+            H1(attrs = { classes("text-2xl", "font-semibold", "text-heading") }) { Text("Saved Deals") }
 
             when {
                 state.isLoading -> LoadingScreen()
                 state.error != null -> Alert(variant = AlertVariant.Danger, body = state.error!!)
-                state.offers.isEmpty() -> EmptyState("🏷️", "No saved offers yet. Browse offers to save them.")
+                state.offers.isEmpty() -> EmptyState("🏷️", "No saved deals yet. Browse deals to save them.")
                 else -> {
                     Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "gap-4") }) {
                         state.offers.forEach { offer ->

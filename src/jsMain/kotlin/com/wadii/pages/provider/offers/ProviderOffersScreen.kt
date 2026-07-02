@@ -27,7 +27,7 @@ class ProviderOffersScreen : Screen {
     override fun Content() {
         val model = koinScreenModel<ProviderOffersViewModel>()
         Div(attrs = { classes("space-y-6") }) {
-            PageHeader("My Offers", "+ New Offer") { model.onEvent(ProviderOffersEvent.ShowModal(null)) }
+            PageHeader("My Deals", "+ New Deal") { model.onEvent(ProviderOffersEvent.ShowModal(null)) }
 
             val state by model.state.collectAsState()
             when {
@@ -36,7 +36,7 @@ class ProviderOffersScreen : Screen {
 
                 else -> {
                     if (state.offers.isEmpty()) {
-                        EmptyState("🏷️", "No offers yet. Create your first offer!")
+                        EmptyState("🏷️", "No deals yet. Create your first deal!")
                     } else {
                         Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "gap-4") }) {
                             state.offers.forEach { offer ->
@@ -58,7 +58,7 @@ class ProviderOffersScreen : Screen {
                     }
                     Modal(
                         open = state.showModal,
-                        title = if (state.editOffer != null) "Edit Offer" else "New Offer",
+                        title = if (state.editOffer != null) "Edit Deal" else "New Deal",
                         variant = ModalVariant.Form,
                         onDismiss = { model.onEvent(ProviderOffersEvent.CloseModal) }
                     ) {

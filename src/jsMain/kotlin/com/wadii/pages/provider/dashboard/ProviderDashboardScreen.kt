@@ -27,7 +27,7 @@ class ProviderDashboardScreen : Screen {
         val state by model.state.collectAsState()
 
         Div(attrs = { classes("space-y-8") }) {
-            H1(attrs = { classes("text-2xl", "font-semibold", "text-heading") }) { Text("Provider Dashboard") }
+            H1(attrs = { classes("text-2xl", "font-semibold", "text-heading") }) { Text("Seller Dashboard") }
 
             when {
                 state.isLoading -> LoadingScreen()

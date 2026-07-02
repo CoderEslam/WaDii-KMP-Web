@@ -30,7 +30,7 @@ class RegisterScreen : Screen {
                 Card(classes = "p-8") {
                     Div(attrs = { classes("space-y-4") }) {
                         Tabs(
-                            tabs = listOf("User", "Provider"),
+                            tabs = listOf("Buyer", "Seller"),
                             selected = s.userType,
                             onSelect = { model.onEvent(RegisterEvent.SetUserType(it)) },
                             variant = TabVariant.Pills
@@ -46,7 +46,7 @@ class RegisterScreen : Screen {
                         InputField("Password", s.password, "••••••••", "password", true) { model.onEvent(RegisterEvent.SetPassword(it)) }
 
                         if (s.userType == 1) {
-                            InputField("Provider / Business Name", s.providerName, "My Service Co.", required = true) { model.onEvent(RegisterEvent.SetProviderName(it)) }
+                            InputField("Shop / Business Name", s.providerName, "My Auto Parts Co.", required = true) { model.onEvent(RegisterEvent.SetProviderName(it)) }
                         }
 
                         Div(attrs = { classes("space-y-3") }) {

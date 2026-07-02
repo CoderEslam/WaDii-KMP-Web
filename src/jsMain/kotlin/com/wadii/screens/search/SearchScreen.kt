@@ -36,7 +36,7 @@ class SearchScreen : Screen {
                             "bg-surface", "shadow-neu-inset", "text-sm", "text-heading",
                             "focus:outline-none", "focus:ring-1", "focus:ring-brand", "focus:border-brand"
                         )
-                        attr("placeholder", "Search providers, offers, services…")
+                        attr("placeholder", "Search parts sellers, deals, categories…")
                         attr("value", state.query)
                         onInput { model.onEvent(SearchEvent.SetQuery(it.value)) }
                         onKeyDown { if (it.key == "Enter") model.onEvent(SearchEvent.Search) }
@@ -52,7 +52,7 @@ class SearchScreen : Screen {
                 }
                 if (r.providers.isNotEmpty()) {
                     Div {
-                        P(attrs = { classes("text-base", "font-semibold", "text-heading", "mb-3") }) { Text("Providers") }
+                        P(attrs = { classes("text-base", "font-semibold", "text-heading", "mb-3") }) { Text("Parts Sellers") }
                         Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "gap-4") }) {
                             r.providers.forEach { p ->
                                 Div(attrs = {
@@ -73,7 +73,7 @@ class SearchScreen : Screen {
                 }
                 if (r.offers.isNotEmpty()) {
                     Div {
-                        P(attrs = { classes("text-base", "font-semibold", "text-heading", "mb-3") }) { Text("Offers") }
+                        P(attrs = { classes("text-base", "font-semibold", "text-heading", "mb-3") }) { Text("Deals") }
                         Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "gap-4") }) {
                             r.offers.forEach { OfferCard(navigator = navigator, offer = it) }
                         }
@@ -81,7 +81,7 @@ class SearchScreen : Screen {
                 }
                 if (r.services.isNotEmpty()) {
                     Div {
-                        P(attrs = { classes("text-base", "font-semibold", "text-heading", "mb-3") }) { Text("Services") }
+                        P(attrs = { classes("text-base", "font-semibold", "text-heading", "mb-3") }) { Text("Categories") }
                         Div(attrs = { classes("flex", "flex-wrap", "gap-2") }) {
                             r.services.forEach { svc -> Badge(svc.name, variant = BadgeVariant.Alternative, large = true, pill = true) }
                         }

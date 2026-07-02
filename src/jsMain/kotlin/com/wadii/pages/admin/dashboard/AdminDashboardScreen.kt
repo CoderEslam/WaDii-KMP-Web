@@ -30,19 +30,19 @@ class AdminDashboardScreen : Screen {
             }
             if (state.requests.isNotEmpty()) {
                 Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-3", "gap-4") }) {
-                    StatCard("Provider Requests", state.requests.size.toString(), "📋") {
+                    StatCard("Seller Requests", state.requests.size.toString(), "📋") {
                         navigator.replaceAll(ProviderRequestsScreen())
                     }
                     StatCard("Advertisements", state.ads.size.toString(), "📣") {
                         navigator.replaceAll(AdsScreen())
                     }
-                    StatCard("Services", state.services.size.toString(), "🔧") {
+                    StatCard("Categories", state.services.size.toString(), "⚙️") {
                         navigator.replaceAll(ServicesScreen())
                     }
                 }
                 Div {
                     Div(attrs = { classes("flex", "items-center", "justify-between", "mb-3") }) {
-                        H2(attrs = { classes("font-semibold", "text-heading") }) { Text("Pending Provider Requests") }
+                        H2(attrs = { classes("font-semibold", "text-heading") }) { Text("Pending Seller Requests") }
                         GhostButton("View all") { navigator.replaceAll(ProviderRequestsScreen()) }
                     }
                     if (state.requests.isEmpty()) {

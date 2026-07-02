@@ -35,22 +35,22 @@ fun Layout(content: @Composable () -> Unit) {
         NavLink("Home", "✦", HomeScreen()),
         NavLink("Search", "⊹", SearchScreen()),
         NavLink("My Orders", "◈", OrdersScreen()),
-        NavLink("Saved Offers", "◉", SavedOffersScreen()),
+        NavLink("Saved Deals", "◉", SavedOffersScreen()),
         NavLink("Messages", "◎", ChatScreen()),
         NavLink("Notifications", "◇", NotificationsScreen()),
     )
     val providerLinks = listOf(
         NavLink("Dashboard", "⬡", ProviderDashboardScreen()),
         NavLink("Orders", "◈", ProviderOrdersScreen()),
-        NavLink("My Offers", "◉", ProviderOffersScreen()),
+        NavLink("My Deals", "◉", ProviderOffersScreen()),
         NavLink("Messages", "◎", ChatScreen()),
         NavLink("Notifications", "◇", NotificationsScreen()),
     )
     val adminLinks = listOf(
         NavLink("Dashboard", "⬡", AdminDashboardScreen()),
-        NavLink("Requests", "◈", ProviderRequestsScreen()),
+        NavLink("Seller Requests", "◈", ProviderRequestsScreen()),
         NavLink("Ads", "◉", AdsScreen()),
-        NavLink("Services", "⊹", ServicesScreen()),
+        NavLink("Categories", "⊹", ServicesScreen()),
     )
 
     val links = when (user.role) {

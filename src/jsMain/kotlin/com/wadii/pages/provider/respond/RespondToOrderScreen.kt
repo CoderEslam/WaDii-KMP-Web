@@ -60,7 +60,7 @@ class RespondToOrderScreen(val orderId: Int) : Screen {
                     Card(classes = "p-6") {
                         H2(attrs = { classes("font-semibold", "text-heading", "mb-4") }) { Text("Submit Response") }
                         Div(attrs = { classes("space-y-5") }) {
-                            TextArea("Your Comment", state.comment, "Describe your service offer, timeline…", 4) {
+                            TextArea("Your Comment", state.comment, "Describe your parts availability, pricing, timeline…", 4) {
                                 model.onEvent(RespondToOrderEvent.SetComment(it))
                             }
                             if (state.prices.isNotEmpty() && o.spareParts != null) {

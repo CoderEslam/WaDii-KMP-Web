@@ -41,13 +41,13 @@ class HomeScreen : Screen {
                 H1(attrs = { classes("text-3xl", "font-semibold", "text-heading", "mb-2") }) {
                     Text("Welcome back, ${user?.firstName}!")
                 }
-                P(attrs = { classes("text-body", "mb-4") }) { Text("Find the best service providers near you") }
-                PrimaryButton("Search Providers") { navigator.replaceAll(SearchScreen()) }
+                P(attrs = { classes("text-body", "mb-4") }) { Text("Find the best spare parts sellers near you") }
+                PrimaryButton("Search Parts Sellers") { navigator.replaceAll(SearchScreen()) }
             }
 
             if (state.services.isNotEmpty()) {
                 Div {
-                    P(attrs = { classes("text-lg", "font-semibold", "text-heading", "mb-3") }) { Text("🛠️ Our Services") }
+                    P(attrs = { classes("text-lg", "font-semibold", "text-heading", "mb-3") }) { Text("⚙️ Categories") }
                     Div(attrs = { classes("flex", "flex-wrap", "gap-2") }) {
                         if (state.selectedService.name.isNotNullOrEmptyString()) {
                             Button(attrs = {
@@ -100,13 +100,13 @@ class HomeScreen : Screen {
             }
 
             Div {
-                P(attrs = { classes("text-lg", "font-semibold", "text-heading", "mb-3") }) { Text("🔧 Service Providers") }
+                P(attrs = { classes("text-lg", "font-semibold", "text-heading", "mb-3") }) { Text("🔩 Parts Sellers") }
                 if (state.filterLoading) {
                     LoadingSkeletons(4, "h-28")
                 } else if (state.filteredProviders.isEmpty()) {
                     EmptyState(
-                        "🔧",
-                        if (state.selectedService.name.isNotNullOrEmptyString()) "No providers for this service." else "No providers available yet."
+                        "🔩",
+                        if (state.selectedService.name.isNotNullOrEmptyString()) "No sellers for this category." else "No sellers available yet."
                     )
                 } else {
                     Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-3", "gap-4") }) {
@@ -116,12 +116,12 @@ class HomeScreen : Screen {
             }
 
             Div {
-                P(attrs = { classes("text-lg", "font-semibold", "text-heading", "mb-4") }) { Text("🏷️ Latest Offers") }
+                P(attrs = { classes("text-lg", "font-semibold", "text-heading", "mb-4") }) { Text("🏷️ Latest Deals") }
                 val visible = state.offers
                 if (visible.isEmpty()) {
                     EmptyState(
                         "🏷️",
-                        if (state.selectedService.name.isNotNullOrEmptyString()) "No offers for this service." else "No offers available yet."
+                        if (state.selectedService.name.isNotNullOrEmptyString()) "No deals for this category." else "No deals available yet."
                     )
                 } else {
                     Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-3", "gap-4") }) {

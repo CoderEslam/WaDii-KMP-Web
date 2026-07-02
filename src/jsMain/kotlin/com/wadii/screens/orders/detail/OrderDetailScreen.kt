@@ -60,12 +60,12 @@ class OrderDetailScreen(val orderId: Int) : Screen {
 
                     H2(attrs = { classes("font-semibold", "text-heading") }) { Text("Responses (${o.responses?.size ?: 0})") }
                     if (o.responses.isNullOrEmpty()) {
-                        EmptyState("💬", "No responses yet. Providers will respond soon.")
+                        EmptyState("💬", "No responses yet. Sellers will respond soon.")
                     } else {
                         Div(attrs = { classes("space-y-3") }) {
                             o.responses!!.forEach { resp ->
                                 Card(classes = "p-5") {
-                                    P(attrs = { classes("font-medium", "text-heading", "mb-3") }) { Text("👤 ${resp.provider?.name ?: "Provider"}") }
+                                    P(attrs = { classes("font-medium", "text-heading", "mb-3") }) { Text("👤 ${resp.provider?.name ?: "Seller"}") }
                                     P(attrs = { classes("text-sm", "text-body") }) { Text(resp.comment) }
                                 }
                             }

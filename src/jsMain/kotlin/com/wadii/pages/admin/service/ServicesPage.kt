@@ -24,24 +24,24 @@ class ServicesScreen : Screen {
         val state by model.state.collectAsState()
 
         Div(attrs = { classes("space-y-6") }) {
-            H1(attrs = { classes("text-2xl", "font-semibold", "text-heading") }) { Text("Services") }
+            H1(attrs = { classes("text-2xl", "font-semibold", "text-heading") }) { Text("Categories") }
 
             when {
                 state.isLoading -> LoadingScreen()
                 state.error != null -> Alert(variant = AlertVariant.Danger, body = state.error!!)
                 else -> {
                     Card(classes = "p-5") {
-                        H2(attrs = { classes("font-semibold", "text-heading", "mb-3") }) { Text("Add Service") }
+                        H2(attrs = { classes("font-semibold", "text-heading", "mb-3") }) { Text("Add Category") }
                         Div(attrs = { classes("flex", "gap-3", "items-end") }) {
                             Div(attrs = { classes("flex-1") }) {
-                                InputField("Service name", state.newName, required = true) { model.onEvent(ServicesEvent.SetNewName(it)) }
+                                InputField("Category name", state.newName, required = true) { model.onEvent(ServicesEvent.SetNewName(it)) }
                             }
                             PrimaryButton("Add", loading = state.adding) { model.onEvent(ServicesEvent.Add) }
                         }
                     }
 
                     if (state.services.isEmpty()) {
-                        EmptyState("🔧", "No services yet.")
+                        EmptyState("⚙️", "No categories yet.")
                     } else {
                         Card {
                             Div(attrs = { classes("divide-y", "divide-default") }) {
@@ -55,7 +55,7 @@ class ServicesScreen : Screen {
                                             SecondaryButton("Cancel") { model.onEvent(ServicesEvent.CancelEdit) }
                                         } else {
                                             Div(attrs = { classes("flex", "items-center", "gap-3", "flex-1") }) {
-                                                IconShape("🔧", size = IconShapeSize.SM, variant = IconShapeVariant.Brand)
+                                                IconShape("⚙️", size = IconShapeSize.SM, variant = IconShapeVariant.Brand)
                                                 P(attrs = { classes("font-medium", "text-heading") }) { Text(service.name) }
                                             }
                                             GhostButton("✏️") { model.onEvent(ServicesEvent.StartEdit(service)) }

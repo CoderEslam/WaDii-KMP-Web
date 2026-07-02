@@ -116,7 +116,7 @@ class ProviderDetailScreen(val providerId: Int) : Screen {
                     // ── Offers ───────────────────────────────────────────────────
                     if (provider.offers.isNotEmpty()) {
                         Card(classes = "p-6") {
-                            H2(attrs = { classes("font-semibold", "text-heading", "mb-3") }) { Text("🎁 Offers") }
+                            H2(attrs = { classes("font-semibold", "text-heading", "mb-3") }) { Text("🎁 Deals") }
                             Div(attrs = { classes("space-y-3") }) {
                                 provider.offers.forEach { offer ->
                                     Div(attrs = { classes("border", "border-brand-subtle", "bg-brand-softer", "rounded-neu-base", "p-4") }) {
@@ -178,9 +178,9 @@ class ProviderDetailScreen(val providerId: Int) : Screen {
                         }
                     }
 
-                    // ── Request Service CTA ──────────────────────────────────────
+                    // ── Request Parts CTA ─────────────────────────────────────────
                     Card(classes = "p-6") {
-                        PrimaryButton("Request Service", fullWidth = true) { navigator.push(NewOrderScreen()) }
+                        PrimaryButton("Request Parts Quote", fullWidth = true) { navigator.push(NewOrderScreen()) }
                     }
                 }
             }

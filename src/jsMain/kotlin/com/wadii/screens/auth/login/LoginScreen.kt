@@ -22,7 +22,7 @@ class LoginScreen : Screen {
             Div(attrs = { classes("w-full", "max-w-md") }) {
                 Div(attrs = { classes("text-center", "mb-10") }) {
                     H1(attrs = { classes("text-5xl", "font-extrabold", "brand-text", "tracking-tight", "mb-3") }) { Text("WaDii") }
-                    P(attrs = { classes("text-body-subtle", "text-sm", "tracking-widest", "uppercase") }) { Text("Your service universe") }
+                    P(attrs = { classes("text-body-subtle", "text-sm", "tracking-widest", "uppercase") }) { Text("Auto spare parts marketplace") }
                 }
 
                 Div(attrs = { classes("bg-surface", "rounded-neu-base", "shadow-neu-lg", "p-8", "border", "border-default") }) {

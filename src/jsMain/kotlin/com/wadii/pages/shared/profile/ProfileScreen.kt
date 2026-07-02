@@ -104,9 +104,9 @@ class ProfileScreen : Screen {
 
                     u.provider?.let { prov ->
                         Card(classes = "p-6") {
-                            H2(attrs = { classes("font-semibold", "text-heading", "mb-4") }) { Text("Business Info") }
+                            H2(attrs = { classes("font-semibold", "text-heading", "mb-4") }) { Text("Seller Info") }
                             Div(attrs = { classes("space-y-3") }) {
-                                ProfileInfoRow("Business Name", prov.name)
+                                ProfileInfoRow("Shop Name", prov.name)
                                 ProfileInfoRow("Rating", "⭐ ${prov.rate.to1dp()}")
                                 ProfileInfoRow("Followers", prov.followersCount.toString())
                             }

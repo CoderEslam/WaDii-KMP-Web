@@ -53,6 +53,7 @@ import com.wadii.data.api.clientWebSocket
 import com.wadii.data.websocket.ChatWebSocketService
 import com.wadii.pages.shared.chat.ChatViewModel
 import com.wadii.pages.shared.notifications.NotificationsViewModel
+import com.wadii.pages.shared.profile.EditProfileViewModel
 import com.wadii.pages.shared.profile.ProfileViewModel
 import com.wadii.screens.auth.login.LoginViewModel
 import com.wadii.screens.auth.register.RegisterViewModel
@@ -124,6 +125,7 @@ val appModule = module {
     factory { ProviderDashboardViewModel(get(), get()) }
     factory { ProviderOrdersViewModel(get()) }
     factory { ProfileViewModel(get()) }
+    factory { EditProfileViewModel(get(), get(), get(), get()) }
     factory { NotificationsViewModel(get()) }
     factory { ProviderRequestsViewModel(get()) }
     factory { ServicesViewModel(get()) }

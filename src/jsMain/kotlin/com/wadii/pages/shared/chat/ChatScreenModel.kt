@@ -9,7 +9,6 @@ import com.wadii.domain.model.chat.ChatContact
 import com.wadii.domain.model.chat.InsertMessage
 import com.wadii.domain.model.chat.PageMessages
 import com.wadii.domain.usecase.MessageUseCase
-import com.wadii.domain.model.auth.login.User
 import com.wadii.state.AppState
 import com.wadii.utils.RequestState
 import kotlinx.coroutines.Job
@@ -142,6 +141,12 @@ class ChatViewModel(
 //                        messages = it.messages.toMutableList().apply { add(optimistic) }
 //                    )
 //                }
+                updateState { it.copy(sending = false, contacts = _state.value.contacts.toMutableList().apply {
+                    this[this.indexOf(contact)] = contact.copy(
+                        lastMessage = text,
+                        lastMessageAt = "now"
+                    )
+                }) }
             } else {
                 // WS not connected — fall back to REST and reload the conversation
                 var restSent = false

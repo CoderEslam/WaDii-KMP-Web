@@ -34,13 +34,13 @@ class ProfileViewModel(
     private fun load() = screenModelScope.launch {
         val cached = AppState.user
         if (cached != null) {
-            updateState { it.copy(user = cached, isLoading = false) }
+            updateState { it.copy(user = cached, isLoading = false, revision = it.revision + 1) }
             return@launch
         }
         userUseCase.userMe { r ->
             r.handelState(
                 onLoading = { updateState { it.copy(isLoading = true) } },
-                onSuccess = { data -> updateState { it.copy(user = data.data, isLoading = false) } },
+                onSuccess = { data -> updateState { it.copy(user = data.data, isLoading = false, revision = it.revision + 1) } },
                 onError = { e, _ -> updateState { it.copy(error = e, isLoading = false) } }
             )
         }

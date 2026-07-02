@@ -10,7 +10,10 @@ import kotlinx.serialization.json.Json
 enum class ToastVariant { Success, Warning, Error }
 
 object AppState {
-    var user by mutableStateOf<User?>(null)
+    // User.equals() compares only by id, so the default structural-equality policy would
+    // silently discard writes where the id is unchanged but other fields (name, provider, etc.)
+    // were updated — neverEqualPolicy forces every assignment to actually propagate.
+    var user by mutableStateOf<User?>(null, neverEqualPolicy())
     var token by mutableStateOf<String?>(null)
 
     var toastMessage by mutableStateOf<String?>(null)

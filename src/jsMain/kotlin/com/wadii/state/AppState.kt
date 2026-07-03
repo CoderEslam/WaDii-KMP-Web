@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import com.wadii.core.fromJson
 import com.wadii.core.toJson
 import com.wadii.domain.model.auth.login.User
+import com.wadii.domain.model.call.CallSignal
 import kotlinx.browser.localStorage
 import kotlinx.serialization.json.Json
 
@@ -18,6 +19,8 @@ object AppState {
 
     var toastMessage by mutableStateOf<String?>(null)
     var toastVariant by mutableStateOf(ToastVariant.Success)
+
+    var incomingCall by mutableStateOf<CallSignal?>(null)
 
     var darkMode by mutableStateOf(localStorage.getItem("darkMode") == "true")
 

@@ -1,12 +1,15 @@
 package com.wadii
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
+import com.wadii.core.call.CallSignalingController
 import com.wadii.core.di.initializeKoin
 import com.wadii.pages.admin.dashboard.AdminDashboardScreen
 import com.wadii.pages.provider.dashboard.ProviderDashboardScreen
+import com.wadii.pages.shared.call.IncomingCallOverlay
 import com.wadii.screens.auth.login.LoginScreen
 import com.wadii.screens.home.HomeScreen
 import com.wadii.state.AppState
@@ -16,6 +19,7 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.compose.web.renderComposable
 import org.koin.compose.KoinContext
+import org.koin.compose.koinInject
 
 fun main() {
     initializeKoin()
@@ -38,6 +42,11 @@ fun App() {
     }
 
     val user = AppState.user
+    val token = AppState.token
+    val callController = koinInject<CallSignalingController>()
+    LaunchedEffect(user?.id, token) {
+        if (user != null && token != null) callController.start(user.id, token) else callController.stop()
+    }
 
     if (user == null) {
         Navigator(LoginScreen()) { CurrentScreen() }
@@ -53,6 +62,7 @@ fun App() {
 
     Navigator(initialScreen) {
         Layout { CurrentScreen() }
+        IncomingCallOverlay()
     }
     Toast()
 }

@@ -7,6 +7,8 @@ import com.wadii.domain.model.ads.Ads
 import com.wadii.domain.model.auth.login.LoginRequest
 import com.wadii.domain.model.auth.login.User
 import com.wadii.domain.model.auth.register.RegisterRequest
+import com.wadii.domain.model.call.agora.AgoraTokenRequest
+import com.wadii.domain.model.call.agora.AgoraTokenResponse
 import com.wadii.domain.model.carTypes.CarType
 import com.wadii.domain.model.chat.ChatContact
 import com.wadii.domain.model.chat.InsertMessage
@@ -441,6 +443,20 @@ class ApiService(
         response(client.getApiResponse<BaseResponse<PageMessages>>(urlString = "${Constants.CONVERSATION}/$userId") {
             parameter("page", page)
         })
+    }
+
+    //agora
+    suspend fun getAgoraToken(
+        request: AgoraTokenRequest,
+        response: (RequestState<BaseResponse<AgoraTokenResponse>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<AgoraTokenRequest, BaseResponse<AgoraTokenResponse>>(
+                urlString = Constants.AGORA_TOKEN,
+                body = request
+            )
+        )
     }
 
     //offers

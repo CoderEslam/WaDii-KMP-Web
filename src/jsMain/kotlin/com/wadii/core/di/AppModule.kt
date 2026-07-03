@@ -1,10 +1,12 @@
 package com.wadii.core.di
 
+import com.wadii.core.call.CallSignalingController
 import com.wadii.data.api.ApiService
 import com.wadii.data.api.createHttpClient
 import com.wadii.data.api.createHttpClientSendFile
 import com.wadii.data.repo.AdminRepoImpl
 import com.wadii.data.repo.AdsRepoImpl
+import com.wadii.data.repo.AgoraRepoImpl
 import com.wadii.data.repo.AuthRepoImpl
 import com.wadii.data.repo.CountryRepoImpl
 import com.wadii.data.repo.MessagesRepoImpl
@@ -16,8 +18,10 @@ import com.wadii.data.repo.ResponseRepoImpl
 import com.wadii.data.repo.SearchRepoImpl
 import com.wadii.data.repo.ServicesRepoImpl
 import com.wadii.data.repo.UserRepoImpl
+import com.wadii.data.websocket.CallSignalingService
 import com.wadii.domain.repo.AdminRepo
 import com.wadii.domain.repo.AdsRepo
+import com.wadii.domain.repo.AgoraRepo
 import com.wadii.domain.repo.AuthRepo
 import com.wadii.domain.repo.CountryRepo
 import com.wadii.domain.repo.MessagesRepo
@@ -31,6 +35,7 @@ import com.wadii.domain.repo.ServicesRepo
 import com.wadii.domain.repo.UserRepo
 import com.wadii.domain.usecase.AdminDashboardUseCase
 import com.wadii.domain.usecase.AdsUseCase
+import com.wadii.domain.usecase.AgoraUseCase
 import com.wadii.domain.usecase.AuthUseCase
 import com.wadii.domain.usecase.CountryUseCase
 import com.wadii.domain.usecase.MessageUseCase
@@ -41,6 +46,7 @@ import com.wadii.domain.usecase.ProviderUseCase
 import com.wadii.domain.usecase.ResponseUseCase
 import com.wadii.domain.usecase.SearchUseCase
 import com.wadii.domain.usecase.UserUseCase
+import com.wadii.pages.shared.call.CallViewModel
 import com.wadii.pages.admin.ads.AdsScreenModel
 import com.wadii.pages.admin.dashboard.AdminDashboardScreenModel
 import com.wadii.pages.admin.provider.ProviderRequestsViewModel
@@ -79,8 +85,11 @@ val appModule = module {
     single<ApiService> { ApiService(get(), createHttpClientSendFile()) }
     single(named("wsClient")) { clientWebSocket() }
     single { ChatWebSocketService(get(named("wsClient"))) }
+    single { CallSignalingService(get(named("wsClient"))) }
+    single { CallSignalingController(get()) }
 
     // Repos
+    single<AgoraRepo> { AgoraRepoImpl(get()) }
     single<AuthRepo> { AuthRepoImpl(get()) }
     single<OrderRepo> { OrderRepoImpl(get()) }
     single<OfferRepo> { OfferRepoImpl(get()) }
@@ -96,6 +105,7 @@ val appModule = module {
     single<UserRepo> { UserRepoImpl(get()) }
 
     // UseCases
+    single { AgoraUseCase(get()) }
     single { AuthUseCase(get()) }
     single { OrderUseCase(get()) }
     single { OfferUseCase(get()) }
@@ -120,6 +130,18 @@ val appModule = module {
     factory { SearchViewModel(get()) }
     factory { SavedOffersViewModel(get()) }
     factory { (providerId: Int) -> ProviderDetailViewModel(providerId, get()) }
+    factory { params ->
+        CallViewModel(
+            channelName = params.get(),
+            remoteUserId = params.get(),
+            remoteUserName = params.get(),
+            remoteUserImage = params.get(),
+            withVideo = params.get(),
+            isCaller = params.get(),
+            agoraUseCase = get(),
+            callSignaling = get()
+        )
+    }
 
     // ViewModels — pages/
     factory { ProviderDashboardViewModel(get(), get()) }

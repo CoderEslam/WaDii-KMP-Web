@@ -5,14 +5,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wadii.core.isNotNullOrEmptyString
+import com.wadii.domain.model.call.CallChannel
 import com.wadii.domain.model.chat.ChatContact
+import com.wadii.pages.shared.call.CallScreen
 import com.wadii.state.AppState
 import com.wadii.ui.AnimatedVisibility
 import com.wadii.ui.Avatar
 import com.wadii.ui.LoadingScreen
 import com.wadii.ui.classNames
 import com.wadii.ui.PrimaryButton
+import com.wadii.ui.SecondaryButton
 import com.wadii.ui.Spinner
 import com.wadii.utils.Constants
 import org.jetbrains.compose.web.attributes.InputType
@@ -22,6 +27,7 @@ import org.w3c.dom.HTMLDivElement
 class ChatScreen : Screen {
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
         val model = koinScreenModel<ChatViewModel>()
         val state by model.state.collectAsState()
         val myId = AppState.user?.id
@@ -169,6 +175,34 @@ class ChatScreen : Screen {
                                 "text-heading"
                             )
                         }) { Text(displayName) }
+                        Div(attrs = { classes("ml-auto", "flex", "gap-2") }) {
+                            SecondaryButton("Call", icon = "📞") {
+                                val myId = AppState.user?.id ?: return@SecondaryButton
+                                navigator.push(
+                                    CallScreen(
+                                        channelName = CallChannel.name(myId, contact.contact.id),
+                                        remoteUserId = contact.contact.id,
+                                        remoteUserName = displayName,
+                                        remoteUserImage = contact.contact.image,
+                                        withVideo = false,
+                                        isCaller = true
+                                    )
+                                )
+                            }
+                            PrimaryButton("Video", icon = "🎥") {
+                                val myId = AppState.user?.id ?: return@PrimaryButton
+                                navigator.push(
+                                    CallScreen(
+                                        channelName = CallChannel.name(myId, contact.contact.id),
+                                        remoteUserId = contact.contact.id,
+                                        remoteUserName = displayName,
+                                        remoteUserImage = contact.contact.image,
+                                        withVideo = true,
+                                        isCaller = true
+                                    )
+                                )
+                            }
+                        }
                     }
                     var messagesContainer by remember { mutableStateOf<HTMLDivElement?>(null) }
                     var scrollHeightBeforeLoad by remember { mutableStateOf(0.0) }
@@ -218,7 +252,7 @@ class ChatScreen : Screen {
                                 )
                             }) { Text("No messages yet. Say hello!") }
                         } else {
-                            state.messages.asReversed().forEach { msg ->
+                            state.messages.forEach { msg ->
                                 val isMe = msg.fromUser.id == myId
                                 Div(attrs = {
                                     classes(

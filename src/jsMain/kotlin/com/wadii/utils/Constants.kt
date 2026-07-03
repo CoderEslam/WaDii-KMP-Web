@@ -95,6 +95,9 @@ object Constants {
 
     const val CONVERSATION = "${BASE_URL}$VERSION/messages/conversation"
 
+    //agora
+    const val AGORA_TOKEN = "${BASE_URL}$VERSION/agora/token"
+
     //car type
     const val CAR_TYPE_SHOW_ALL = "${BASE_URL}$VERSION/car-types/show-all"
 

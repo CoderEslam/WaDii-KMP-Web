@@ -49,6 +49,9 @@ kotlin {
                 // Provides the ability to load network images
                 implementation(libs.sketch.http)
 
+                // Agora Web SDK for video/voice calling
+                implementation(npm("agora-rtc-sdk-ng", "4.22.1"))
+
             }
         }
     }

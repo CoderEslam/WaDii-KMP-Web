@@ -10,8 +10,8 @@ data class City(
     val id: Int = 0,
     @SerialName("name")
     val name: String = "",
-    @SerialName("provinceId")
-    val province: com.wadii.domain.model.province.Province = _root_ide_package_.com.wadii.domain.model.province.Province()
+    @SerialName("province")
+    val province: Province = Province()
 ) {
 
 }

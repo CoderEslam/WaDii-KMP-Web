@@ -63,7 +63,9 @@ class ProviderOffersViewModel(
         updateState { it.copy(saving = true) }
         screenModelScope.launch {
             val body = buildMap<String, Any?> {
-                put("title", title); put("description", description); put("endDate", endDate)
+                put("title", title);
+                put("description", description);
+                put("endDate", endDate)
                 put("services", services.map { mapOf("id" to it) })
                 offer?.let { put("id", it.id) }
             }

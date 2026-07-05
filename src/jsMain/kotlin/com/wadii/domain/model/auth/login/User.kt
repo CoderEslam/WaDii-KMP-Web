@@ -10,7 +10,7 @@ data class User(
     @SerialName("backgroundImage")
     val backgroundImage: String? = null,
     @SerialName("city")
-    val city: com.wadii.domain.model.city.City? = _root_ide_package_.com.wadii.domain.model.city.City(),
+    val city: City? = City(),
     @SerialName("email")
     val email: String = "",
     @SerialName("firstName")

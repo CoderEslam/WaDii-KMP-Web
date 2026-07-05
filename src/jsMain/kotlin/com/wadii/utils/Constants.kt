@@ -7,7 +7,7 @@ object Constants {
     const val APP_LANGUAGE = "APP_LANGUAGE"
     const val USER_KEY = "USER_KEY"
     const val THEME_KEY = "THEME_KEY"
-    const val IP = "192.168.1.6"
+    const val IP = "192.168.1.2"
     const val BASE_URL = "http://$IP:8080"
     const val WS_URL = "ws://$IP:8080/web-socket"
     const val BASE_URL_USER_IMAGES = "${BASE_URL}/users"
@@ -125,6 +125,8 @@ object Constants {
 
     //provider-request
     const val PROVIDER_REQUEST = "${BASE_URL}$VERSION/provider-requests/show-all"
+    fun PROVIDER_REQUEST_ACCEPT(id: Long) = "${BASE_URL}$VERSION/provider-requests/accept/$id"
+    fun PROVIDER_REQUEST_REJECT(id: Long) = "${BASE_URL}$VERSION/provider-requests/reject/$id"
 
     fun ORDER_SHOW_BY_ID(id: Int) = "${BASE_URL}$VERSION/orders/show/$id"
 

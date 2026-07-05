@@ -2,32 +2,49 @@
 # yarn lockfile v1
 
 
-"@agora-js/media@4.22.1":
-  version "4.22.1"
-  resolved "https://registry.yarnpkg.com/@agora-js/media/-/media-4.22.1.tgz#dd6b284e1cdb965ff97c1dda5db4236e94e1e3dd"
-  integrity sha512-WJ4t2I8Y8C/66u+YzqVbmkpVhWq5ZHxNlx30ZoKC9g5xQDXex/ZwsjdXBkcn7iWTIiK0L2+5GHFQyzpJIkfBFA==
+"@agora-js/media@4.24.3":
+  version "4.24.3"
+  resolved "https://registry.yarnpkg.com/@agora-js/media/-/media-4.24.3.tgz#699116227c90c4e9ce07a0247eec41012dde44a7"
+  integrity sha512-aC471uaWWGSXnruoaJggi9Ltbp3ldYxMyIi61jOew960zVsHaw78YhTDVv27XX1NvPRqEPLyfyMGEX4av0xOKA==
   dependencies:
-    "@agora-js/report" "4.22.1"
-    "@agora-js/shared" "4.22.1"
+    "@agora-js/report" "4.24.3"
+    "@agora-js/shared" "4.24.3"
     agora-rte-extension "^1.2.4"
-    axios "^1.7.7"
+    axios "^1.13.6"
     webrtc-adapter "8.2.0"
 
-"@agora-js/report@4.22.1":
-  version "4.22.1"
-  resolved "https://registry.yarnpkg.com/@agora-js/report/-/report-4.22.1.tgz#06496490d742051919120df1b19348563175bb39"
-  integrity sha512-7Jh7gVX346Ee/2cbKBsRdW0FqfPBw9R9YmgVLunvVXRyX+7Y3S0YdWRdxyL5aH4BbepFySsBUkZqDyrlatkMdA==
+"@agora-js/protocol@4.24.3":
+  version "4.24.3"
+  resolved "https://registry.yarnpkg.com/@agora-js/protocol/-/protocol-4.24.3.tgz#1ed190ba215e0e6f6c05a445242a7a7f7ffe1226"
+  integrity sha512-GWAV+J9wv53u5T/k4KAjsxQ9Y+n73bWc3dSBe7OHjWcSZQikcWRJoOtygQiZKWmpYV/ZW5LQ0R12jHI7GAG0cQ==
   dependencies:
-    "@agora-js/shared" "4.22.1"
-    axios "^1.7.7"
+    "@agora-js/media" "4.24.3"
+    "@agora-js/report" "4.24.3"
+    "@agora-js/shared" "4.24.3"
+    "@bufbuild/protobuf" "^2.9.0"
+    "@types/pako" "^2.0.0"
+    pako "^2.1.0"
 
-"@agora-js/shared@4.22.1":
-  version "4.22.1"
-  resolved "https://registry.yarnpkg.com/@agora-js/shared/-/shared-4.22.1.tgz#9697ca50a227ea37abd5a03a5c95988d91dc8e02"
-  integrity sha512-BkWhfGX8vTpqOkAj/Czgz69Pa9qYDTteplcFXvoHfJN6KuFy9lTF1JReozDUj+Vjj6fWIZf232QJ4dCDQE3xtQ==
+"@agora-js/report@4.24.3":
+  version "4.24.3"
+  resolved "https://registry.yarnpkg.com/@agora-js/report/-/report-4.24.3.tgz#f4db436a906ab89834e9f927e257b957571144b2"
+  integrity sha512-A2Q13JbRlSYkEF0W6eMCJmnzmHSBzaWZORNnsS23GElwACSxoa2KTMcDp0MQhlsI9Ht6277ZuVSCdkT48A6Pwg==
   dependencies:
-    axios "^1.7.7"
+    "@agora-js/shared" "4.24.3"
+    axios "^1.13.6"
+
+"@agora-js/shared@4.24.3":
+  version "4.24.3"
+  resolved "https://registry.yarnpkg.com/@agora-js/shared/-/shared-4.24.3.tgz#090d5ddb04b336968cc3fbfbdf99a7de63351070"
+  integrity sha512-PyKelGEuV/g4fTjDjANpBqPZMaY0NFdd0W4UcGtJ2rayVU+YAeztLvu4tpDbm14U4BG5dmz/N+VHckxFPgoIjQ==
+  dependencies:
+    axios "^1.13.6"
     ua-parser-js "^0.7.34"
+
+"@bufbuild/protobuf@^2.9.0":
+  version "2.12.1"
+  resolved "https://registry.yarnpkg.com/@bufbuild/protobuf/-/protobuf-2.12.1.tgz#89b0a4ad6412ba55a971e107a46b6c6326ff1b8a"
+  integrity sha512-BvAMfS6LrgZiryOAZ4pBYucu4wG/Ei/9o9DZ9akbREnMLbPJiom2i8b9C8IsKErQoiKqVhrerzt3kOT/RrzLHg==
 
 "@colors/colors@1.5.0":
   version "1.5.0"
@@ -199,6 +216,11 @@
   integrity sha512-vf2YFi1iY9lHGwNJMs01biZFbKJkrZR1T6/MlzjhJLPdntOHLhTrDSnSVcdtvjihi4VQNlrFRIxLsDBlQpAipA==
   dependencies:
     undici-types "~8.3.0"
+
+"@types/pako@^2.0.0":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@types/pako/-/pako-2.0.4.tgz#c3575ef8125e176c345fa0e7b301c1db41170c15"
+  integrity sha512-VWDCbrLeVXJM9fihYodcLiIv0ku+AlOa/TQ1SvYOaBuyrSKgEcro95LJyIsJ4vSo6BXIxOKxiJAat04CmST9Fw==
 
 "@types/qs@*":
   version "6.15.1"
@@ -439,16 +461,17 @@ agent-base@6:
   dependencies:
     debug "4"
 
-agora-rtc-sdk-ng@4.22.1:
-  version "4.22.1"
-  resolved "https://registry.yarnpkg.com/agora-rtc-sdk-ng/-/agora-rtc-sdk-ng-4.22.1.tgz#5e8368e09686358a7e98a53358eae4c8e3f74bcb"
-  integrity sha512-lp98Ru9KRV7In6YOUBb3Lve0bYpaT+z2LA8VJ7ZqP7xjmE0+pk0EYuKrhht3kvY6mGBjrEU+0G8Fri5ivmKLBQ==
+agora-rtc-sdk-ng@4.24.3:
+  version "4.24.3"
+  resolved "https://registry.yarnpkg.com/agora-rtc-sdk-ng/-/agora-rtc-sdk-ng-4.24.3.tgz#6a64fc56d237663f79ec94f02c75678bf58c045f"
+  integrity sha512-DEz0+/jgsajZgWFG/uHijoMeheqr7YWUJ5AyubiqKt5vC1TF0/3v51vVl2aqupY+YkmJOg0q64B4AJcdpj/TBQ==
   dependencies:
-    "@agora-js/media" "4.22.1"
-    "@agora-js/report" "4.22.1"
-    "@agora-js/shared" "4.22.1"
+    "@agora-js/media" "4.24.3"
+    "@agora-js/protocol" "4.24.3"
+    "@agora-js/report" "4.24.3"
+    "@agora-js/shared" "4.24.3"
     agora-rte-extension "^1.2.4"
-    axios "^1.7.7"
+    axios "^1.13.6"
     formdata-polyfill "^4.0.7"
     pako "^2.1.0"
     ua-parser-js "^0.7.34"
@@ -543,7 +566,7 @@ asynckit@^0.4.0:
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==
 
-axios@^1.7.7:
+axios@^1.13.6:
   version "1.18.1"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.18.1.tgz#d63f9863bcd8938815c86f9e2abd380189d96dfe"
   integrity sha512-3nTvFlvpn9Zu/RkHUqtc7/+al4UpRW5az71ap5zccp6e8RAYEzhMTecX8Dz1wWDYrPpUoB1HAQEGEAEvUr7S9g==

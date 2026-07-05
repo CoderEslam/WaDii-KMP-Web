@@ -35,77 +35,77 @@ import kotlin.coroutines.suspendCoroutine
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 val httpClient = createHttpClient()
-suspend fun apiLogin(email: String, password: String): User? = runCatching {
-    val r: BaseResponse<User> = httpClient.post("$BASE_URL/auth/login") {
-        contentType(ContentType.Application.Json)
-        setBody(LoginRequest(email = email, password = password, fcmToken = "", userType = 0))
-    }.body()
-    r.data
+//suspend fun apiLogin(email: String, password: String): User? = runCatching {
+//    val r: BaseResponse<User> = httpClient.post("$BASE_URL/auth/login") {
+//        contentType(ContentType.Application.Json)
+//        setBody(LoginRequest(email = email, password = password, fcmToken = "", userType = 0))
+//    }.body()
+//    r.data
+//
+//}.getOrNull()
 
-}.getOrNull()
-
-suspend fun apiRegister(req: RegisterRequest): User? = runCatching {
-    val r: BaseResponse<User> = httpClient.post("$BASE_URL/auth/register") {
-        contentType(ContentType.Application.Json)
-        setBody(req)
-    }.body()
-    r.data
-}.getOrNull()
+//suspend fun apiRegister(req: RegisterRequest): User? = runCatching {
+//    val r: BaseResponse<User> = httpClient.post("$BASE_URL/auth/register") {
+//        contentType(ContentType.Application.Json)
+//        setBody(req)
+//    }.body()
+//    r.data
+//}.getOrNull()
 
 // ── Users ─────────────────────────────────────────────────────────────────────
 
-suspend fun apiGetMe(): User? = runCatching {
-    val r: BaseResponse<User> = httpClient.get("$BASE_URL/users/me") { auth() }.body()
-    r.data
-}.getOrNull()
-
-suspend fun apiIsOnline(userId: Long): Boolean = runCatching {
-    httpClient.get("$BASE_URL/users/$userId/online") { auth() }.body<Boolean>()
-}.getOrDefault(false)
+//suspend fun apiGetMe(): User? = runCatching {
+//    val r: BaseResponse<User> = httpClient.get("$BASE_URL/users/me") { auth() }.body()
+//    r.data
+//}.getOrNull()
+//
+//suspend fun apiIsOnline(userId: Long): Boolean = runCatching {
+//    httpClient.get("$BASE_URL/users/$userId/online") { auth() }.body<Boolean>()
+//}.getOrDefault(false)
 
 // ── Countries / Provinces / Cities ───────────────────────────────────────────
 
-suspend fun apiGetCountries(): List<Country> = runCatching {
-    httpClient.get("$BASE_URL/countries").body<BaseResponse<List<Country>>>().data ?: emptyList()
-}.getOrDefault(emptyList())
-
-suspend fun apiGetProvinces(countryId: Int): List<Province> = runCatching {
-    httpClient.get("$BASE_URL/provinces/by-country/$countryId")
-        .body<BaseResponse<List<Province>>>().data ?: emptyList()
-}.getOrDefault(emptyList())
-
-suspend fun apiGetCities(provinceId: Int): List<City> = runCatching {
-    httpClient.get("$BASE_URL/cities/by-province/$provinceId").body<BaseResponse<List<City>>>().data
-        ?: emptyList()
-}.getOrDefault(emptyList())
+//suspend fun apiGetCountries(): List<Country> = runCatching {
+//    httpClient.get("$BASE_URL/countries").body<BaseResponse<List<Country>>>().data ?: emptyList()
+//}.getOrDefault(emptyList())
+//
+//suspend fun apiGetProvinces(countryId: Int): List<Province> = runCatching {
+//    httpClient.get("$BASE_URL/provinces/by-country/$countryId")
+//        .body<BaseResponse<List<Province>>>().data ?: emptyList()
+//}.getOrDefault(emptyList())
+//
+//suspend fun apiGetCities(provinceId: Int): List<City> = runCatching {
+//    httpClient.get("$BASE_URL/cities/by-province/$provinceId").body<BaseResponse<List<City>>>().data
+//        ?: emptyList()
+//}.getOrDefault(emptyList())
 
 // ── Providers ─────────────────────────────────────────────────────────────────
 
-suspend fun apiAllProviders(): List<ProviderModel>? = runCatching {
-    httpClient.get("$BASE_URL/providers/show-all") { auth() }
-        .body<BaseResponse<List<ProviderModel>>>().data
-}.getOrNull()
-
-suspend fun apiGetMyProvider(): ProviderModel? = runCatching {
-    httpClient.get("$BASE_URL/providers/me") { auth() }.body<BaseResponse<ProviderModel>>().data
-}.getOrNull()
-
-suspend fun apiGetProvider(id: Int): ProviderModel? = runCatching {
-    httpClient.get("$BASE_URL/providers/show/$id") { auth() }.body<BaseResponse<ProviderModel>>().data
-}.getOrNull()
-
-suspend fun apiFilterProvidersByService(serviceId: Int): List<ProviderModel> = runCatching {
-    httpClient.get("$BASE_URL/providers/filter-by-service/$serviceId") { auth() }
-        .body<BaseResponse<List<ProviderModel>>>().data ?: emptyList()
-}.getOrDefault(emptyList())
-
-suspend fun apiFollowProvider(id: Int): Boolean = runCatching {
-    httpClient.post("$BASE_URL/providers/follow-provider/$id") { auth() }.status.isSuccess()
-}.getOrDefault(false)
-
-suspend fun apiUnfollowProvider(id: Int): Boolean = runCatching {
-    httpClient.delete("$BASE_URL/providers/unfollow-provider/$id") { auth() }.status.isSuccess()
-}.getOrDefault(false)
+//suspend fun apiAllProviders(): List<ProviderModel>? = runCatching {
+//    httpClient.get("$BASE_URL/providers/show-all") { auth() }
+//        .body<BaseResponse<List<ProviderModel>>>().data
+//}.getOrNull()
+//
+//suspend fun apiGetMyProvider(): ProviderModel? = runCatching {
+//    httpClient.get("$BASE_URL/providers/me") { auth() }.body<BaseResponse<ProviderModel>>().data
+//}.getOrNull()
+//
+//suspend fun apiGetProvider(id: Int): ProviderModel? = runCatching {
+//    httpClient.get("$BASE_URL/providers/show/$id") { auth() }.body<BaseResponse<ProviderModel>>().data
+//}.getOrNull()
+//
+//suspend fun apiFilterProvidersByService(serviceId: Int): List<ProviderModel> = runCatching {
+//    httpClient.get("$BASE_URL/providers/filter-by-service/$serviceId") { auth() }
+//        .body<BaseResponse<List<ProviderModel>>>().data ?: emptyList()
+//}.getOrDefault(emptyList())
+//
+//suspend fun apiFollowProvider(id: Int): Boolean = runCatching {
+//    httpClient.post("$BASE_URL/providers/follow-provider/$id") { auth() }.status.isSuccess()
+//}.getOrDefault(false)
+//
+//suspend fun apiUnfollowProvider(id: Int): Boolean = runCatching {
+//    httpClient.delete("$BASE_URL/providers/unfollow-provider/$id") { auth() }.status.isSuccess()
+//}.getOrDefault(false)
 
 // ── Offers ────────────────────────────────────────────────────────────────────
 
@@ -306,9 +306,9 @@ suspend fun apiGetAllRequests(): List<ProviderRequest> = runCatching {
         .body<BaseResponse<List<ProviderRequest>>>().data ?: emptyList()
 }.getOrDefault(emptyList())
 
-suspend fun apiAcceptRequest(id: Int): Boolean = runCatching {
-    httpClient.post("$BASE_URL/provider-requests/accept/$id") { auth() }.status.isSuccess()
-}.getOrDefault(false)
+//suspend fun apiAcceptRequest(id: Int): Boolean = runCatching {
+//    httpClient.post("$BASE_URL/provider-requests/accept/$id") { auth() }.status.isSuccess()
+//}.getOrDefault(false)
 
 // ── Image upload ──────────────────────────────────────────────────────────────
 

@@ -15,7 +15,7 @@ data class ProviderRequestModel(
     @SerialName("frontIdImage")
     val frontIdImage: String? = null,
     @SerialName("id")
-    val id: Int = 0,
+    val id: Long = 0,
     @SerialName("links")
     val links: List<String> = listOf(),
     @SerialName("name")

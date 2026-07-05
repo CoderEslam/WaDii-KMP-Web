@@ -248,7 +248,7 @@ fun InputField(
                     "focus:border-brand"))
                 attr("type", type)
                 attr("placeholder", placeholder)
-                attr("value", value)
+                value(value)
                 if (required) required()
                 onInput { event -> onInput(event.value) }
             })

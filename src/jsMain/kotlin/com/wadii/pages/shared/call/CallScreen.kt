@@ -36,15 +36,16 @@ class CallScreen(
         var localContainer by remember { mutableStateOf<HTMLDivElement?>(null) }
         var remoteContainer by remember { mutableStateOf<HTMLDivElement?>(null) }
 
-        LaunchedEffect(state.localVideoTrack, localContainer) {
-            val track = state.localVideoTrack
+        val localTrack = state.localVideoTrack
+        val remoteTrack = state.remoteVideoTrack
+
+        LaunchedEffect(localTrack, localContainer) {
             val el = localContainer
-            if (track != null && el != null) track.play(el)
+            if (localTrack != null && el != null) localTrack.play(el)
         }
-        LaunchedEffect(state.remoteVideoTrack, remoteContainer) {
-            val track = state.remoteVideoTrack
+        LaunchedEffect(remoteTrack, remoteContainer) {
             val el = remoteContainer
-            if (track != null && el != null) track.play(el)
+            if (remoteTrack != null && el != null) remoteTrack.play(el)
         }
         LaunchedEffect(state.status) {
             if (state.status == CallStatus.ENDED) {

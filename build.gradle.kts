@@ -50,7 +50,7 @@ kotlin {
                 implementation(libs.sketch.http)
 
                 // Agora Web SDK for video/voice calling
-                implementation(npm("agora-rtc-sdk-ng", "4.22.1"))
+                implementation(npm("agora-rtc-sdk-ng", "4.24.3"))
 
             }
         }

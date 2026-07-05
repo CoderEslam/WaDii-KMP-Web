@@ -7,8 +7,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Province(
-    @SerialName("countryId")
-    val country: com.wadii.domain.model.country.Country = _root_ide_package_.com.wadii.domain.model.country.Country(),
+    @SerialName("country")
+    val country: Country = Country(),
     @SerialName("id")
     val id: Int = 0,
     @SerialName("name")

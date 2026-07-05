@@ -1,7 +1,6 @@
 package com.wadii.data.api
 
 
-
 import com.wadii.domain.model.BaseResponse
 import com.wadii.domain.model.ads.Ads
 import com.wadii.domain.model.auth.login.LoginRequest
@@ -594,6 +593,7 @@ class ApiService(
             }
         )
     }
+
     //admin
     suspend fun requests(
         response: (RequestState<BaseResponse<List<ProviderRequestModel>>>) -> Unit
@@ -606,12 +606,42 @@ class ApiService(
         )
     }
 
+    suspend fun acceptRequest(
+        id: Long,
+        response: (RequestState<BaseResponse<ProviderModel>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<BaseResponse<ProviderModel>>(
+                urlString = Constants.PROVIDER_REQUEST_ACCEPT(id)
+            )
+        )
+    }
+
+    suspend fun rejectRequest(
+        id: Long,
+        response: (RequestState<BaseResponse<ProviderRequestModel>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<BaseResponse<ProviderRequestModel>>(
+                urlString = Constants.PROVIDER_REQUEST_REJECT(id)
+            )
+        )
+    }
+
     suspend fun getOrderById(
         id: Int,
         response: (RequestState<BaseResponse<OrderModel>>) -> Unit
     ) {
         response(RequestState.Loading)
-        response(client.getApiResponse<BaseResponse<OrderModel>>(urlString = Constants.ORDER_SHOW_BY_ID(id)))
+        response(
+            client.getApiResponse<BaseResponse<OrderModel>>(
+                urlString = Constants.ORDER_SHOW_BY_ID(
+                    id
+                )
+            )
+        )
     }
 
 }

@@ -99,33 +99,71 @@ class CallViewModel(
                 onSuccess = { resp ->
                     screenModelScope.launch {
                         runCatching {
-                            agoraClient.onUserPublished = { user, mediaType -> onRemotePublished(user, mediaType) }
-                            agoraClient.onUserLeft = { onRemoteLeft() }
-                            val localCam =
-                                agoraClient.join(resp.data.appId, channelName, resp.data.token, uid, withVideo)
-                            updateState { it.copy(status = CallStatus.CONNECTED, localVideoTrack = localCam) }
+                            try {
+                                agoraClient.onUserPublished =
+                                    { user, mediaType -> onRemotePublished(user, mediaType) }
+                                agoraClient.onUserLeft = { onRemoteLeft() }
+                                console.log("AppId:", resp.data.appId)
+                                console.log("Channel:", channelName)
+                                console.log("UID:", uid)
+                                console.log("Token:", resp.data.token)
+                                val localCam = agoraClient.join(
+                                    resp.data.appId,
+                                    channelName,
+                                    resp.data.token,
+                                    uid,
+                                    withVideo
+                                )
+                                localCam?.let { localCam ->
+                                    updateState {
+                                        it.copy(
+                                            status = CallStatus.CONNECTED,
+                                            localVideoTrack = localCam
+                                        )
+                                    }
+                                }
+                            } catch (e: dynamic) {
+                                console.log(e)
+                                console.log(e.code)
+                                console.log(e.message)
+                            }
                         }.onFailure { e ->
                             updateState {
-                                it.copy(status = CallStatus.ENDED, error = e.message ?: "Failed to join call")
+                                it.copy(
+                                    status = CallStatus.ENDED,
+                                    error = e.message ?: "Failed to join call"
+                                )
                             }
+
                         }
                     }
                 },
-                onError = { msg, _ -> updateState { it.copy(status = CallStatus.ENDED, error = msg) } }
+                onError = { msg, _ ->
+                    updateState {
+                        it.copy(
+                            status = CallStatus.ENDED,
+                            error = msg
+                        )
+                    }
+                }
             )
         }
     }
 
-    private fun onRemotePublished(user: IAgoraRTCRemoteUser, mediaType: String) = screenModelScope.launch {
-        val track = agoraClient.subscribe(user, mediaType)
-        when (mediaType) {
-            "video" -> updateState {
-                it.copy(remoteVideoTrack = track.unsafeCast<IRemoteVideoTrack>(), remoteHasVideo = true)
-            }
+    private fun onRemotePublished(user: IAgoraRTCRemoteUser, mediaType: String) =
+        screenModelScope.launch {
+            val track = agoraClient.subscribe(user, mediaType) ?: return@launch
+            when (mediaType) {
+                "video" -> updateState {
+                    it.copy(
+                        remoteVideoTrack = track.unsafeCast<IRemoteVideoTrack>(),
+                        remoteHasVideo = true
+                    )
+                }
 
-            "audio" -> track.unsafeCast<IRemoteAudioTrack>().play()
+                "audio" -> track.unsafeCast<IRemoteAudioTrack>().play()
+            }
         }
-    }
 
     private fun onRemoteLeft() {
         screenModelScope.launch { cleanupAgora() }
@@ -148,7 +186,11 @@ class CallViewModel(
         if (notifyPeer) {
             callSignaling.send(
                 SocketEvent.CALL_END,
-                CallSignal(channelName = channelName, fromUserId = AppState.user?.id ?: 0, toUserId = remoteUserId)
+                CallSignal(
+                    channelName = channelName,
+                    fromUserId = AppState.user?.id ?: 0,
+                    toUserId = remoteUserId
+                )
             )
         }
         cleanupAgora()

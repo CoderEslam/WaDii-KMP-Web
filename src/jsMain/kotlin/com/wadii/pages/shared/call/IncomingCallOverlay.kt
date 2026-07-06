@@ -1,6 +1,7 @@
 package com.wadii.pages.shared.call
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -13,6 +14,7 @@ import com.wadii.ui.AvatarSize
 import com.wadii.ui.DangerButton
 import com.wadii.ui.SuccessButton
 import com.wadii.utils.Constants
+import com.wadii.utils.RingtonePlayer
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.P
@@ -32,6 +34,11 @@ fun IncomingCallOverlay() {
                 AppState.incomingCall = null
             }
         }
+    }
+
+    DisposableEffect(incoming.channelName) {
+        RingtonePlayer.start()
+        onDispose { RingtonePlayer.stop() }
     }
 
     Div(attrs = {

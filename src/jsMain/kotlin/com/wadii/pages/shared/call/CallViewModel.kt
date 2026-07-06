@@ -34,14 +34,15 @@ class CallViewModel(
     private val agoraClient = AgoraCallClient()
     private var signalJob: Job? = null
 
-    override val initialState = CallState(
-        status = if (isCaller) CallStatus.CALLING else CallStatus.CONNECTING,
-        isCaller = isCaller,
-        withVideo = withVideo,
-        cameraEnabled = withVideo,
-        remoteUserName = remoteUserName,
-        remoteUserImage = remoteUserImage
-    )
+    override val initialState: CallState
+        get() = CallState(
+            status = if (isCaller) CallStatus.CALLING else CallStatus.CONNECTING,
+            isCaller = isCaller,
+            withVideo = withVideo,
+            cameraEnabled = withVideo,
+            remoteUserName = remoteUserName,
+            remoteUserImage = remoteUserImage
+        )
 
     override val state: StateFlow<CallState> =
         _state.stateIn(screenModelScope, SharingStarted.Eagerly, initialState)

@@ -10,26 +10,30 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class CreateAdScreenModel(
-    existingAd: Ads?
+    private val existingAd: Ads?
 ) : BaseViewModel<CreateAdState, CreateAdEvent>() {
 
-    override val initialState: CreateAdState = if (existingAd != null) {
-        CreateAdState(
-            id = existingAd.id,
-            title = existingAd.title,
-            description = existingAd.description,
-            advertiserName = existingAd.advertiserName,
-            imageUrl = existingAd.imageUrl,
-            targetUrl = existingAd.targetUrl,
-            startDate = existingAd.startDate.take(10),
-            endDate = existingAd.endDate.take(10),
-            priority = existingAd.priority.toString()
-        )
-    } else {
-        CreateAdState()
-    }
+    override val initialState: CreateAdState get() = CreateAdState()
 
     override val state: StateFlow<CreateAdState> = _state
+
+    init {
+        existingAd?.let { ad ->
+            updateState {
+                it.copy(
+                    id = ad.id,
+                    title = ad.title,
+                    description = ad.description,
+                    advertiserName = ad.advertiserName,
+                    imageUrl = ad.imageUrl,
+                    targetUrl = ad.targetUrl,
+                    startDate = ad.startDate.take(10),
+                    endDate = ad.endDate.take(10),
+                    priority = ad.priority.toString()
+                )
+            }
+        }
+    }
 
     override fun onEvent(event: CreateAdEvent) {
         when (event) {

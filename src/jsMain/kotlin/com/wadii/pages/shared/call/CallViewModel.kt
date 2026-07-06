@@ -12,11 +12,13 @@ import com.wadii.domain.model.call.agora.AgoraTokenRequest
 import com.wadii.domain.model.chat.SocketEvent
 import com.wadii.domain.usecase.AgoraUseCase
 import com.wadii.state.AppState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CallViewModel(
     private val channelName: String,
@@ -97,29 +99,31 @@ class CallViewModel(
         agoraUseCase.getToken(AgoraTokenRequest(channelName, uid)) { r ->
             r.handelState(
                 onSuccess = { resp ->
-                    screenModelScope.launch {
+                    screenModelScope.launch(Dispatchers.Default) {
                         runCatching {
                             try {
-                                agoraClient.onUserPublished =
-                                    { user, mediaType -> onRemotePublished(user, mediaType) }
-                                agoraClient.onUserLeft = { onRemoteLeft() }
-                                console.log("AppId:", resp.data.appId)
-                                console.log("Channel:", channelName)
-                                console.log("UID:", uid)
-                                console.log("Token:", resp.data.token)
-                                val localCam = agoraClient.join(
-                                    resp.data.appId,
-                                    channelName,
-                                    resp.data.token,
-                                    uid,
-                                    withVideo
-                                )
-                                localCam?.let { localCam ->
-                                    updateState {
-                                        it.copy(
-                                            status = CallStatus.CONNECTED,
-                                            localVideoTrack = localCam
-                                        )
+                                withContext(Dispatchers.Main) {
+                                    agoraClient.onUserPublished =
+                                        { user, mediaType -> onRemotePublished(user, mediaType) }
+                                    agoraClient.onUserLeft = { onRemoteLeft() }
+                                    console.log("AppId:", resp.data.appId)
+                                    console.log("Channel:", channelName)
+                                    console.log("UID:", uid)
+                                    console.log("Token:", resp.data.token)
+                                    val localCam = agoraClient.join(
+                                        resp.data.appId,
+                                        channelName,
+                                        resp.data.token,
+                                        uid,
+                                        withVideo
+                                    )
+                                    localCam?.let { localCam ->
+                                        updateState {
+                                            it.copy(
+                                                status = CallStatus.CONNECTED,
+                                                localVideoTrack = localCam
+                                            )
+                                        }
                                     }
                                 }
                             } catch (e: dynamic) {

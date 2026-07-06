@@ -23,8 +23,7 @@ class AdsScreenModel(
 
     override fun onEvent(event: AdsEvent) {
         when (event) {
-            is AdsEvent.ShowModal -> Unit
-            is AdsEvent.CloseModal -> Unit
+            AdsEvent.Load -> load()
             is AdsEvent.Delete -> delete(event.adId)
         }
     }

@@ -47,7 +47,9 @@ import com.wadii.domain.usecase.ResponseUseCase
 import com.wadii.domain.usecase.SearchUseCase
 import com.wadii.domain.usecase.UserUseCase
 import com.wadii.pages.shared.call.CallViewModel
+import com.wadii.domain.model.ads.Ads
 import com.wadii.pages.admin.ads.AdsScreenModel
+import com.wadii.pages.admin.ads.CreateAdScreenModel
 import com.wadii.pages.admin.dashboard.AdminDashboardScreenModel
 import com.wadii.pages.admin.provider.ProviderRequestsViewModel
 import com.wadii.pages.admin.service.ServicesViewModel
@@ -156,6 +158,7 @@ val appModule = module {
     factory { (orderId: Int) -> RespondToOrderViewModel(orderId, get()) }
     factory { AdminDashboardScreenModel(get(), get(), get()) }
     factory { AdsScreenModel(get()) }
+    factory { (ad: Ads?) -> CreateAdScreenModel(ad) }
 }
 
 fun initializeKoin() {

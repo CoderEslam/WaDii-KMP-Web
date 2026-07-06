@@ -126,53 +126,53 @@ suspend fun apiUpdateOffer(body: Map<String, Any?>): OfferResponse? = runCatchin
     }.body<BaseResponse<OfferResponse>>().data
 }.getOrNull()
 
-suspend fun apiDeleteOffer(id: Long): Boolean = runCatching {
-    httpClient.delete("$BASE_URL/offers/$id") { auth() }.status.isSuccess()
-}.getOrDefault(false)
+//suspend fun apiDeleteOffer(id: Long): Boolean = runCatching {
+//    httpClient.delete("$BASE_URL/offers/$id") { auth() }.status.isSuccess()
+//}.getOrDefault(false)
 
 // ── Saved Offers ──────────────────────────────────────────────────────────────
 
-suspend fun apiGetSavedOffers(): List<SavedOffer> = runCatching {
-    httpClient.get("$BASE_URL/saved-offers/my-saved-offers") { auth() }
-        .body<BaseResponse<List<SavedOffer>>>().data ?: emptyList()
-}.getOrDefault(emptyList())
+//suspend fun apiGetSavedOffers(): List<SavedOffer> = runCatching {
+//    httpClient.get("$BASE_URL/saved-offers/my-saved-offers") { auth() }
+//        .body<BaseResponse<List<SavedOffer>>>().data ?: emptyList()
+//}.getOrDefault(emptyList())
 
-suspend fun apiSaveOffer(offerId: Long): Boolean = runCatching {
-    httpClient.post("$BASE_URL/saved-offers/insert") {
-        auth(); contentType(ContentType.Application.Json)
-        setBody(SavedOfferRequest(offerId = offerId))
-    }.status.isSuccess()
-}.getOrDefault(false)
-
-suspend fun apiRemoveSavedOffer(offerId: Long): Boolean = runCatching {
-    httpClient.delete("$BASE_URL/saved-offers/remove/$offerId") { auth() }.status.isSuccess()
-}.getOrDefault(false)
+//suspend fun apiSaveOffer(offerId: Long): Boolean = runCatching {
+//    httpClient.post("$BASE_URL/saved-offers/insert") {
+//        auth(); contentType(ContentType.Application.Json)
+//        setBody(SavedOfferRequest(offerId = offerId))
+//    }.status.isSuccess()
+//}.getOrDefault(false)
+//
+//suspend fun apiRemoveSavedOffer(offerId: Long): Boolean = runCatching {
+//    httpClient.delete("$BASE_URL/saved-offers/remove/$offerId") { auth() }.status.isSuccess()
+//}.getOrDefault(false)
 
 // ── Orders ────────────────────────────────────────────────────────────────────
 
-suspend fun apiGetUserOrders(): List<OrderModel> = runCatching {
-    httpClient.get("$BASE_URL/orders/show-all-order-of-user") { auth() }
-        .body<BaseResponse<List<OrderModel>>>().data ?: emptyList()
-}.getOrDefault(emptyList())
+//suspend fun apiGetUserOrders(): List<OrderModel> = runCatching {
+//    httpClient.get("$BASE_URL/orders/show-all-order-of-user") { auth() }
+//        .body<BaseResponse<List<OrderModel>>>().data ?: emptyList()
+//}.getOrDefault(emptyList())
+//
+//suspend fun apiGetProviderOrders(): List<OrderModel> = runCatching {
+//    httpClient.get("$BASE_URL/orders/show-all-order-of-provider") { auth() }
+//        .body<BaseResponse<List<OrderModel>>>().data ?: emptyList()
+//}.getOrDefault(emptyList())
+//
+//suspend fun apiGetOrder(id: Int): OrderModel? = runCatching {
+//    httpClient.get("$BASE_URL/orders/$id") { auth() }.body<BaseResponse<OrderModel>>().data
+//}.getOrNull()
 
-suspend fun apiGetProviderOrders(): List<OrderModel> = runCatching {
-    httpClient.get("$BASE_URL/orders/show-all-order-of-provider") { auth() }
-        .body<BaseResponse<List<OrderModel>>>().data ?: emptyList()
-}.getOrDefault(emptyList())
-
-suspend fun apiGetOrder(id: Int): OrderModel? = runCatching {
-    httpClient.get("$BASE_URL/orders/$id") { auth() }.body<BaseResponse<OrderModel>>().data
-}.getOrNull()
-
-suspend fun apiInsertOrder(body: Map<String, Any?>): OrderModel? = runCatching {
-    httpClient.post("$BASE_URL/orders/insert") {
-        auth(); contentType(ContentType.Application.Json); setBody(body)
-    }.body<BaseResponse<OrderModel>>().data
-}.getOrNull()
-
-suspend fun apiDeleteOrder(id: Long): Boolean = runCatching {
-    httpClient.delete("$BASE_URL/orders/$id") { auth() }.status.isSuccess()
-}.getOrDefault(false)
+//suspend fun apiInsertOrder(body: Map<String, Any?>): OrderModel? = runCatching {
+//    httpClient.post("$BASE_URL/orders/insert") {
+//        auth(); contentType(ContentType.Application.Json); setBody(body)
+//    }.body<BaseResponse<OrderModel>>().data
+//}.getOrNull()
+//
+//suspend fun apiDeleteOrder(id: Long): Boolean = runCatching {
+//    httpClient.delete("$BASE_URL/orders/$id") { auth() }.status.isSuccess()
+//}.getOrDefault(false)
 
 // ── Responses ─────────────────────────────────────────────────────────────────
 
@@ -182,68 +182,68 @@ suspend fun apiInsertResponse(body: Map<String, Any?>): OrderResponse? = runCatc
     }.body<BaseResponse<OrderResponse>>().data
 }.getOrNull()
 
-suspend fun apiAcceptResponse(id: Long): Boolean = runCatching {
-    httpClient.post("$BASE_URL/responses/accept-response") {
-        auth(); contentType(ContentType.Application.Json); setBody(mapOf("id" to id))
-    }.status.isSuccess()
-}.getOrDefault(false)
-
-suspend fun apiCancelResponse(id: Long): Boolean = runCatching {
-    httpClient.post("$BASE_URL/responses/cancel-response") {
-        auth(); contentType(ContentType.Application.Json); setBody(mapOf("id" to id))
-    }.status.isSuccess()
-}.getOrDefault(false)
+//suspend fun apiAcceptResponse(id: Long): Boolean = runCatching {
+//    httpClient.post("$BASE_URL/responses/accept-response") {
+//        auth(); contentType(ContentType.Application.Json); setBody(mapOf("id" to id))
+//    }.status.isSuccess()
+//}.getOrDefault(false)
+//
+//suspend fun apiCancelResponse(id: Long): Boolean = runCatching {
+//    httpClient.post("$BASE_URL/responses/cancel-response") {
+//        auth(); contentType(ContentType.Application.Json); setBody(mapOf("id" to id))
+//    }.status.isSuccess()
+//}.getOrDefault(false)
 
 // ── Messages ──────────────────────────────────────────────────────────────────
 
-suspend fun apiGetChatList(): List<ChatContact> = runCatching {
-    httpClient.get("$BASE_URL/messages/chat-list") { auth() }
-        .body<BaseResponse<List<ChatContact>>>().data ?: emptyList()
-}.getOrDefault(emptyList())
-
-suspend fun apiGetConversation(userId: Int): List<ShowAllMessagesResponse> = runCatching {
-    httpClient.get("$BASE_URL/messages/conversation/$userId") { auth() }
-        .body<BaseResponse<List<ShowAllMessagesResponse>>>().data ?: emptyList()
-}.getOrDefault(emptyList())
-
-suspend fun apiSendMessage(toUserId: Int, text: String): InsertResponse? = runCatching {
-    httpClient.post("$BASE_URL/messages/insert") {
-        auth(); contentType(ContentType.Application.Json)
-        setBody(InsertMessage(toUserId = toUserId, text = text, type = ""))
-    }.body<BaseResponse<InsertResponse>>().data
-}.getOrNull()
+//suspend fun apiGetChatList(): List<ChatContact> = runCatching {
+//    httpClient.get("$BASE_URL/messages/chat-list") { auth() }
+//        .body<BaseResponse<List<ChatContact>>>().data ?: emptyList()
+//}.getOrDefault(emptyList())
+//
+//suspend fun apiGetConversation(userId: Int): List<ShowAllMessagesResponse> = runCatching {
+//    httpClient.get("$BASE_URL/messages/conversation/$userId") { auth() }
+//        .body<BaseResponse<List<ShowAllMessagesResponse>>>().data ?: emptyList()
+//}.getOrDefault(emptyList())
+//
+//suspend fun apiSendMessage(toUserId: Int, text: String): InsertResponse? = runCatching {
+//    httpClient.post("$BASE_URL/messages/insert") {
+//        auth(); contentType(ContentType.Application.Json)
+//        setBody(InsertMessage(toUserId = toUserId, text = text, type = ""))
+//    }.body<BaseResponse<InsertResponse>>().data
+//}.getOrNull()
 
 // ── Notifications ─────────────────────────────────────────────────────────────
 
-suspend fun apiGetNotifications(): List<String> = runCatching {
-    httpClient.get("$BASE_URL/notifications/my") { auth() }
-        .body<BaseResponse<List<String>>>().data ?: emptyList()
-}.getOrDefault(emptyList())
-
-suspend fun apiMarkRead(id: Long): Boolean = runCatching {
-    httpClient.post("$BASE_URL/notifications/mark-read/$id") { auth() }.status.isSuccess()
-}.getOrDefault(false)
-
-suspend fun apiMarkAllRead(): Boolean = runCatching {
-    httpClient.post("$BASE_URL/notifications/mark-all-read") { auth() }.status.isSuccess()
-}.getOrDefault(false)
-
-suspend fun apiDeleteNotification(id: Long): Boolean = runCatching {
-    httpClient.delete("$BASE_URL/notifications/$id") { auth() }.status.isSuccess()
-}.getOrDefault(false)
+//suspend fun apiGetNotifications(): List<String> = runCatching {
+//    httpClient.get("$BASE_URL/notifications/my") { auth() }
+//        .body<BaseResponse<List<String>>>().data ?: emptyList()
+//}.getOrDefault(emptyList())
+//
+//suspend fun apiMarkRead(id: Long): Boolean = runCatching {
+//    httpClient.post("$BASE_URL/notifications/mark-read/$id") { auth() }.status.isSuccess()
+//}.getOrDefault(false)
+//
+//suspend fun apiMarkAllRead(): Boolean = runCatching {
+//    httpClient.post("$BASE_URL/notifications/mark-all-read") { auth() }.status.isSuccess()
+//}.getOrDefault(false)
+//
+//suspend fun apiDeleteNotification(id: Long): Boolean = runCatching {
+//    httpClient.delete("$BASE_URL/notifications/$id") { auth() }.status.isSuccess()
+//}.getOrDefault(false)
 
 // ── Advertisements ────────────────────────────────────────────────────────────
 
-suspend fun apiGetAllAds(): List<Ads> = runCatching {
-    httpClient.get("$BASE_URL/advertisements/show-all") { auth() }
-        .body<BaseResponse<List<Ads>>>().data ?: emptyList()
-}.getOrDefault(emptyList())
-
-suspend fun apiGetActiveAds(): List<Ads> = runCatching {
-    httpClient.get("$BASE_URL/advertisements/active") { auth() }
-        .body<BaseResponse<List<Ads>>>().data ?: emptyList()
-}.getOrDefault(emptyList())
-
+//suspend fun apiGetAllAds(): List<Ads> = runCatching {
+//    httpClient.get("$BASE_URL/advertisements/show-all") { auth() }
+//        .body<BaseResponse<List<Ads>>>().data ?: emptyList()
+//}.getOrDefault(emptyList())
+//
+//suspend fun apiGetActiveAds(): List<Ads> = runCatching {
+//    httpClient.get("$BASE_URL/advertisements/active") { auth() }
+//        .body<BaseResponse<List<Ads>>>().data ?: emptyList()
+//}.getOrDefault(emptyList())
+//
 suspend fun apiInsertAd(body: Map<String, Any?>): Ads? = runCatching {
     httpClient.post("$BASE_URL/advertisements/insert") {
         auth(); contentType(ContentType.Application.Json); setBody(body)
@@ -260,16 +260,16 @@ suspend fun apiDeleteAd(id: Long): Boolean = runCatching {
     httpClient.delete("$BASE_URL/advertisements/$id") { auth() }.status.isSuccess()
 }.getOrDefault(false)
 
-suspend fun apiTrackClick(id: Long) = runCatching {
-    httpClient.post("$BASE_URL/advertisements/track-click/$id") { auth() }
-}.getOrNull()
+//suspend fun apiTrackClick(id: Long) = runCatching {
+//    httpClient.post("$BASE_URL/advertisements/track-click/$id") { auth() }
+//}.getOrNull()
 
 // ── Services ──────────────────────────────────────────────────────────────────
 
-suspend fun apiGetAllServices(): List<Service> = runCatching {
-    httpClient.get("$BASE_URL/services/show-all") { auth() }
-        .body<BaseResponse<List<Service>>>().data ?: emptyList()
-}.getOrDefault(emptyList())
+//suspend fun apiGetAllServices(): List<Service> = runCatching {
+//    httpClient.get("$BASE_URL/services/show-all") { auth() }
+//        .body<BaseResponse<List<Service>>>().data ?: emptyList()
+//}.getOrDefault(emptyList())
 
 suspend fun apiInsertService(name: String): Service? = runCatching {
     httpClient.post("$BASE_URL/services/insert") {
@@ -294,17 +294,17 @@ suspend fun apiDeleteService(id: Long): Boolean = runCatching {
 
 // ── Search ────────────────────────────────────────────────────────────────────
 
-suspend fun apiSearch(q: String): SearchModel = runCatching {
-    httpClient.get("$BASE_URL/search") { auth(); parameter("q", q) }
-        .body<BaseResponse<SearchModel>>().data ?: SearchModel()
-}.getOrDefault(SearchModel())
+//suspend fun apiSearch(q: String): SearchModel = runCatching {
+//    httpClient.get("$BASE_URL/search") { auth(); parameter("q", q) }
+//        .body<BaseResponse<SearchModel>>().data ?: SearchModel()
+//}.getOrDefault(SearchModel())
 
 // ── Provider Requests ─────────────────────────────────────────────────────────
 
-suspend fun apiGetAllRequests(): List<ProviderRequest> = runCatching {
-    httpClient.get("$BASE_URL/provider-requests/show-all") { auth() }
-        .body<BaseResponse<List<ProviderRequest>>>().data ?: emptyList()
-}.getOrDefault(emptyList())
+//suspend fun apiGetAllRequests(): List<ProviderRequest> = runCatching {
+//    httpClient.get("$BASE_URL/provider-requests/show-all") { auth() }
+//        .body<BaseResponse<List<ProviderRequest>>>().data ?: emptyList()
+//}.getOrDefault(emptyList())
 
 //suspend fun apiAcceptRequest(id: Int): Boolean = runCatching {
 //    httpClient.post("$BASE_URL/provider-requests/accept/$id") { auth() }.status.isSuccess()

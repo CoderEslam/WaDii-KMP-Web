@@ -22,8 +22,10 @@ class AdsScreen : Screen {
         val adsScreenModel = navigator.koinNavigatorScreenModel<AdsScreenModel>()
         val state by adsScreenModel.state.collectAsState()
 
+        LaunchedEffect(Unit) { adsScreenModel.onEvent(AdsEvent.Load) }
+
         Div(attrs = { classes("space-y-6") }) {
-            PageHeader("Advertisements", "+ New Ad") { adsScreenModel.onEvent(AdsEvent.ShowModal(null)) }
+            PageHeader("Advertisements", "+ New Ad") { navigator.push(CreateAdScreen()) }
             if (state.isLoading) {
                 LoadingScreen()
             }
@@ -47,7 +49,7 @@ class AdsScreen : Screen {
                                 }
                             }
                             Div(attrs = { classes("flex", "gap-1") }) {
-                                GhostButton("✏️") { adsScreenModel.onEvent(AdsEvent.ShowModal(ad)) }
+                                GhostButton("✏️") { navigator.push(CreateAdScreen(ad)) }
                                 GhostButton("🗑️") { adsScreenModel.onEvent(AdsEvent.Delete(ad.id.toLong())) }
                             }
                         }

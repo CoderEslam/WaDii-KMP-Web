@@ -14,12 +14,12 @@ class CountryRepoImpl(private val apiService: ApiService) : CountryRepo {
         apiService.getCountryList(response)
 
     override suspend fun getProvinceByCountryId(
-        countryId: Int,
+        countryId: Long,
         response: (RequestState<BaseResponse<List<Province>>>) -> Unit
     ) = apiService.getProvinceByCountryId(countryId, response)
 
     override suspend fun getCitiesByProvinceId(
-        provinceId: Int,
+        provinceId: Long,
         response: (RequestState<BaseResponse<List<City>>>) -> Unit
     ) = apiService.getCitiesByProvinceId(provinceId, response)
 

@@ -10,7 +10,7 @@ data class Province(
     @SerialName("country")
     val country: Country = Country(),
     @SerialName("id")
-    val id: Int = 0,
+    val id: Long = 0,
     @SerialName("name")
     val name: String = ""
 ) {

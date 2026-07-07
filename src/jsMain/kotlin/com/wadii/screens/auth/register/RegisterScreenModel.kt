@@ -45,32 +45,64 @@ class RegisterViewModel(
         countryUseCase.getCountryList { response ->
             response.handelState(
                 onLoading = {},
-                onSuccess = { data -> updateState { it.copy(countries = data.data ?: emptyList()) } },
+                onSuccess = { data ->
+                    updateState {
+                        it.copy(
+                            countries = data.data ?: emptyList()
+                        )
+                    }
+                },
                 onError = { _, _ -> }
             )
         }
     }
 
-    private fun loadProvinces(countryId: Int) {
-        updateState { it.copy(selectedCountry = countryId, provinces = emptyList(), cities = emptyList(), selectedProvince = 0, selectedCity = 0) }
+    private fun loadProvinces(countryId: Long) {
+        updateState {
+            it.copy(
+                selectedCountry = countryId,
+                provinces = emptyList(),
+                cities = emptyList(),
+                selectedProvince = 0,
+                selectedCity = 0
+            )
+        }
         screenModelScope.launch {
             countryUseCase.getProvinceByCountryId(countryId) { response ->
                 response.handelState(
                     onLoading = {},
-                    onSuccess = { data -> updateState { it.copy(provinces = data.data ?: emptyList()) } },
+                    onSuccess = { data ->
+                        updateState {
+                            it.copy(
+                                provinces = data.data ?: emptyList()
+                            )
+                        }
+                    },
                     onError = { _, _ -> }
                 )
             }
         }
     }
 
-    private fun loadCities(provinceId: Int) {
-        updateState { it.copy(selectedProvince = provinceId, cities = emptyList(), selectedCity = 0) }
+    private fun loadCities(provinceId: Long) {
+        updateState {
+            it.copy(
+                selectedProvince = provinceId,
+                cities = emptyList(),
+                selectedCity = 0
+            )
+        }
         screenModelScope.launch {
             countryUseCase.getCitiesByProvinceId(provinceId) { response ->
                 response.handelState(
                     onLoading = {},
-                    onSuccess = { data -> updateState { it.copy(cities = data.data ?: emptyList()) } },
+                    onSuccess = { data ->
+                        updateState {
+                            it.copy(
+                                cities = data.data ?: emptyList()
+                            )
+                        }
+                    },
                     onError = { _, _ -> }
                 )
             }
@@ -79,7 +111,7 @@ class RegisterViewModel(
 
     private fun submit() = screenModelScope.launch {
         val s = _state.value
-        if (s.loading || s.selectedCity == 0) {
+        if (s.loading || s.selectedCity == 0L) {
             AppState.toast("Please select a city", true)
             return@launch
         }
@@ -93,8 +125,8 @@ class RegisterViewModel(
                 firstName = s.firstName,
                 lastName = s.lastName,
                 phone = s.phone,
-                cityId = s.selectedCity.toInt(),
-                userType = s.userType
+                cityId = s.selectedCity,
+                userType = 0 //s.userType
             )
         ) { response ->
             response.handelState(

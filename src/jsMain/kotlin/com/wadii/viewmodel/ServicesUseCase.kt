@@ -23,6 +23,6 @@ class ServicesUseCase(private val servicesRepo: ServicesRepo) {
 
     suspend fun deleteService(
         id: Long,
-        response: (RequestState<BaseResponse<Service>>) -> Unit
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
     ) = servicesRepo.deleteService(id, response)
 }

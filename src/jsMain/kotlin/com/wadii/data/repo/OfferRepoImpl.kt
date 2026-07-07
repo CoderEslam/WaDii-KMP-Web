@@ -27,7 +27,7 @@ class OfferRepoImpl(private val apiService: ApiService) : OfferRepo {
 
     override suspend fun removeSavedOffer(
         offerId: Long,
-        response: (RequestState<BaseResponse<String>>) -> Unit
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
     ) = apiService.removeSavedOffer(offerId, response)
 
     override suspend fun getMySavedOffers(
@@ -47,6 +47,6 @@ class OfferRepoImpl(private val apiService: ApiService) : OfferRepo {
 
     override suspend fun deleteOffer(
         offerId: Int,
-        response: (RequestState<BaseResponse<String>>) -> Unit
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
     ) = apiService.deleteOffer(offerId, response)
 }

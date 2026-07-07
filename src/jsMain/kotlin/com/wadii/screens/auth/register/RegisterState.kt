@@ -15,8 +15,8 @@ data class RegisterState(
     val countries: List<Country> = emptyList(),
     val provinces: List<Province> = emptyList(),
     val cities: List<City> = emptyList(),
-    val selectedCountry: Int = 0,
-    val selectedProvince: Int = 0,
-    val selectedCity: Int = 0,
+    val selectedCountry: Long = 0,
+    val selectedProvince: Long = 0,
+    val selectedCity: Long = 0,
     val loading: Boolean = false
 )

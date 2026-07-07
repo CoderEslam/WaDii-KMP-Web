@@ -167,9 +167,9 @@ class ApiService(
     }
 
     //delete account
-    suspend fun deleteAccount(response: (RequestState<String>) -> Unit) {
+    suspend fun deleteAccount(response: (RequestState<Boolean>) -> Unit) {
         response(RequestState.Loading)
-        response(client.postApiResponse<String>(urlString = Constants.DELETE_ACCOUNT))
+        response(client.postApiResponse<Boolean>(urlString = Constants.DELETE_ACCOUNT))
     }
 
 
@@ -226,10 +226,10 @@ class ApiService(
 
     suspend fun unfollowProvider(
         providerId: Int,
-        response: (RequestState<BaseResponse<String>>) -> Unit
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
     ) {
         response(RequestState.Loading)
-        response(client.deleteApiResponse<BaseResponse<String>>(urlString = "${Constants.UNFOLLOW_PROVIDER_BY_ID}/$providerId"))
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = "${Constants.UNFOLLOW_PROVIDER_BY_ID}/$providerId"))
     }
 
     suspend fun updateProvider(
@@ -289,6 +289,32 @@ class ApiService(
                                     append(
                                         HttpHeaders.ContentDisposition,
                                         "filename=\"back_id_${GMTDate().timestamp}.jpg\""
+                                    )
+                                }
+                            )
+                        }
+                        providerRequest.taxCardFront?.let { bytes ->
+                            append(
+                                "taxCardFront",
+                                bytes,
+                                Headers.build {
+                                    append(HttpHeaders.ContentType, "image/jpeg")
+                                    append(
+                                        HttpHeaders.ContentDisposition,
+                                        "filename=\"tax_card_front_${GMTDate().timestamp}.jpg\""
+                                    )
+                                }
+                            )
+                        }
+                        providerRequest.taxCardBack?.let { bytes ->
+                            append(
+                                "taxCardBack",
+                                bytes,
+                                Headers.build {
+                                    append(HttpHeaders.ContentType, "image/jpeg")
+                                    append(
+                                        HttpHeaders.ContentDisposition,
+                                        "filename=\"tax_card_back_${GMTDate().timestamp}.jpg\""
                                     )
                                 }
                             )
@@ -359,11 +385,11 @@ class ApiService(
 
     suspend fun deleteService(
         id: Long,
-        response: (RequestState<BaseResponse<Service>>) -> Unit
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
     ) {
         response(RequestState.Loading)
         response(
-            client.deleteApiResponse<BaseResponse<Service>>(
+            client.deleteApiResponse<BaseResponse<Boolean>>(
                 urlString = Constants.SERVICE_DELETE(id),
             )
         )
@@ -527,10 +553,10 @@ class ApiService(
 
     suspend fun removeSavedOffer(
         offerId: Long,
-        response: (RequestState<BaseResponse<String>>) -> Unit
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
     ) {
         response(RequestState.Loading)
-        response(client.deleteApiResponse<BaseResponse<String>>(urlString = "${Constants.REMOVE_SAVED_OFFER}/$offerId"))
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = "${Constants.REMOVE_SAVED_OFFER}/$offerId"))
     }
 
     suspend fun getMySavedOffers(response: (RequestState<BaseResponse<List<SavedOffer>>>) -> Unit) {
@@ -567,10 +593,10 @@ class ApiService(
 
     suspend fun deleteOffer(
         offerId: Int,
-        response: (RequestState<BaseResponse<String>>) -> Unit
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
     ) {
         response(RequestState.Loading)
-        response(client.deleteApiResponse<BaseResponse<String>>(urlString = "${Constants.DELETE_OFFER}/$offerId"))
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = "${Constants.DELETE_OFFER}/$offerId"))
     }
 
     //car type
@@ -586,7 +612,7 @@ class ApiService(
     }
 
     suspend fun getProvinceByCountryId(
-        countryId: Int,
+        countryId: Long,
         response: (RequestState<BaseResponse<List<Province>>>) -> Unit
     ) {
         response(RequestState.Loading)
@@ -594,7 +620,7 @@ class ApiService(
     }
 
     suspend fun getCitiesByProvinceId(
-        provinceId: Int,
+        provinceId: Long,
         response: (RequestState<BaseResponse<List<City>>>) -> Unit
     ) {
         response(RequestState.Loading)

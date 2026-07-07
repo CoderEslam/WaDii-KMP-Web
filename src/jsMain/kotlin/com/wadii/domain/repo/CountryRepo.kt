@@ -12,12 +12,12 @@ interface CountryRepo {
     suspend fun getCountryList(response: (RequestState<BaseResponse<List<Country>>>) -> Unit)
 
     suspend fun getProvinceByCountryId(
-        countryId: Int,
+        countryId: Long,
         response: (RequestState<BaseResponse<List<Province>>>) -> Unit
     )
 
     suspend fun getCitiesByProvinceId(
-        provinceId: Int,
+        provinceId: Long,
         response: (RequestState<BaseResponse<List<City>>>) -> Unit
     )
 

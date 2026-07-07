@@ -24,19 +24,39 @@ class ServicesScreen : Screen {
         val state by model.state.collectAsState()
 
         Div(attrs = { classes("space-y-6") }) {
-            H1(attrs = { classes("text-2xl", "font-semibold", "text-heading") }) { Text("Categories") }
+            H1(attrs = {
+                classes(
+                    "text-2xl",
+                    "font-semibold",
+                    "text-heading"
+                )
+            }) { Text("Categories") }
 
             when {
                 state.isLoading -> LoadingScreen()
                 state.error != null -> Alert(variant = AlertVariant.Danger, body = state.error!!)
                 else -> {
                     Card(classes = "p-5") {
-                        H2(attrs = { classes("font-semibold", "text-heading", "mb-3") }) { Text("Add Category") }
+                        H2(attrs = {
+                            classes(
+                                "font-semibold",
+                                "text-heading",
+                                "mb-3"
+                            )
+                        }) { Text("Add Category") }
                         Div(attrs = { classes("flex", "gap-3", "items-end") }) {
                             Div(attrs = { classes("flex-1") }) {
-                                InputField("Category name", state.newName, required = true) { model.onEvent(ServicesEvent.SetNewName(it)) }
+                                InputField(
+                                    "Category name",
+                                    state.newName,
+                                    required = true
+                                ) { model.onEvent(ServicesEvent.SetNewName(it)) }
                             }
-                            PrimaryButton("Add", loading = state.adding) { model.onEvent(ServicesEvent.Add) }
+                            PrimaryButton("Add", loading = state.adding) {
+                                model.onEvent(
+                                    ServicesEvent.Add
+                                )
+                            }
                         }
                     }
 
@@ -46,20 +66,63 @@ class ServicesScreen : Screen {
                         Card {
                             Div(attrs = { classes("divide-y", "divide-default") }) {
                                 state.services.forEach { service ->
-                                    Div(attrs = { classes("flex", "items-center", "gap-3", "px-5", "py-4") }) {
+                                    Div(attrs = {
+                                        classes(
+                                            "flex",
+                                            "items-center",
+                                            "gap-3",
+                                            "px-5",
+                                            "py-4"
+                                        )
+                                    }) {
                                         if (state.editingId == service.id) {
                                             Div(attrs = { classes("flex-1") }) {
-                                                InputField("Name", state.editName) { model.onEvent(ServicesEvent.SetEditName(it)) }
+                                                InputField("Name", state.editName) {
+                                                    model.onEvent(
+                                                        ServicesEvent.SetEditName(it)
+                                                    )
+                                                }
                                             }
-                                            PrimaryButton("Save", loading = state.saving) { model.onEvent(ServicesEvent.SaveEdit(service)) }
+                                            PrimaryButton(
+                                                "Save",
+                                                loading = state.saving
+                                            ) { model.onEvent(ServicesEvent.SaveEdit(service)) }
                                             SecondaryButton("Cancel") { model.onEvent(ServicesEvent.CancelEdit) }
                                         } else {
-                                            Div(attrs = { classes("flex", "items-center", "gap-3", "flex-1") }) {
-                                                IconShape("⚙️", size = IconShapeSize.SM, variant = IconShapeVariant.Brand)
-                                                P(attrs = { classes("font-medium", "text-heading") }) { Text(service.name) }
+                                            Div(attrs = {
+                                                classes(
+                                                    "flex",
+                                                    "items-center",
+                                                    "gap-3",
+                                                    "flex-1"
+                                                )
+                                            }) {
+                                                IconShape(
+                                                    "⚙️",
+                                                    size = IconShapeSize.SM,
+                                                    variant = IconShapeVariant.Brand
+                                                )
+                                                P(attrs = {
+                                                    classes(
+                                                        "font-medium",
+                                                        "text-heading"
+                                                    )
+                                                }) { Text(service.name) }
                                             }
-                                            GhostButton("✏️") { model.onEvent(ServicesEvent.StartEdit(service)) }
-                                            GhostButton("🗑️") { model.onEvent(ServicesEvent.Delete(service.id)) }
+                                            GhostButton("✏️") {
+                                                model.onEvent(
+                                                    ServicesEvent.StartEdit(
+                                                        service
+                                                    )
+                                                )
+                                            }
+                                            GhostButton("🗑️") {
+                                                model.onEvent(
+                                                    ServicesEvent.Delete(
+                                                        service.id
+                                                    )
+                                                )
+                                            }
                                         }
                                     }
                                 }

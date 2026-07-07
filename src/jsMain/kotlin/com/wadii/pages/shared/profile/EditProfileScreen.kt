@@ -171,7 +171,7 @@ class EditProfileScreen : Screen {
 }
 
 @Composable
-private fun SelectField(label: String, options: List<Pair<Int, String>>, selectedId: Int, onChange: (Int) -> Unit) {
+private fun SelectField(label: String, options: List<Pair<Long, String>>, selectedId: Long, onChange: (Long) -> Unit) {
     Div(attrs = { classes("flex", "flex-col", "gap-2") }) {
         Label(attrs = { classes("text-sm", "font-medium", "text-heading") }) { Text(label) }
         Select(attrs = {
@@ -180,9 +180,9 @@ private fun SelectField(label: String, options: List<Pair<Int, String>>, selecte
                 "bg-surface", "shadow-neu-inset", "text-sm", "text-heading",
                 "focus:outline-none", "focus:ring-1", "focus:ring-brand", "focus:border-brand"
             )
-            onChange { event -> onChange((event.value ?: "").toIntOrNull() ?: 0) }
+            onChange { event -> onChange((event.value ?: "").toLongOrNull() ?: 0L) }
         }) {
-            Option(value = "0", attrs = { if (selectedId == 0) selected() }) { Text("Select $label") }
+            Option(value = "0", attrs = { if (selectedId == 0L) selected() }) { Text("Select $label") }
             options.forEach { (id, name) ->
                 Option(value = id.toString(), attrs = { if (selectedId == id) selected() }) { Text(name) }
             }

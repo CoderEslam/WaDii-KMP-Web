@@ -141,8 +141,8 @@ class EditProfileViewModel(
         loadCountries()
         val countryId = user.city?.province?.country?.id ?: 0
         val provinceId = user.city?.province?.id ?: 0
-        if (countryId != 0) loadProvinces(countryId, resetChildren = false)
-        if (provinceId != 0) loadCities(provinceId, resetChildren = false)
+        if (countryId != 0L) loadProvinces(countryId, resetChildren = false)
+        if (provinceId != 0L) loadCities(provinceId, resetChildren = false)
         if (user.role == "PROVIDER") loadServices()
 
         updateState { it.copy(loading = false) }
@@ -158,7 +158,7 @@ class EditProfileViewModel(
         }
     }
 
-    private fun loadProvinces(countryId: Int, resetChildren: Boolean) {
+    private fun loadProvinces(countryId: Long, resetChildren: Boolean) {
         if (resetChildren) {
             updateState {
                 it.copy(selectedCountry = countryId, provinces = emptyList(), cities = emptyList(), selectedProvince = 0, selectedCity = 0)
@@ -175,7 +175,7 @@ class EditProfileViewModel(
         }
     }
 
-    private fun loadCities(provinceId: Int, resetChildren: Boolean) {
+    private fun loadCities(provinceId: Long, resetChildren: Boolean) {
         if (resetChildren) {
             updateState { it.copy(selectedProvince = provinceId, cities = emptyList(), selectedCity = 0) }
         } else {
@@ -203,7 +203,7 @@ class EditProfileViewModel(
     private fun submit() {
         val s = _state.value
         val user = s.originalUser
-        if (user == null || s.firstName.isBlank() || s.lastName.isBlank() || s.email.isBlank() || s.selectedCity == 0) {
+        if (user == null || s.firstName.isBlank() || s.lastName.isBlank() || s.email.isBlank() || s.selectedCity == 0L) {
             AppState.toast("Please fill in all required fields", true)
             return
         }

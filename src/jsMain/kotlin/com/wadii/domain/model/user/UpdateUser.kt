@@ -24,5 +24,5 @@ data class UpdateUser(
     @SerialName("userType")
     val userType: Long = 0,
     @SerialName("cityId")
-    val cityId: Int = 0
+    val cityId: Long = 0
 )

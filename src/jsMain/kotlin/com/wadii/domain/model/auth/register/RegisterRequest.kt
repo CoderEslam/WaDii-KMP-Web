@@ -19,7 +19,7 @@ data class RegisterRequest(
     @SerialName("phone")
     val phone: String = "",
     @SerialName("userType")
-    val userType: Int = 0,
+    val userType: Int,
     @SerialName("cityId")
-    val cityId: Int = 0
+    val cityId: Long = 0
 )

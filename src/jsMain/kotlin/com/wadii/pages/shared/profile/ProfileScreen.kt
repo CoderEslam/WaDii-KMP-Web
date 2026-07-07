@@ -32,9 +32,6 @@ class ProfileScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val model = koinScreenModel<ProfileViewModel>()
         val state by model.state.collectAsState()
-
-        LaunchedEffect(Unit) { model.onEvent(ProfileEvent.Load) }
-
         Div(attrs = { classes("max-w-2xl", "mx-auto", "space-y-6") }) {
             H1(attrs = { classes("text-2xl", "font-semibold", "text-heading") }) { Text("Profile") }
 
@@ -213,6 +210,49 @@ class ProfileScreen : Screen {
                         Div(attrs = { classes("space-y-3") }) {
                             SecondaryButton("Edit Profile", fullWidth = true) { navigator.push(EditProfileScreen()) }
                             DangerButton("Sign Out", fullWidth = true) { AppState.logout() }
+                        }
+                    }
+
+                    val hasProviderProfile = u.provider != null && u.provider.id != 0
+                    Div(attrs = {
+                        style {
+                            property("position", "fixed")
+                            property("bottom", "24px")
+                            property("right", "24px")
+                            property("z-index", "50")
+                        }
+                    }) {
+                        Button(attrs = {
+                            classes(
+                                "flex",
+                                "items-center",
+                                "justify-center",
+                                "gap-2",
+                                "px-5",
+                                "py-3",
+                                "bg-surface",
+                                "text-fg-brand",
+                                "font-medium",
+                                "rounded-full",
+                                "shadow-neu-sm",
+                                "hover:shadow-neu-md",
+                                "active:shadow-neu-inset",
+                                "transition-all",
+                                "disabled:opacity-60"
+                            )
+                            style { property("border", "none"); property("cursor", "pointer") }
+                            onClick {
+                                if (u.role == "PROVIDER" || hasProviderProfile) {
+                                    model.onEvent(ProfileEvent.SwitchRole)
+                                } else {
+                                    navigator.push(RequestProviderScreen())
+                                }
+                            }
+                            if (state.switchingRole) disabled()
+                        }) {
+                            if (state.switchingRole) Spinner() else {
+                                Text(if (u.role == "PROVIDER") "🧑 Switch to Buyer" else "🏬 Switch to Seller")
+                            }
                         }
                     }
                 }

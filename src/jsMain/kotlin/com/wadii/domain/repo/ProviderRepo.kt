@@ -42,7 +42,7 @@ interface ProviderRepo {
 
     suspend fun unfollowProvider(
         providerId: Int,
-        response: (RequestState<BaseResponse<String>>) -> Unit
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
     )
 
     suspend fun requestProvider(

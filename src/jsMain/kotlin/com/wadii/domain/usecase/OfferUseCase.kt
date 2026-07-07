@@ -27,7 +27,7 @@ class OfferUseCase(private val offerRepo: OfferRepo) {
 
     suspend fun removeSavedOffer(
         offerId: Long,
-        response: (RequestState<BaseResponse<String>>) -> Unit
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
     ) = offerRepo.removeSavedOffer(offerId, response)
 
     suspend fun getMySavedOffers(
@@ -47,6 +47,6 @@ class OfferUseCase(private val offerRepo: OfferRepo) {
 
     suspend fun deleteOffer(
         offerId: Int,
-        response: (RequestState<BaseResponse<String>>) -> Unit
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
     ) = offerRepo.deleteOffer(offerId, response)
 }

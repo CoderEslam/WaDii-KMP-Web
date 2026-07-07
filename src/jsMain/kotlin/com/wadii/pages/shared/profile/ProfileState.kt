@@ -7,6 +7,7 @@ data class ProfileState(
     val user: User? = null,
     val uploadingAvatar: Boolean = false,
     val uploadingBg: Boolean = false,
+    val switchingRole: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null,
     // User.equals() compares only by id, so a re-load carrying updated fields for the same

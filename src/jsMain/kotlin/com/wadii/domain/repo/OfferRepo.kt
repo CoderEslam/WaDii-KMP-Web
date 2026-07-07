@@ -26,7 +26,7 @@ interface OfferRepo {
 
     suspend fun removeSavedOffer(
         offerId: Long,
-        response: (RequestState<BaseResponse<String>>) -> Unit
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
     )
 
     suspend fun getMySavedOffers(
@@ -46,6 +46,6 @@ interface OfferRepo {
 
     suspend fun deleteOffer(
         offerId: Int,
-        response: (RequestState<BaseResponse<String>>) -> Unit
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
     )
 }

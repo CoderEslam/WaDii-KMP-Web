@@ -8,8 +8,8 @@ sealed class RegisterEvent {
     data class SetPhone(val value: String) : RegisterEvent()
     data class SetUserType(val type: Int) : RegisterEvent()
     data class SetProviderName(val value: String) : RegisterEvent()
-    data class SelectCountry(val id: Int) : RegisterEvent()
-    data class SelectProvince(val id: Int) : RegisterEvent()
-    data class SelectCity(val id: Int) : RegisterEvent()
+    data class SelectCountry(val id: Long) : RegisterEvent()
+    data class SelectProvince(val id: Long) : RegisterEvent()
+    data class SelectCity(val id: Long) : RegisterEvent()
     object Submit : RegisterEvent()
 }

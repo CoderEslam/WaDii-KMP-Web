@@ -340,6 +340,19 @@ suspend fun apiUploadImage(file: File): String? {
 }
 
 
+suspend fun File.readBytes(): ByteArray = suspendCoroutine { cont ->
+    val reader = org.w3c.files.FileReader()
+    reader.onload = {
+        val buffer = reader.result as org.khronos.webgl.ArrayBuffer
+        val array = org.khronos.webgl.Int8Array(buffer).asDynamic()
+        val length = array.length as Int
+        cont.resumeWith(Result.success(ByteArray(length) { i -> array[i] as Byte }))
+        Unit
+    }
+    reader.onerror = { cont.resumeWith(Result.success(ByteArray(0))); Unit }
+    reader.readAsArrayBuffer(this)
+}
+
 suspend fun apiUploadImageBackground(file: File): String? {
     val token = AppState.token ?: return null
     return runCatching {

@@ -19,5 +19,5 @@ interface ServicesRepo {
         response: (RequestState<BaseResponse<Service>>) -> Unit
     )
 
-    suspend fun deleteService(id: Long, response: (RequestState<BaseResponse<Service>>) -> Unit)
+    suspend fun deleteService(id: Long, response: (RequestState<BaseResponse<Boolean>>) -> Unit)
 }

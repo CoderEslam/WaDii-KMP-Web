@@ -62,6 +62,7 @@ import com.wadii.pages.shared.chat.ChatViewModel
 import com.wadii.pages.shared.notifications.NotificationsViewModel
 import com.wadii.pages.shared.profile.EditProfileViewModel
 import com.wadii.pages.shared.profile.ProfileViewModel
+import com.wadii.pages.shared.profile.RequestProviderViewModel
 import com.wadii.screens.auth.login.LoginViewModel
 import com.wadii.screens.auth.register.RegisterViewModel
 import com.wadii.screens.home.HomeViewModel
@@ -147,8 +148,9 @@ val appModule = module {
     // ViewModels — pages/
     factory { ProviderDashboardViewModel(get(), get()) }
     factory { ProviderOrdersViewModel(get()) }
-    factory { ProfileViewModel(get()) }
+    factory { ProfileViewModel(get(), get()) }
     factory { EditProfileViewModel(get(), get(), get(), get()) }
+    factory { RequestProviderViewModel(get(), get()) }
     factory { NotificationsViewModel(get()) }
     factory { ProviderRequestsViewModel(get()) }
     factory { ServicesViewModel(get()) }

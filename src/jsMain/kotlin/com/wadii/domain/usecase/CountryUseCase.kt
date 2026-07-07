@@ -14,13 +14,13 @@ class CountryUseCase(private val countryRepo: CountryRepo) {
         countryRepo.getCountryList(response)
 
     suspend fun getProvinceByCountryId(
-        countryId: Int,
+        countryId: Long,
         response: (RequestState<BaseResponse<List<Province>>>) -> Unit
     ) = countryRepo.getProvinceByCountryId(countryId, response)
 
 
     suspend fun getCitiesByProvinceId(
-        provinceId: Int,
+        provinceId: Long,
         response: (RequestState<BaseResponse<List<City>>>) -> Unit
     ) = countryRepo.getCitiesByProvinceId(provinceId, response)
 

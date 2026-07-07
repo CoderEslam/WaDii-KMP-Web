@@ -25,7 +25,7 @@ class ServicesRepoImpl(private val apiService: ApiService) : ServicesRepo {
 
     override suspend fun deleteService(
         id: Long,
-        response: (RequestState<BaseResponse<Service>>) -> Unit
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
     ) = apiService.deleteService(id, response)
 
 }

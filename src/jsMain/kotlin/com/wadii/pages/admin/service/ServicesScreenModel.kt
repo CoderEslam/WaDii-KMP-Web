@@ -84,7 +84,8 @@ class ServicesViewModel(
                 updateState { it.copy(isLoading = true) }
             }, onSuccess = {
                 updateState { it.copy(isLoading = false) }
-                AppState.toast("Deleted"); load()
+                AppState.toast("Deleted")
+                load()
             }, onError = { error, code ->
                 updateState { it.copy(error = error, isLoading = false) }
                 AppState.toast("Failed to delete", true)
@@ -99,6 +100,7 @@ class ServicesViewModel(
             }, onSuccess = {
                 updateState { it.copy(newName = "", isLoading = false) }
                 AppState.toast("Service added!")
+                load()
             }, onError = { error, code ->
                 updateState { it.copy(error = error, isLoading = false) }
                 AppState.toast("Failed to add", true)

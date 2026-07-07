@@ -8,9 +8,9 @@ sealed class EditProfileEvent {
     data class SetEmail(val value: String) : EditProfileEvent()
     data class SetPhone(val value: String) : EditProfileEvent()
 
-    data class SelectCountry(val id: Int) : EditProfileEvent()
-    data class SelectProvince(val id: Int) : EditProfileEvent()
-    data class SelectCity(val id: Int) : EditProfileEvent()
+    data class SelectCountry(val id: Long) : EditProfileEvent()
+    data class SelectProvince(val id: Long) : EditProfileEvent()
+    data class SelectCity(val id: Long) : EditProfileEvent()
 
     data class ToggleService(val serviceId: Int) : EditProfileEvent()
 

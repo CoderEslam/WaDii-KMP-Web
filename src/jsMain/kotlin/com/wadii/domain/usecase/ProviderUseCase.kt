@@ -38,7 +38,7 @@ class ProviderUseCase(private val providerRepo: ProviderRepo) {
 
     suspend fun unfollowProvider(
         providerId: Int,
-        response: (RequestState<BaseResponse<String>>) -> Unit
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
     ) = providerRepo.unfollowProvider(providerId, response)
 
     suspend fun updateProvider(

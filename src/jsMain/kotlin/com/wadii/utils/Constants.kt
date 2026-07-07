@@ -7,7 +7,13 @@ object Constants {
     const val APP_LANGUAGE = "APP_LANGUAGE"
     const val USER_KEY = "USER_KEY"
     const val THEME_KEY = "THEME_KEY"
-    const val IP = "192.168.1.30"
+    const val PORT = ""
+
+//    const val IP = "wadii-spring-production.up.railway.app"//"172.28.0.65"
+//    const val BASE_URL = "https://$IP"
+//    const val WS_URL = "wss://$IP/web-socket"
+
+    const val IP = "172.28.0.80"
     const val BASE_URL = "http://$IP:8080"
     const val WS_URL = "ws://$IP:8080/web-socket"
     const val BASE_URL_USER_IMAGES = "${BASE_URL}/users"
@@ -112,6 +118,10 @@ object Constants {
 
     //ads
     const val ADS_SHOW_ALL = "${BASE_URL}$VERSION/advertisements/show-all"
+    const val ADS_INSERT = "${BASE_URL}$VERSION/advertisements/insert"
+    const val ADS_UPDATE = "${BASE_URL}$VERSION/advertisements/update"
+    fun ADS_DELETE(id: Long) = "${BASE_URL}$VERSION/advertisements/delete/$id"
+    fun TRACK_CLICK(id: Long) = "${BASE_URL}$VERSION/advertisements/track-click/$id"
 
     //notifications
 

@@ -244,21 +244,21 @@ suspend fun apiInsertResponse(body: Map<String, Any?>): OrderResponse? = runCatc
 //        .body<BaseResponse<List<Ads>>>().data ?: emptyList()
 //}.getOrDefault(emptyList())
 //
-suspend fun apiInsertAd(body: Map<String, Any?>): Ads? = runCatching {
-    httpClient.post("$BASE_URL/advertisements/insert") {
-        auth(); contentType(ContentType.Application.Json); setBody(body)
-    }.body<BaseResponse<Ads>>().data
-}.getOrNull()
+//suspend fun apiInsertAd(body: Map<String, Any?>): Ads? = runCatching {
+//    httpClient.post("$BASE_URL/advertisements/insert") {
+//        auth(); contentType(ContentType.Application.Json); setBody(body)
+//    }.body<BaseResponse<Ads>>().data
+//}.getOrNull()
 
-suspend fun apiUpdateAd(body: Map<String, Any?>): Ads? = runCatching {
-    httpClient.put("$BASE_URL/advertisements/update") {
-        auth(); contentType(ContentType.Application.Json); setBody(body)
-    }.body<BaseResponse<Ads>>().data
-}.getOrNull()
+//suspend fun apiUpdateAd(body: Map<String, Any?>): Ads? = runCatching {
+//    httpClient.put("$BASE_URL/advertisements/update") {
+//        auth(); contentType(ContentType.Application.Json); setBody(body)
+//    }.body<BaseResponse<Ads>>().data
+//}.getOrNull()
 
-suspend fun apiDeleteAd(id: Long): Boolean = runCatching {
-    httpClient.delete("$BASE_URL/advertisements/$id") { auth() }.status.isSuccess()
-}.getOrDefault(false)
+//suspend fun apiDeleteAd(id: Long): Boolean = runCatching {
+//    httpClient.delete("$BASE_URL/advertisements/$id") { auth() }.status.isSuccess()
+//}.getOrDefault(false)
 
 //suspend fun apiTrackClick(id: Long) = runCatching {
 //    httpClient.post("$BASE_URL/advertisements/track-click/$id") { auth() }

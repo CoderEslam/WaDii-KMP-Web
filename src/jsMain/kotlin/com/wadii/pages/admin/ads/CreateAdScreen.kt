@@ -20,14 +20,8 @@ class CreateAdScreen(private val existingAd: Ads? = null) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val model = koinScreenModel<CreateAdScreenModel> { parametersOf(existingAd) }
+        val model = koinScreenModel<AdsScreenModel> { parametersOf(existingAd) }
         val state by model.state.collectAsState()
-
-        if (state.submitted) {
-            LaunchedEffect(Unit) { navigator.pop() }
-            return
-        }
-
         Div(attrs = { classes("max-w-2xl", "mx-auto", "space-y-6") }) {
             Div(attrs = { classes("flex", "items-center", "gap-3") }) {
                 BackButton { navigator.pop() }
@@ -43,40 +37,45 @@ class CreateAdScreen(private val existingAd: Ads? = null) : Screen {
                     }
 
                     InputField("Title", state.title, "Summer promo", required = true) {
-                        model.onEvent(CreateAdEvent.SetTitle(it))
+                        model.onEvent(AdsEvent.SetTitle(it))
                     }
-                    InputField("Advertiser Name", state.advertiserName, "Acme Corp", required = true) {
-                        model.onEvent(CreateAdEvent.SetAdvertiserName(it))
+                    InputField(
+                        "Advertiser Name",
+                        state.advertiserName,
+                        "Acme Corp",
+                        required = true
+                    ) {
+                        model.onEvent(AdsEvent.SetAdvertiserName(it))
                     }
                     TextArea("Description", state.description, "What is this ad about…") {
-                        model.onEvent(CreateAdEvent.SetDescription(it))
+                        model.onEvent(AdsEvent.SetDescription(it))
                     }
                     InputField("Image URL", state.imageUrl, "https://…", type = "url") {
-                        model.onEvent(CreateAdEvent.SetImageUrl(it))
+                        model.onEvent(AdsEvent.SetImageUrl(it))
                     }
                     InputField("Target URL", state.targetUrl, "https://…", type = "url") {
-                        model.onEvent(CreateAdEvent.SetTargetUrl(it))
+                        model.onEvent(AdsEvent.SetTargetUrl(it))
                     }
 
                     Div(attrs = { classes("grid", "grid-cols-2", "gap-4") }) {
                         InputField("Start Date", state.startDate, type = "date") {
-                            model.onEvent(CreateAdEvent.SetStartDate(it))
+                            model.onEvent(AdsEvent.SetStartDate(it))
                         }
                         InputField("End Date", state.endDate, type = "date") {
-                            model.onEvent(CreateAdEvent.SetEndDate(it))
+                            model.onEvent(AdsEvent.SetEndDate(it))
                         }
                     }
 
                     InputField("Priority", state.priority, "0", type = "number") {
-                        model.onEvent(CreateAdEvent.SetPriority(it))
+                        model.onEvent(AdsEvent.SetPriority(it))
                     }
 
                     PrimaryButton(
                         if (state.isEdit) "Save Changes" else "Create Ad",
-                        loading = state.submitting,
+                        loading = state.isLoading,
                         fullWidth = true
                     ) {
-                        model.onEvent(CreateAdEvent.Submit)
+                        model.onEvent(AdsEvent.Submit)
                     }
                 }
             }

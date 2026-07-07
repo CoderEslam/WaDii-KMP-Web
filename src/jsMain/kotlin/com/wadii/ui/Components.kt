@@ -3,6 +3,7 @@ package com.wadii.ui
 import androidx.compose.runtime.*
 import com.wadii.state.AppState
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.attributes.required
 import org.jetbrains.compose.web.dom.*
@@ -239,7 +240,7 @@ fun InputField(
                     classes("absolute", "right-3", "top-1/2", "-translate-y-1/2", "text-body", "text-sm", "pointer-events-none")
                 }) { Text(trailingIcon) }
             }
-            Input(type = org.jetbrains.compose.web.attributes.InputType.Text, attrs = {
+            Input(type = InputType.Text, attrs = {
                 classes(*classNames("w-full", "py-2.5", "border", "border-default-medium", "rounded-neu-base",
                     "bg-surface", "shadow-neu-inset", "text-sm", "text-heading",
                     if (leadingIcon != null) "pl-9" else "px-4",

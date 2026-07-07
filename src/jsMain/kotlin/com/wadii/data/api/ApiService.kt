@@ -3,6 +3,7 @@ package com.wadii.data.api
 
 import com.wadii.domain.model.BaseResponse
 import com.wadii.domain.model.ads.Ads
+import com.wadii.domain.model.ads.InsertAds
 import com.wadii.domain.model.auth.login.LoginRequest
 import com.wadii.domain.model.auth.login.User
 import com.wadii.domain.model.auth.register.RegisterRequest
@@ -579,6 +580,46 @@ class ApiService(
         response(RequestState.Loading)
         response(client.getApiResponse<BaseResponse<List<Ads>>>(urlString = Constants.ADS_SHOW_ALL))
     }
+
+
+    suspend fun insertAds(
+        insertAds: InsertAds,
+        response: (RequestState<BaseResponse<Ads>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<InsertAds, BaseResponse<Ads>>(
+                urlString = Constants.ADS_INSERT,
+                body = insertAds
+            )
+        )
+    }
+
+    suspend fun updateAds(
+        insertAds: InsertAds,
+        response: (RequestState<BaseResponse<Ads>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<InsertAds, BaseResponse<Ads>>(
+                urlString = Constants.ADS_UPDATE,
+                body = insertAds
+            )
+        )
+    }
+
+    suspend fun deleteAds(
+        id: Long,
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.deleteApiResponse<BaseResponse<Boolean>>(
+                urlString = Constants.ADS_DELETE(id),
+            )
+        )
+    }
+
 
     suspend fun search(
         query: String,

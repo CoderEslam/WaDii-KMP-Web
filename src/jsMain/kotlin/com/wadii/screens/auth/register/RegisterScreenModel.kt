@@ -2,6 +2,7 @@ package com.wadii.screens.auth.register
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
+import com.wadii.data.firebase.FcmService
 import com.wadii.domain.model.auth.register.RegisterRequest
 import com.wadii.domain.usecase.AuthUseCase
 import com.wadii.domain.usecase.CountryUseCase
@@ -83,10 +84,12 @@ class RegisterViewModel(
             return@launch
         }
         updateState { it.copy(loading = true) }
+        val fcmToken = FcmService.fetchToken().orEmpty()
         authUseCase.register(
             RegisterRequest(
                 email = s.email,
                 password = s.password,
+                fcmToken = fcmToken,
                 firstName = s.firstName,
                 lastName = s.lastName,
                 phone = s.phone,

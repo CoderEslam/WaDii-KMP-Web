@@ -2,6 +2,7 @@ package com.wadii.screens.auth.login
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
+import com.wadii.data.firebase.FcmService
 import com.wadii.domain.model.auth.login.LoginRequest
 import com.wadii.domain.usecase.AuthUseCase
 import com.wadii.state.AppState
@@ -9,8 +10,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.w3c.notifications.Notification.Companion.permission
 
-class LoginViewModel(private val authUseCase: AuthUseCase) : BaseViewModel<LoginState, LoginEvent>() {
+class LoginViewModel(private val authUseCase: AuthUseCase) :
+    BaseViewModel<LoginState, LoginEvent>() {
 
     override val initialState: LoginState
         get() = LoginState()
@@ -22,7 +25,9 @@ class LoginViewModel(private val authUseCase: AuthUseCase) : BaseViewModel<Login
         when (event) {
             is LoginEvent.SetEmail -> updateState { it.copy(email = event.value) }
             is LoginEvent.SetPassword -> updateState { it.copy(password = event.value) }
-            LoginEvent.Submit -> submit()
+            LoginEvent.Submit -> {
+              submit()
+            }
         }
     }
 
@@ -30,7 +35,16 @@ class LoginViewModel(private val authUseCase: AuthUseCase) : BaseViewModel<Login
         val current = _state.value
         if (current.loading) return@launch
         updateState { it.copy(loading = true) }
-        authUseCase.login(LoginRequest(email = current.email, password = current.password)) { response ->
+        console.log("Permission:", permission)
+        val fcmToken = FcmService.fetchToken().orEmpty()
+        console.log("FCM token:", fcmToken)
+        authUseCase.login(
+            LoginRequest(
+                email = current.email,
+                password = current.password,
+                fcmToken = fcmToken
+            )
+        ) { response ->
             response.handelState(
                 onLoading = {},
                 onSuccess = { data ->

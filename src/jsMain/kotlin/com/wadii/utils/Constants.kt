@@ -140,4 +140,17 @@ object Constants {
 
     fun ORDER_SHOW_BY_ID(id: Int) = "${BASE_URL}$VERSION/orders/show/$id"
 
+    //firebase (web config — public, safe to ship client-side; NOT the admin.json service account)
+    //project_id came from wadii.json; the rest isn't in that file at all — it's not a
+    //service-account field. Get it from Firebase Console > Project settings > General >
+    //Your apps > SDK setup and configuration, and the VAPID key from Cloud Messaging >
+    //Web configuration > Web Push certificates.
+    const val FIREBASE_API_KEY = "AIzaSyChi41C0aEzzjctisYpqpHvzJKN6uD0v8A"
+    const val FIREBASE_AUTH_DOMAIN = "wadii-kmp.firebaseapp.com"
+    const val FIREBASE_PROJECT_ID = "wadii-kmp"
+    const val FIREBASE_STORAGE_BUCKET = "wadii-kmp.firebasestorage.app"
+    const val FIREBASE_MESSAGING_SENDER_ID = "1041244088662"
+    const val FIREBASE_APP_ID = "1:1041244088662:web:292b831dddb6727ed40ef7"
+    const val FIREBASE_VAPID_KEY = "BCZXCUTLg2DQq9WT9AL6AZxTGq37_s8c8s8gFQSIIdojIPahkUaeXcBBrhk4252YCa5Rg0yyOS9jBn7MHO4RAHE"
+
 }

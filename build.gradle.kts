@@ -52,6 +52,9 @@ kotlin {
                 // Agora Web SDK for video/voice calling
                 implementation(npm("agora-rtc-sdk-ng", "4.24.3"))
 
+                // Firebase Web SDK (Cloud Messaging) for push notification tokens
+                implementation(npm("firebase", "11.6.0"))
+
             }
         }
     }

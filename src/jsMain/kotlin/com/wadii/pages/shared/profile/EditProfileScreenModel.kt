@@ -2,6 +2,7 @@ package com.wadii.pages.shared.profile
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
+import com.wadii.data.firebase.FcmService
 import com.wadii.domain.model.auth.Role
 import com.wadii.domain.model.auth.login.User
 import com.wadii.domain.model.provider.BranchRequest
@@ -209,6 +210,7 @@ class EditProfileViewModel(
 
         screenModelScope.launch {
             updateState { it.copy(saving = true, error = null) }
+            val fcmToken = FcmService.fetchToken().orEmpty()
             userUseCase.updateUser(
                 UpdateUser(
                     id = user.id.toLong(),
@@ -216,7 +218,7 @@ class EditProfileViewModel(
                     lastName = s.lastName,
                     email = s.email,
                     password = "",
-                    fcmToken = "",
+                    fcmToken = fcmToken,
                     phone = s.phone,
                     userType = Role.valueOf(s.role).userType.toLong(),
                     cityId = s.selectedCity

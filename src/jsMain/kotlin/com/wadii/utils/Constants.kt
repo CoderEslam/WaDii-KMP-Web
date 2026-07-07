@@ -59,6 +59,9 @@ object Constants {
 
     //service
     const val SERVICE_LIST = "${BASE_URL}$VERSION/services/show-all"
+    const val SERVICE_INSERT = "${BASE_URL}$VERSION/services/insert"
+    fun SERVICE_DELETE(id: Long) = "${BASE_URL}$VERSION/services/delete/$id"
+    const val SERVICE_UPDATE = "${BASE_URL}$VERSION/services/insert"
 
     const val UPDATE_PROVIDER = "${BASE_URL}$VERSION/providers/update-all"
 

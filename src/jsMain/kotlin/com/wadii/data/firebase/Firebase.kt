@@ -38,6 +38,18 @@ fun firebaseOptions(
 external object FirebaseMessaging {
     fun getMessaging(app: dynamic): dynamic
     fun getToken(messaging: dynamic, options: GetTokenOptions): Promise<String>
+    fun onMessage(messaging: dynamic, callback: (MessagePayload) -> Unit): () -> Unit
+}
+
+external interface MessagePayload {
+    val notification: NotificationBody?
+    val data: dynamic
+}
+
+external interface NotificationBody {
+    val title: String?
+    val body: String?
+    val image: String?
 }
 
 external interface GetTokenOptions {

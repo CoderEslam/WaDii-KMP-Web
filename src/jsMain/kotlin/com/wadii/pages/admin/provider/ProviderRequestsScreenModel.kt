@@ -80,19 +80,19 @@ class ProviderRequestsViewModel(
         adminDashboardUseCase.rejectRequest(id = req.id) { response ->
             response.handelState(
                 onLoading = {
-                    updateState { it.copy(isLoading = true) }
+                    updateState { it.copy(rejectingId = req.id) }
                 }, onSuccess = { data ->
                     updateState {
                         it.copy(
                             requests = it.requests.filter { r -> r.id != req.id },
-                            acceptingId = 0L
+                            rejectingId = 0L
                         )
                     }
                 }, onError = { error, code ->
                     updateState {
                         it.copy(
                             error = error,
-                            isLoading = false
+                            rejectingId = 0L
                         )
                     }
                 }

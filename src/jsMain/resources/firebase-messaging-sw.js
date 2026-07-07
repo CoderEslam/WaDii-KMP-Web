@@ -14,4 +14,13 @@ firebase.initializeApp({
     appId: "1:1041244088662:web:292b831dddb6727ed40ef7",
 });
 
-firebase.messaging();
+const messaging = firebase.messaging();
+
+// Catches pushes that arrive while the tab is unfocused/closed (foreground pushes are
+// caught in Kotlin instead — see FcmService.observeForegroundMessages). Handles data-only
+// payloads too, not just ones with a "notification" field.
+messaging.onBackgroundMessage((payload) => {
+    const title = payload.notification?.title ?? payload.data?.title ?? "WaDii";
+    const body = payload.notification?.body ?? payload.data?.body ?? "";
+    self.registration.showNotification(title, { body });
+});

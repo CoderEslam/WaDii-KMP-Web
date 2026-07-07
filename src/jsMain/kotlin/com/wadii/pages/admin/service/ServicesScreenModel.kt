@@ -2,9 +2,7 @@ package com.wadii.pages.admin.service
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
-import com.wadii.data.api.apiDeleteService
-import com.wadii.data.api.apiInsertService
-import com.wadii.data.api.apiUpdateService
+import com.wadii.domain.model.service.InsertService
 import com.wadii.domain.model.service.Service
 import com.wadii.state.AppState
 import com.wadii.viewmodel.ServicesUseCase
@@ -60,43 +58,52 @@ class ServicesViewModel(
         }
     }
 
-    private fun saveEdit(service: Service) {
-        val current = _state.value
-        if (current.saving) return
-        updateState { it.copy(saving = true) }
-        screenModelScope.launch {
-            val result = apiUpdateService(service.id, current.editName)
-            updateState { it.copy(saving = false) }
-            if (result != null) {
-                updateState { it.copy(editingId = 0) }
+    private fun saveEdit(service: Service) = screenModelScope.launch {
+        servicesUseCase.updateService(
+            insertService = InsertService(
+                id = service.id,
+                name = _state.value.editName
+            )
+        ) { response ->
+            response.handelState(onLoading = {
+                updateState { it.copy(saving = true) }
+            }, onSuccess = {
+                updateState { it.copy(saving = false) }
                 AppState.toast("Updated!")
                 load()
-            } else {
+            }, onError = { error, code ->
+                updateState { it.copy(error = error, saving = false) }
                 AppState.toast("Failed to update", true)
-            }
+            })
         }
     }
 
     private fun delete(id: Long) = screenModelScope.launch {
-        if (apiDeleteService(id)) {
-            AppState.toast("Deleted"); load()
-        } else AppState.toast("Failed to delete", true)
-    }
-
-    private fun add() {
-        val current = _state.value
-        if (current.adding || current.newName.isBlank()) return
-        updateState { it.copy(adding = true) }
-        screenModelScope.launch {
-            val result = apiInsertService(current.newName)
-            updateState { it.copy(adding = false) }
-            if (result != null) {
-                updateState { it.copy(newName = "") }
-                AppState.toast("Service added!")
-                load()
-            } else {
-                AppState.toast("Failed to add", true)
-            }
+        servicesUseCase.deleteService(id) { response ->
+            response.handelState(onLoading = {
+                updateState { it.copy(isLoading = true) }
+            }, onSuccess = {
+                updateState { it.copy(isLoading = false) }
+                AppState.toast("Deleted"); load()
+            }, onError = { error, code ->
+                updateState { it.copy(error = error, isLoading = false) }
+                AppState.toast("Failed to delete", true)
+            })
         }
     }
+
+    private fun add() = screenModelScope.launch {
+        servicesUseCase.addService(insertService = InsertService(name = _state.value.newName)) { response ->
+            response.handelState(onLoading = {
+                updateState { it.copy(isLoading = true) }
+            }, onSuccess = {
+                updateState { it.copy(newName = "", isLoading = false) }
+                AppState.toast("Service added!")
+            }, onError = { error, code ->
+                updateState { it.copy(error = error, isLoading = false) }
+                AppState.toast("Failed to add", true)
+            })
+        }
+    }
+
 }

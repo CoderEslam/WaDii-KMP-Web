@@ -36,6 +36,7 @@ import com.wadii.domain.model.response.OrderResponse
 import com.wadii.domain.model.response.ResponseCallback
 import com.wadii.domain.model.response.ResponseRequest
 import com.wadii.domain.model.serach.SearchModel
+import com.wadii.domain.model.service.InsertService
 import com.wadii.domain.model.service.Service
 import com.wadii.domain.model.user.UpdateUser
 import com.wadii.utils.Constants
@@ -328,6 +329,44 @@ class ApiService(
     suspend fun getServiceList(response: (RequestState<BaseResponse<List<Service>>>) -> Unit) {
         response(RequestState.Loading)
         response(client.getApiResponse<BaseResponse<List<Service>>>(urlString = Constants.SERVICE_LIST))
+    }
+
+    suspend fun addService(
+        insertService: InsertService,
+        response: (RequestState<BaseResponse<Service>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<InsertService, BaseResponse<Service>>(
+                urlString = Constants.SERVICE_INSERT,
+                body = insertService
+            )
+        )
+    }
+
+    suspend fun updateService(
+        insertService: InsertService,
+        response: (RequestState<BaseResponse<Service>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<InsertService, BaseResponse<Service>>(
+                urlString = Constants.SERVICE_UPDATE,
+                body = insertService
+            )
+        )
+    }
+
+    suspend fun deleteService(
+        id: Long,
+        response: (RequestState<BaseResponse<Service>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.deleteApiResponse<BaseResponse<Service>>(
+                urlString = Constants.SERVICE_DELETE(id),
+            )
+        )
     }
 
 

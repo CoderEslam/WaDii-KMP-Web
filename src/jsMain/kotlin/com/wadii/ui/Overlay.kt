@@ -73,6 +73,36 @@ private fun ModalCloseButton(onClick: () -> Unit) {
     }) { Text("✕") }
 }
 
+@Composable
+fun ImageLightbox(src: String?, onDismiss: () -> Unit) {
+    if (src == null) return
+    Div(attrs = {
+        classes("fixed", "inset-0", "z-50", "bg-black/80", "flex", "items-center", "justify-center", "p-4", "lightbox-backdrop")
+        style { property("backdrop-filter", "blur(4px)") }
+        attr("role", "presentation")
+        onClick { onDismiss() }
+    }) {
+        Img(src = src, attrs = {
+            classes("lightbox-image", "rounded-neu-base", "shadow-neu-xl")
+            style {
+                property("max-width", "90vw")
+                property("max-height", "90vh")
+                property("object-fit", "contain")
+            }
+            onClick { it.stopPropagation() }
+        })
+        Button(attrs = {
+            classes("fixed", "flex", "items-center", "justify-center", "rounded-full", "bg-black/50", "text-white", "hover:bg-black/70", "transition-colors")
+            style {
+                property("top", "16px"); property("right", "16px")
+                property("width", "36px"); property("height", "36px")
+                property("border", "none"); property("cursor", "pointer"); property("font-size", "18px")
+            }
+            onClick { onDismiss() }
+        }) { Text("✕") }
+    }
+}
+
 enum class AlertVariant { Brand, Success, Danger, Warning }
 
 private fun alertTokens(variant: AlertVariant): Triple<String, String, String> = when (variant) {

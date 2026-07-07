@@ -271,26 +271,26 @@ suspend fun apiInsertResponse(body: Map<String, Any?>): OrderResponse? = runCatc
 //        .body<BaseResponse<List<Service>>>().data ?: emptyList()
 //}.getOrDefault(emptyList())
 
-suspend fun apiInsertService(name: String): Service? = runCatching {
-    httpClient.post("$BASE_URL/services/insert") {
-        auth(); contentType(ContentType.Application.Json); setBody(mapOf("name" to name))
-    }.body<BaseResponse<Service>>().data
-}.getOrNull()
+//suspend fun apiInsertService(name: String): Service? = runCatching {
+//    httpClient.post("$BASE_URL/services/insert") {
+//        auth(); contentType(ContentType.Application.Json); setBody(mapOf("name" to name))
+//    }.body<BaseResponse<Service>>().data
+//}.getOrNull()
 
-suspend fun apiUpdateService(id: Long, name: String): Service? = runCatching {
-    httpClient.put("$BASE_URL/services/update") {
-        auth(); contentType(ContentType.Application.Json); setBody(
-        mapOf(
-            "id" to id,
-            "name" to name
-        )
-    )
-    }.body<BaseResponse<Service>>().data
-}.getOrNull()
+//suspend fun apiUpdateService(id: Long, name: String): Service? = runCatching {
+//    httpClient.put("$BASE_URL/services/update") {
+//        auth(); contentType(ContentType.Application.Json); setBody(
+//        mapOf(
+//            "id" to id,
+//            "name" to name
+//        )
+//    )
+//    }.body<BaseResponse<Service>>().data
+//}.getOrNull()
 
-suspend fun apiDeleteService(id: Long): Boolean = runCatching {
-    httpClient.delete("$BASE_URL/services/$id") { auth() }.status.isSuccess()
-}.getOrDefault(false)
+//suspend fun apiDeleteService(id: Long): Boolean = runCatching {
+//    httpClient.delete("$BASE_URL/services/$id") { auth() }.status.isSuccess()
+//}.getOrDefault(false)
 
 // ── Search ────────────────────────────────────────────────────────────────────
 

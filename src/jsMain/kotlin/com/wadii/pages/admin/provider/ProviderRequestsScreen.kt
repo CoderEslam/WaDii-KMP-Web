@@ -7,10 +7,12 @@ import com.wadii.ui.Alert
 import com.wadii.ui.AlertVariant
 import com.wadii.ui.Card
 import com.wadii.ui.EmptyState
+import com.wadii.ui.ImageLightbox
 import com.wadii.ui.LoadingScreen
 import com.wadii.ui.Spinner
 import com.wadii.utils.Constants.BASE_URL_USER_IMAGES
 import org.jetbrains.compose.web.attributes.disabled
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.*
 
 class ProviderRequestsScreen : Screen {
@@ -19,6 +21,7 @@ class ProviderRequestsScreen : Screen {
     override fun Content() {
         val model = koinScreenModel<ProviderRequestsViewModel>()
         val state by model.state.collectAsState()
+        var lightboxImage by remember { mutableStateOf<String?>(null) }
 
         Div(attrs = { classes("space-y-6") }) {
             H1(attrs = {
@@ -101,25 +104,47 @@ class ProviderRequestsScreen : Screen {
                                                 }) { Text("🔗 $it") }
                                             }
                                         }
-                                        Button(attrs = {
-                                            classes(
-                                                "flex",
-                                                "items-center",
-                                                "gap-2",
-                                                "px-4",
-                                                "py-2",
-                                                "bg-green-500",
-                                                "text-white",
-                                                "text-sm",
-                                                "font-medium",
-                                                "rounded-xl",
-                                                "hover:bg-green-600",
-                                                "disabled:opacity-60"
-                                            )
-                                            onClick { model.onEvent(ProviderRequestsEvent.Accept(req)) }
-                                            if (state.acceptingId == req.id) disabled()
-                                        }) {
-                                            if (state.acceptingId == req.id) Spinner() else Text("✓ Accept")
+                                        Div(attrs = { classes("flex", "items-center", "gap-2") }) {
+                                            Button(attrs = {
+                                                classes(
+                                                    "flex",
+                                                    "items-center",
+                                                    "gap-2",
+                                                    "px-4",
+                                                    "py-2",
+                                                    "bg-green-500",
+                                                    "text-white",
+                                                    "text-sm",
+                                                    "font-medium",
+                                                    "rounded-xl",
+                                                    "hover:bg-green-600",
+                                                    "disabled:opacity-60"
+                                                )
+                                                onClick { model.onEvent(ProviderRequestsEvent.Accept(req)) }
+                                                if (state.acceptingId == req.id || state.rejectingId == req.id) disabled()
+                                            }) {
+                                                if (state.acceptingId == req.id) Spinner() else Text("✓ Accept")
+                                            }
+                                            Button(attrs = {
+                                                classes(
+                                                    "flex",
+                                                    "items-center",
+                                                    "gap-2",
+                                                    "px-4",
+                                                    "py-2",
+                                                    "bg-red-500",
+                                                    "text-white",
+                                                    "text-sm",
+                                                    "font-medium",
+                                                    "rounded-xl",
+                                                    "hover:bg-red-600",
+                                                    "disabled:opacity-60"
+                                                )
+                                                onClick { model.onEvent(ProviderRequestsEvent.Reject(req)) }
+                                                if (state.acceptingId == req.id || state.rejectingId == req.id) disabled()
+                                            }) {
+                                                if (state.rejectingId == req.id) Spinner() else Text("✕ Reject")
+                                            }
                                         }
                                     }
                                     if (req.frontIdImage != null || req.backIdImage != null) {
@@ -141,8 +166,12 @@ class ProviderRequestsScreen : Screen {
                                                                 "rounded-neu-base",
                                                                 "object-cover",
                                                                 "border",
-                                                                "border-default"
+                                                                "border-default",
+                                                                "hover:shadow-neu-sm",
+                                                                "transition-all"
                                                             )
+                                                            style { property("cursor", "pointer") }
+                                                            onClick { lightboxImage = "$BASE_URL_USER_IMAGES/$img" }
                                                         })
                                                 }
                                             }
@@ -163,8 +192,12 @@ class ProviderRequestsScreen : Screen {
                                                                 "rounded-neu-base",
                                                                 "object-cover",
                                                                 "border",
-                                                                "border-default"
+                                                                "border-default",
+                                                                "hover:shadow-neu-sm",
+                                                                "transition-all"
                                                             )
+                                                            style { property("cursor", "pointer") }
+                                                            onClick { lightboxImage = "$BASE_URL_USER_IMAGES/$img" }
                                                         })
                                                 }
                                             }
@@ -177,5 +210,7 @@ class ProviderRequestsScreen : Screen {
                 }
             }
         }
+
+        ImageLightbox(lightboxImage) { lightboxImage = null }
     }
 }

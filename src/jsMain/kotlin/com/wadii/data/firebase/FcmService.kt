@@ -68,4 +68,19 @@ object FcmService {
         console.error("FCM token fetch failed:", error)
         null
     }
+
+    /**
+     * Fires for pushes that arrive while this tab is open and focused. Background pushes
+     * (tab unfocused/closed) never reach here — those are caught in firebase-messaging-sw.js.
+     * Returns an unsubscribe function.
+     */
+    fun observeForegroundMessages(onReceive: (title: String, body: String) -> Unit): () -> Unit {
+        val messaging = FirebaseMessaging.getMessaging(firebaseApp())
+        return FirebaseMessaging.onMessage(messaging) { payload ->
+            val notification = payload.notification
+            if (notification != null) {
+                onReceive(notification.title.orEmpty(), notification.body.orEmpty())
+            }
+        }
+    }
 }

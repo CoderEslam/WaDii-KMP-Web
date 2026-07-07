@@ -7,6 +7,7 @@ import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import com.wadii.core.call.CallSignalingController
 import com.wadii.core.di.initializeKoin
+import com.wadii.data.firebase.FcmService
 import com.wadii.domain.model.auth.login.User
 import com.wadii.pages.admin.dashboard.AdminDashboardScreen
 import com.wadii.pages.provider.dashboard.ProviderDashboardScreen
@@ -21,6 +22,7 @@ import com.wadii.ui.Layout
 import com.wadii.ui.Toast
 import kotlinx.browser.document
 import kotlinx.browser.window
+import kotlinx.coroutines.awaitCancellation
 import org.jetbrains.compose.web.renderComposable
 import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
@@ -59,6 +61,18 @@ fun App() {
     val callController = koinInject<CallSignalingController>()
     LaunchedEffect(user?.id, token) {
         if (user != null && token != null) callController.start(user.id, token) else callController.stop()
+    }
+
+    LaunchedEffect(user?.id) {
+        if (user == null) return@LaunchedEffect
+        val unsubscribe = FcmService.observeForegroundMessages { title, body ->
+            AppState.toast(if (body.isNotBlank()) "$title: $body" else title)
+        }
+        try {
+            awaitCancellation()
+        } finally {
+            unsubscribe()
+        }
     }
 
     if (user == null) {

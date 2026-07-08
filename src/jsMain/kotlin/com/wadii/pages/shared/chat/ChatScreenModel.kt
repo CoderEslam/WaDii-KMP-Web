@@ -84,7 +84,7 @@ class ChatViewModel(
         paginator?.loadNextItems()
     }
 
-    private fun buildPaginator(contactId: Int) = Paginator<Int, PageMessages>(
+    private fun buildPaginator(contactId: Long) = Paginator<Int, PageMessages>(
         initialKey = 0,
         onLoadUpdated = { loading ->
             if (_state.value.messages.isEmpty()) {
@@ -121,7 +121,7 @@ class ChatViewModel(
     private fun send() {
         val current = _state.value
         val contact = current.selectedContact
-        if (contact.contact.id == 0 || current.messageText.isBlank() || current.sending) return
+        if (contact.contact.id == 0L || current.messageText.isBlank() || current.sending) return
         val text = current.messageText.trim()
         updateState { it.copy(messageText = "", sending = true) }
         screenModelScope.launch {

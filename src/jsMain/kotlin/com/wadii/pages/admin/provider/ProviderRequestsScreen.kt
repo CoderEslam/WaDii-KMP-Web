@@ -94,14 +94,24 @@ class ProviderRequestsScreen : Screen {
                                                     }
                                                 }
                                             }
-                                            req.links?.let {
-                                                if (it.isNotEmpty()) P(attrs = {
-                                                    classes(
-                                                        "text-sm",
-                                                        "text-amber-600",
-                                                        "mt-1"
-                                                    )
-                                                }) { Text("🔗 $it") }
+                                            req.links.takeIf { it.isNotEmpty() }?.let { links ->
+                                                Div(attrs = { classes("space-y-1", "mt-1") }) {
+                                                    links.forEach { link ->
+                                                        A(
+                                                            href = link,
+                                                            attrs = {
+                                                                classes(
+                                                                    "text-sm",
+                                                                    "text-amber-600",
+                                                                    "hover:underline",
+                                                                    "block"
+                                                                )
+                                                                attr("target", "_blank")
+                                                                attr("rel", "noopener noreferrer")
+                                                            }
+                                                        ) { Text("🔗 $link") }
+                                                    }
+                                                }
                                             }
                                         }
                                         Div(attrs = { classes("flex", "items-center", "gap-2") }) {
@@ -176,6 +186,62 @@ class ProviderRequestsScreen : Screen {
                                                 }
                                             }
                                             req.backIdImage?.let { img ->
+                                                Div {
+                                                    P(attrs = {
+                                                        classes(
+                                                            "text-xs",
+                                                            "text-body-subtle",
+                                                            "mb-1"
+                                                        )
+                                                    }) { Text("Back ID") }
+                                                    Img(
+                                                        src = "$BASE_URL_USER_IMAGES/$img",
+                                                        attrs = {
+                                                            classes(
+                                                                "h-20",
+                                                                "rounded-neu-base",
+                                                                "object-cover",
+                                                                "border",
+                                                                "border-default",
+                                                                "hover:shadow-neu-sm",
+                                                                "transition-all"
+                                                            )
+                                                            style { property("cursor", "pointer") }
+                                                            onClick { lightboxImage = "$BASE_URL_USER_IMAGES/$img" }
+                                                        })
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (req.taxCardFront != null || req.taxCardBack != null) {
+                                        Div(attrs = { classes("mt-4", "flex", "gap-3") }) {
+                                            req.taxCardFront?.let { img ->
+                                                Div {
+                                                    P(attrs = {
+                                                        classes(
+                                                            "text-xs",
+                                                            "text-body-subtle",
+                                                            "mb-1"
+                                                        )
+                                                    }) { Text("Front ID") }
+                                                    Img(
+                                                        src = "$BASE_URL_USER_IMAGES/$img",
+                                                        attrs = {
+                                                            classes(
+                                                                "h-20",
+                                                                "rounded-neu-base",
+                                                                "object-cover",
+                                                                "border",
+                                                                "border-default",
+                                                                "hover:shadow-neu-sm",
+                                                                "transition-all"
+                                                            )
+                                                            style { property("cursor", "pointer") }
+                                                            onClick { lightboxImage = "$BASE_URL_USER_IMAGES/$img" }
+                                                        })
+                                                }
+                                            }
+                                            req.taxCardBack?.let { img ->
                                                 Div {
                                                     P(attrs = {
                                                         classes(

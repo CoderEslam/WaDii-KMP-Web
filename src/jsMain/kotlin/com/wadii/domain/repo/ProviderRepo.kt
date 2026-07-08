@@ -51,12 +51,12 @@ interface ProviderRepo {
     )
 
     suspend fun putItUser(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<User>>) -> Unit
     )
 
     suspend fun putItProvider(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<User>>) -> Unit
     )
 

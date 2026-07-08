@@ -22,7 +22,7 @@ import kotlinx.coroutines.withContext
 
 class CallViewModel(
     private val channelName: String,
-    private val remoteUserId: Int,
+    private val remoteUserId: Long,
     private val remoteUserName: String,
     private val remoteUserImage: String?,
     private val withVideo: Boolean,
@@ -86,7 +86,7 @@ class CallViewModel(
             CallSignal(
                 channelName = channelName,
                 callType = if (withVideo) "VIDEO" else "AUDIO",
-                fromUserId = AppState.user?.id ?: 0,
+                fromUserId = AppState.user?.id ?: 0L,
                 toUserId = remoteUserId,
                 fromUserName = AppState.user?.fullName ?: "",
                 fromUserImage = AppState.user?.image
@@ -107,10 +107,6 @@ class CallViewModel(
                                     agoraClient.onUserPublished =
                                         { user, mediaType -> onRemotePublished(user, mediaType) }
                                     agoraClient.onUserLeft = { onRemoteLeft() }
-                                    console.log("AppId:", resp.data.appId)
-                                    console.log("Channel:", channelName)
-                                    console.log("UID:", uid)
-                                    console.log("Token:", resp.data.token)
                                     val localCam = agoraClient.join(
                                         resp.data.appId,
                                         channelName,

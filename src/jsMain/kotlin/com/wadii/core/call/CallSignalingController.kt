@@ -18,7 +18,7 @@ class CallSignalingController(private val service: CallSignalingService) {
 
     val events = MutableSharedFlow<IncomingCallSignal>(extraBufferCapacity = 8)
 
-    fun start(userId: Int, token: String) {
+    fun start(userId: Long, token: String) {
         if (job?.isActive == true) return
         job = scope.launch {
             service.connect(userId, token).collect { incoming ->

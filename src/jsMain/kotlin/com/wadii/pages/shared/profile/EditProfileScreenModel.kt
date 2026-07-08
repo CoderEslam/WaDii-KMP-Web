@@ -213,14 +213,14 @@ class EditProfileViewModel(
             val fcmToken = FcmService.fetchToken().orEmpty()
             userUseCase.updateUser(
                 UpdateUser(
-                    id = user.id.toLong(),
+                    id = user.id,
                     firstName = s.firstName,
                     lastName = s.lastName,
                     email = s.email,
                     password = "",
                     fcmToken = fcmToken,
                     phone = s.phone,
-                    userType = Role.valueOf(s.role).userType.toLong(),
+                    userType = Role.valueOf(s.role).userType,
                     cityId = s.selectedCity
                 )
             ) { r ->

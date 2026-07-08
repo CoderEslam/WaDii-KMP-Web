@@ -64,7 +64,7 @@ data class ProviderModel(
             @SerialName("firstName")
             val firstName: String = "",
             @SerialName("id")
-            val id: Int = 0,
+            val id: Long = 0,
             @SerialName("image")
             val image: String? = null,
             @SerialName("lastName")

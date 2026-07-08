@@ -18,7 +18,7 @@ data class User(
     @SerialName("following")
     val following: List<Following?> = listOf(),
     @SerialName("id")
-    val id: Int = 0,
+    val id: Long = 0,
     @SerialName("image")
     val image: String? = null,
     @SerialName("lastName")
@@ -363,6 +363,6 @@ data class User(
     }
 
     override fun hashCode(): Int {
-        return id
+        return id.toInt()
     }
 }

@@ -52,12 +52,12 @@ class ProviderUseCase(private val providerRepo: ProviderRepo) {
     ) = providerRepo.requestProvider(providerRequest, response)
 
     suspend fun putItUser(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<User>>) -> Unit
     ) = providerRepo.putItUser(id, response)
 
     suspend fun putItProvider(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<User>>) -> Unit
     ) = providerRepo.putItProvider(id, response)
 

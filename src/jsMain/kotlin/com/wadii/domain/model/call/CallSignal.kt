@@ -10,9 +10,9 @@ data class CallSignal(
     @SerialName("callType")
     val callType: String = "VIDEO",
     @SerialName("fromUserId")
-    val fromUserId: Int = 0,
+    val fromUserId: Long = 0,
     @SerialName("toUserId")
-    val toUserId: Int = 0,
+    val toUserId: Long = 0,
     @SerialName("fromUserName")
     val fromUserName: String = "",
     @SerialName("fromUserImage")

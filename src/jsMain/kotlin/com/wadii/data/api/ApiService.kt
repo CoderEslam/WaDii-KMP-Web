@@ -327,7 +327,7 @@ class ApiService(
 
 
     suspend fun putItUser(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<User>>) -> Unit
     ) {
         response(RequestState.Loading)
@@ -339,7 +339,7 @@ class ApiService(
     }
 
     suspend fun putItProvider(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<User>>) -> Unit
     ) {
         response(RequestState.Loading)
@@ -500,7 +500,7 @@ class ApiService(
     }
 
     suspend fun conversation(
-        userId: Int,
+        userId: Long,
         page: Int = 0,
         response: (RequestState<BaseResponse<PageMessages>>) -> Unit
     ) {

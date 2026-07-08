@@ -21,7 +21,7 @@ interface MessagesRepo {
     suspend fun showAllMessages(response: (RequestState<BaseResponse<List<ShowAllMessagesResponse>>>) -> Unit)
 
     suspend fun conversation(
-        userId: Int,
+        userId: Long,
         page: Int = 0,
         response: (RequestState<BaseResponse<PageMessages>>) -> Unit
     )

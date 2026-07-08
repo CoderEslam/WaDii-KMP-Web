@@ -29,7 +29,7 @@ class CallSignalingService(private val client: HttpClient) {
         SocketEvent.CALL_END.name
     )
 
-    fun connect(userId: Int, token: String): Flow<IncomingCallSignal> = callbackFlow {
+    fun connect(userId: Long, token: String): Flow<IncomingCallSignal> = callbackFlow {
         val job = launch {
             runCatching {
                 client.webSocket("${Constants.WS_URL}/$userId?token=$token") {

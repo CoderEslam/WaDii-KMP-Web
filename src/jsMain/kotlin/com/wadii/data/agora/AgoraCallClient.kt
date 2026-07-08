@@ -75,7 +75,7 @@ class AgoraCallClient {
         appId: String,
         channel: String,
         token: String?,
-        uid: Int,
+        uid: Long,
         withVideo: Boolean
     ): ICameraVideoTrack? {
 

@@ -9,12 +9,12 @@ import org.w3c.dom.url.URLSearchParams
  */
 data class CallDeepLink(
     val channelName: String,
-    val remoteUserId: Int,
+    val remoteUserId: Long,
     val remoteUserName: String,
     val remoteUserImage: String?,
     val withVideo: Boolean,
     val isCaller: Boolean,
-    val myUserId: Int,
+    val myUserId: Long,
     val myUserName: String,
     val token: String
 )
@@ -26,8 +26,8 @@ fun parseCallDeepLink(hash: String): CallDeepLink? {
     val params = URLSearchParams(hash.removePrefix(PREFIX))
 
     val channelName = params.get("channelName")?.takeIf { it.isNotBlank() } ?: return null
-    val remoteUserId = params.get("remoteUserId")?.toIntOrNull() ?: return null
-    val myUserId = params.get("myUserId")?.toIntOrNull() ?: return null
+    val remoteUserId = params.get("remoteUserId")?.toLongOrNull() ?: return null
+    val myUserId = params.get("myUserId")?.toLongOrNull() ?: return null
     val token = params.get("token")?.takeIf { it.isNotBlank() } ?: return null
 
     return CallDeepLink(

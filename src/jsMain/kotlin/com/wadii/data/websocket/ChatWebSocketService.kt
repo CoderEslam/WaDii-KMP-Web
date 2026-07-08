@@ -24,7 +24,7 @@ class ChatWebSocketService(private val client: HttpClient) {
 
     private var sendText: (suspend (String) -> Unit)? = null
 
-    fun connect(userId: Int, token: String): Flow<PageMessages.Content> = callbackFlow {
+    fun connect(userId: Long, token: String): Flow<PageMessages.Content> = callbackFlow {
         val job = launch {
             runCatching {
                 client.webSocket("${Constants.WS_URL}/$userId?token=$token") {

@@ -22,7 +22,7 @@ data class UpdateUser(
     @SerialName("phone")
     val phone: String = "",
     @SerialName("userType")
-    val userType: Long = 0,
+    val userType: Int = 0,
     @SerialName("cityId")
     val cityId: Long = 0
 )

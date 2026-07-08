@@ -51,12 +51,12 @@ class ProviderRepoImpl(private val apiService: ApiService) : ProviderRepo {
     ) = apiService.requestProvider(providerRequest, response)
 
     override suspend fun putItUser(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<User>>) -> Unit
     ) = apiService.putItUser(id, response)
 
     override suspend fun putItProvider(
-        id: Int,
+        id: Long,
         response: (RequestState<BaseResponse<User>>) -> Unit
     ) = apiService.putItProvider(id, response)
 

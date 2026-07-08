@@ -25,7 +25,7 @@ class MessagesRepoImpl(private val apiService: ApiService) : MessagesRepo {
         apiService.showAllMessages(response)
 
     override suspend fun conversation(
-        userId: Int,
+        userId: Long,
         page: Int,
         response: (RequestState<BaseResponse<PageMessages>>) -> Unit
     ) = apiService.conversation(userId = userId, page = page, response)

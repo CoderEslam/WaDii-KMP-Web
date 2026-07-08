@@ -19,7 +19,7 @@ import org.w3c.dom.HTMLDivElement
 
 class CallScreen(
     private val channelName: String,
-    private val remoteUserId: Int,
+    private val remoteUserId: Long,
     private val remoteUserName: String,
     private val remoteUserImage: String?,
     private val withVideo: Boolean,

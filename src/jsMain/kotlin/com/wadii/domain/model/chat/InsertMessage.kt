@@ -10,5 +10,5 @@ data class InsertMessage(
     @SerialName("type")
     val type: String = "",
     @SerialName("toUserId")
-    val toUserId: Int = 0
+    val toUserId: Long = 0
 )

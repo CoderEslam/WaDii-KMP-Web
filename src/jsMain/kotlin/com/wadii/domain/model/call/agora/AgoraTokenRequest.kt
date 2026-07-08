@@ -9,5 +9,5 @@ data class AgoraTokenRequest(
     @SerialName("channelName")
     val channelName: String = "",
     @SerialName("uid")
-    val uid: Int = 0
+    val uid: Long = 0
 )

@@ -24,7 +24,7 @@ class MessageUseCase(private val messageRepo: MessagesRepo) {
         messageRepo.showAllMessages(response)
 
     suspend fun conversation(
-        userId: Int,
+        userId: Long,
         page: Int = 0,
         response: (RequestState<BaseResponse<PageMessages>>) -> Unit
     ) = messageRepo.conversation(

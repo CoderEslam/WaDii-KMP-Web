@@ -49,8 +49,8 @@ kotlin {
                 // Provides the ability to load network images
                 implementation(libs.sketch.http)
 
-                // Agora Web SDK for video/voice calling
-                implementation(npm("agora-rtc-sdk-ng", "4.24.3"))
+                // LiveKit Web SDK for video/voice calling
+                implementation(npm("livekit-client", "2.9.4"))
 
                 // Firebase Web SDK (Cloud Messaging) for push notification tokens
                 implementation(npm("firebase", "11.6.0"))

@@ -3,15 +3,14 @@ package com.wadii.pages.shared.call
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
 import com.wadii.core.call.CallSignalingController
-import com.wadii.data.agora.AgoraCallClient
-import com.wadii.data.agora.IAgoraRTCRemoteUser
-import com.wadii.data.agora.IRemoteAudioTrack
-import com.wadii.data.agora.IRemoteVideoTrack
+import com.wadii.data.livekit.LiveKitCallClient
+import com.wadii.data.livekit.LiveKitClient
 import com.wadii.domain.model.call.CallSignal
-import com.wadii.domain.model.call.agora.AgoraTokenRequest
+import com.wadii.domain.model.call.livekit.LiveKitTokenRequest
 import com.wadii.domain.model.chat.SocketEvent
-import com.wadii.domain.usecase.AgoraUseCase
+import com.wadii.domain.usecase.LiveKitUseCase
 import com.wadii.state.AppState
+import kotlinx.browser.document
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.w3c.dom.HTMLMediaElement
 
 class CallViewModel(
     private val channelName: String,
@@ -27,11 +27,12 @@ class CallViewModel(
     private val remoteUserImage: String?,
     private val withVideo: Boolean,
     private val isCaller: Boolean,
-    private val agoraUseCase: AgoraUseCase,
+    private val liveKitUseCase: LiveKitUseCase,
     private val callSignaling: CallSignalingController
 ) : BaseViewModel<CallState, CallEvent>() {
 
-    private val agoraClient = AgoraCallClient()
+    private val liveKitClient = LiveKitCallClient()
+    private val remoteAudioElements = mutableListOf<HTMLMediaElement>()
     private var signalJob: Job? = null
 
     override val initialState: CallState
@@ -70,7 +71,7 @@ class CallViewModel(
                         updateState { it.copy(status = CallStatus.ENDED, error = "Call declined") }
 
                     SocketEvent.CALL_END -> {
-                        cleanupAgora()
+                        cleanupLiveKit()
                         updateState { it.copy(status = CallStatus.ENDED) }
                     }
 
@@ -97,36 +98,29 @@ class CallViewModel(
     private fun joinAndPublish() = screenModelScope.launch {
         updateState { it.copy(status = CallStatus.CONNECTING) }
         val uid = AppState.user?.id ?: return@launch
-        agoraUseCase.getToken(AgoraTokenRequest(channelName, uid)) { r ->
+        liveKitUseCase.getToken(
+            LiveKitTokenRequest(
+                roomName = channelName,
+                identity = uid.toString(),
+                participantName = AppState.user?.fullName ?: ""
+            )
+        ) { r ->
             r.handelState(
                 onSuccess = { resp ->
                     screenModelScope.launch(Dispatchers.Default) {
                         runCatching {
-                            try {
-                                withContext(Dispatchers.Main) {
-                                    agoraClient.onUserPublished =
-                                        { user, mediaType -> onRemotePublished(user, mediaType) }
-                                    agoraClient.onUserLeft = { onRemoteLeft() }
-                                    val localCam = agoraClient.join(
-                                        resp.data.appId,
-                                        channelName,
-                                        resp.data.token,
-                                        uid,
-                                        withVideo
-                                    )
-                                    localCam?.let { localCam ->
-                                        updateState {
-                                            it.copy(
-                                                status = CallStatus.CONNECTED,
-                                                localVideoTrack = localCam
-                                            )
-                                        }
-                                    }
+                            withContext(Dispatchers.Main) {
+                                liveKitClient.onTrackSubscribed = { track, participant ->
+                                    onRemoteTrackSubscribed(track, participant)
                                 }
-                            } catch (e: dynamic) {
-                                console.log(e)
-                                console.log(e.code)
-                                console.log(e.message)
+                                liveKitClient.onParticipantDisconnected = { onRemoteLeft() }
+                                val localTrack = liveKitClient.join(resp.data.url, resp.data.token, withVideo)
+                                updateState {
+                                    it.copy(
+                                        status = CallStatus.CONNECTED,
+                                        localVideoTrack = localTrack
+                                    )
+                                }
                             }
                         }.onFailure { e ->
                             updateState {
@@ -135,7 +129,6 @@ class CallViewModel(
                                     error = e.message ?: "Failed to join call"
                                 )
                             }
-
                         }
                     }
                 },
@@ -151,35 +144,37 @@ class CallViewModel(
         }
     }
 
-    private fun onRemotePublished(user: IAgoraRTCRemoteUser, mediaType: String) =
-        screenModelScope.launch {
-            val track = agoraClient.subscribe(user, mediaType) ?: return@launch
-            when (mediaType) {
-                "video" -> updateState {
-                    it.copy(
-                        remoteVideoTrack = track.unsafeCast<IRemoteVideoTrack>(),
-                        remoteHasVideo = true
-                    )
-                }
+    private fun onRemoteTrackSubscribed(
+        track: LiveKitClient.Track,
+        participant: LiveKitClient.RemoteParticipant
+    ) {
+        when (track.kind) {
+            "video" -> updateState {
+                it.copy(remoteVideoTrack = track, remoteHasVideo = true)
+            }
 
-                "audio" -> track.unsafeCast<IRemoteAudioTrack>().play()
+            "audio" -> {
+                val element = track.attach()
+                document.body?.appendChild(element)
+                remoteAudioElements += element
             }
         }
+    }
 
     private fun onRemoteLeft() {
-        screenModelScope.launch { cleanupAgora() }
+        screenModelScope.launch { cleanupLiveKit() }
         updateState { it.copy(status = CallStatus.ENDED) }
     }
 
     private fun toggleMic() = screenModelScope.launch {
         val enabled = !state.value.micEnabled
-        agoraClient.setMicEnabled(enabled)
+        liveKitClient.setMicEnabled(enabled)
         updateState { it.copy(micEnabled = enabled) }
     }
 
     private fun toggleCamera() = screenModelScope.launch {
         val enabled = !state.value.cameraEnabled
-        agoraClient.setCameraEnabled(enabled)
+        liveKitClient.setCameraEnabled(enabled)
         updateState { it.copy(cameraEnabled = enabled) }
     }
 
@@ -194,16 +189,18 @@ class CallViewModel(
                 )
             )
         }
-        cleanupAgora()
+        cleanupLiveKit()
         updateState { it.copy(status = CallStatus.ENDED) }
     }
 
-    private suspend fun cleanupAgora() {
-        runCatching { agoraClient.leave() }
+    private suspend fun cleanupLiveKit() {
+        runCatching { liveKitClient.leave() }
+        remoteAudioElements.forEach { it.parentNode?.removeChild(it) }
+        remoteAudioElements.clear()
     }
 
     override fun onDispose() {
         signalJob?.cancel()
-        screenModelScope.launch { cleanupAgora() }
+        screenModelScope.launch { cleanupLiveKit() }
     }
 }

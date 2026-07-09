@@ -1,7 +1,6 @@
 package com.wadii.pages.shared.call
 
-import com.wadii.data.agora.ICameraVideoTrack
-import com.wadii.data.agora.IRemoteVideoTrack
+import com.wadii.data.livekit.LiveKitClient
 
 enum class CallStatus { CALLING, RINGING, CONNECTING, CONNECTED, ENDED }
 
@@ -13,8 +12,8 @@ data class CallState(
     val remoteUserImage: String? = null,
     val micEnabled: Boolean = true,
     val cameraEnabled: Boolean = true,
-    val localVideoTrack: ICameraVideoTrack? = null,
-    val remoteVideoTrack: IRemoteVideoTrack? = null,
+    val localVideoTrack: LiveKitClient.Track? = null,
+    val remoteVideoTrack: LiveKitClient.Track? = null,
     val remoteHasVideo: Boolean = false,
     val error: String = ""
 )

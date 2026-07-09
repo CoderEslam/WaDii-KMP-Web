@@ -7,8 +7,8 @@ import com.wadii.domain.model.ads.InsertAds
 import com.wadii.domain.model.auth.login.LoginRequest
 import com.wadii.domain.model.auth.login.User
 import com.wadii.domain.model.auth.register.RegisterRequest
-import com.wadii.domain.model.call.agora.AgoraTokenRequest
-import com.wadii.domain.model.call.agora.AgoraTokenResponse
+import com.wadii.domain.model.call.livekit.LiveKitTokenRequest
+import com.wadii.domain.model.call.livekit.LiveKitTokenResponse
 import com.wadii.domain.model.carTypes.CarType
 import com.wadii.domain.model.chat.ChatContact
 import com.wadii.domain.model.chat.InsertMessage
@@ -510,15 +510,15 @@ class ApiService(
         })
     }
 
-    //agora
-    suspend fun getAgoraToken(
-        request: AgoraTokenRequest,
-        response: (RequestState<BaseResponse<AgoraTokenResponse>>) -> Unit
+    //livekit
+    suspend fun getLiveKitToken(
+        request: LiveKitTokenRequest,
+        response: (RequestState<BaseResponse<LiveKitTokenResponse>>) -> Unit
     ) {
         response(RequestState.Loading)
         response(
-            client.postApiResponse<AgoraTokenRequest, BaseResponse<AgoraTokenResponse>>(
-                urlString = Constants.AGORA_TOKEN,
+            client.postApiResponse<LiveKitTokenRequest, BaseResponse<LiveKitTokenResponse>>(
+                urlString = Constants.LIVEKIT_TOKEN,
                 body = request
             )
         )

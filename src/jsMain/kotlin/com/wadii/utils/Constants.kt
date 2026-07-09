@@ -13,7 +13,7 @@ object Constants {
 //    const val BASE_URL = "https://$IP"
 //    const val WS_URL = "wss://$IP/web-socket"
 
-    const val IP = "172.28.0.45"
+    const val IP = "192.168.1.7"
     const val BASE_URL = "http://$IP:8080"
     const val WS_URL = "ws://$IP:8080/web-socket"
     const val BASE_URL_USER_IMAGES = "${BASE_URL}/users"
@@ -104,8 +104,8 @@ object Constants {
 
     const val CONVERSATION = "${BASE_URL}$VERSION/messages/conversation"
 
-    //agora
-    const val AGORA_TOKEN = "${BASE_URL}$VERSION/agora/token"
+    //livekit
+    const val LIVEKIT_TOKEN = "${BASE_URL}$VERSION/livekit/token"
 
     //car type
     const val CAR_TYPE_SHOW_ALL = "${BASE_URL}$VERSION/car-types/show-all"

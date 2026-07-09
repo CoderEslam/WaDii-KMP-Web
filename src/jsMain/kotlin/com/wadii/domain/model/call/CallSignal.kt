@@ -16,7 +16,9 @@ data class CallSignal(
     @SerialName("fromUserName")
     val fromUserName: String = "",
     @SerialName("fromUserImage")
-    val fromUserImage: String? = null
+    val fromUserImage: String? = null,
+    @SerialName("provider")
+    val provider: String? = "LIVEKIT"
 )
 
 @Serializable

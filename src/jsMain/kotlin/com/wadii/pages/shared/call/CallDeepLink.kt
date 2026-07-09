@@ -5,7 +5,7 @@ import org.w3c.dom.url.URLSearchParams
 /**
  * Lets a host mobile app (Android/iOS WebView) jump straight into an active call by loading
  * `index.html#call?...` — hash-based so no server-side route/rewrite is needed, since the
- * fragment never reaches the server. See agora-mobile.md for the WebView wrapper side.
+ * fragment never reaches the server. See livekit-frontend-kotlinjs.md for the WebView wrapper side.
  */
 data class CallDeepLink(
     val channelName: String,

@@ -6,7 +6,7 @@ import com.wadii.data.api.createHttpClient
 import com.wadii.data.api.createHttpClientSendFile
 import com.wadii.data.repo.AdminRepoImpl
 import com.wadii.data.repo.AdsRepoImpl
-import com.wadii.data.repo.AgoraRepoImpl
+import com.wadii.data.repo.LiveKitRepoImpl
 import com.wadii.data.repo.AuthRepoImpl
 import com.wadii.data.repo.CountryRepoImpl
 import com.wadii.data.repo.MessagesRepoImpl
@@ -21,7 +21,7 @@ import com.wadii.data.repo.UserRepoImpl
 import com.wadii.data.websocket.CallSignalingService
 import com.wadii.domain.repo.AdminRepo
 import com.wadii.domain.repo.AdsRepo
-import com.wadii.domain.repo.AgoraRepo
+import com.wadii.domain.repo.LiveKitRepo
 import com.wadii.domain.repo.AuthRepo
 import com.wadii.domain.repo.CountryRepo
 import com.wadii.domain.repo.MessagesRepo
@@ -35,7 +35,7 @@ import com.wadii.domain.repo.ServicesRepo
 import com.wadii.domain.repo.UserRepo
 import com.wadii.domain.usecase.AdminDashboardUseCase
 import com.wadii.domain.usecase.AdsUseCase
-import com.wadii.domain.usecase.AgoraUseCase
+import com.wadii.domain.usecase.LiveKitUseCase
 import com.wadii.domain.usecase.AuthUseCase
 import com.wadii.domain.usecase.CountryUseCase
 import com.wadii.domain.usecase.MessageUseCase
@@ -91,7 +91,7 @@ val appModule = module {
     single { CallSignalingController(get()) }
 
     // Repos
-    single<AgoraRepo> { AgoraRepoImpl(get()) }
+    single<LiveKitRepo> { LiveKitRepoImpl(get()) }
     single<AuthRepo> { AuthRepoImpl(get()) }
     single<OrderRepo> { OrderRepoImpl(get()) }
     single<OfferRepo> { OfferRepoImpl(get()) }
@@ -107,7 +107,7 @@ val appModule = module {
     single<UserRepo> { UserRepoImpl(get()) }
 
     // UseCases
-    single { AgoraUseCase(get()) }
+    single { LiveKitUseCase(get()) }
     single { AuthUseCase(get()) }
     single { OrderUseCase(get()) }
     single { OfferUseCase(get()) }
@@ -140,7 +140,7 @@ val appModule = module {
             remoteUserImage = params.get(),
             withVideo = params.get(),
             isCaller = params.get(),
-            agoraUseCase = get(),
+            liveKitUseCase = get(),
             callSignaling = get()
         )
     }

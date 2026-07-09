@@ -39,13 +39,31 @@ class CallScreen(
         val localTrack = state.localVideoTrack
         val remoteTrack = state.remoteVideoTrack
 
-        LaunchedEffect(localTrack, localContainer) {
-            val el = localContainer
-            if (localTrack != null && el != null) localTrack.play(el)
+        DisposableEffect(localTrack, localContainer) {
+            val container = localContainer
+            val element = if (localTrack != null && container != null) {
+                localTrack.attach().also { container.appendChild(it) }
+            } else null
+
+            onDispose {
+                element?.let {
+                    localTrack?.detach()
+                    container?.removeChild(it)
+                }
+            }
         }
-        LaunchedEffect(remoteTrack, remoteContainer) {
-            val el = remoteContainer
-            if (remoteTrack != null && el != null) remoteTrack.play(el)
+        DisposableEffect(remoteTrack, remoteContainer) {
+            val container = remoteContainer
+            val element = if (remoteTrack != null && container != null) {
+                remoteTrack.attach().also { container.appendChild(it) }
+            } else null
+
+            onDispose {
+                element?.let {
+                    remoteTrack?.detach()
+                    container?.removeChild(it)
+                }
+            }
         }
         LaunchedEffect(state.status) {
             if (state.status == CallStatus.ENDED) {

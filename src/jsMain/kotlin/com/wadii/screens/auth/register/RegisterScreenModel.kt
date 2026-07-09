@@ -134,7 +134,7 @@ class RegisterViewModel(
                 onSuccess = { data ->
                     val user = data.data
                     if (user != null && user.token != null) {
-                        AppState.login(user, user.token!!)
+                        AppState.saveUser(user, user.token!!)
                         AppState.toast("Account created!")
                     } else {
                         AppState.toast("Registration failed.", true)

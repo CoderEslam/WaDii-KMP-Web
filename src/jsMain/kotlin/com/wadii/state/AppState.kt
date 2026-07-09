@@ -6,7 +6,6 @@ import com.wadii.core.toJson
 import com.wadii.domain.model.auth.login.User
 import com.wadii.domain.model.call.CallSignal
 import kotlinx.browser.localStorage
-import kotlinx.serialization.json.Json
 
 enum class ToastVariant { Success, Warning, Error }
 
@@ -42,11 +41,11 @@ object AppState {
         }
     }
 
-    fun login(u: User, t: String) {
-        user = u
-        token = t
-        localStorage.setItem("token", t)
-        localStorage.setItem("user", u.toJson())
+    fun saveUser(user: User, token: String) {
+        this.user = user
+        this.token = token
+        localStorage.setItem("token", token)
+        localStorage.setItem("user", user.toJson())
     }
 
     fun logout() {

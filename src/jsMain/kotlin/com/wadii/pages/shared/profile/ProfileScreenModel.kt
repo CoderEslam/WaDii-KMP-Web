@@ -37,11 +37,6 @@ class ProfileViewModel(
     }
 
     private fun load() = screenModelScope.launch {
-        val cached = AppState.user
-        if (cached != null) {
-            updateState { it.copy(user = cached, isLoading = false, revision = it.revision + 1) }
-            return@launch
-        }
         userUseCase.userMe { r ->
             r.handelState(
                 onLoading = { updateState { it.copy(isLoading = true) } },
@@ -50,11 +45,21 @@ class ProfileViewModel(
                         it.copy(
                             user = data.data,
                             isLoading = false,
-                            revision = it.revision + 1
                         )
                     }
+                    AppState.saveUser(
+                        user = data.data,
+                        token = data.data.token
+                    )
                 },
-                onError = { e, _ -> updateState { it.copy(error = e, isLoading = false) } }
+                onError = { e, _ ->
+                    updateState {
+                        it.copy(
+                            error = e,
+                            isLoading = false
+                        )
+                    }
+                }
             )
         }
     }
@@ -63,7 +68,7 @@ class ProfileViewModel(
         updateState { it.copy(uploadingAvatar = true) }
         val uploaded = apiUploadImage(file)
         if (uploaded != null) {
-            updateState { it.copy(user = it.user?.copy(image = uploaded), uploadingAvatar = false) }
+            updateState { it.copy(user = it.user.copy(image = uploaded), uploadingAvatar = false) }
             AppState.toast("Avatar updated!")
         } else {
             updateState { it.copy(uploadingAvatar = false) }
@@ -77,7 +82,7 @@ class ProfileViewModel(
         if (uploaded != null) {
             updateState {
                 it.copy(
-                    user = it.user?.copy(backgroundImage = uploaded),
+                    user = it.user.copy(backgroundImage = uploaded),
                     uploadingBg = false
                 )
             }
@@ -92,18 +97,16 @@ class ProfileViewModel(
         val user = _state.value.user ?: return@launch
         val hasProviderProfile = user.provider != null && user.provider.id != 0
         updateState { it.copy(switchingRole = true) }
-
         val onResult: (RequestState<BaseResponse<User>>) -> Unit = { r ->
             r.handelState(
                 onSuccess = { data ->
                     val updated = data.data
                     if (updated != null) {
-                        AppState.login(updated, AppState.token ?: "")
+                        AppState.saveUser(updated, AppState.token ?: "")
                         updateState {
                             it.copy(
                                 user = updated,
                                 switchingRole = false,
-                                revision = it.revision + 1
                             )
                         }
                         AppState.toast(if (updated.role == "PROVIDER") "Switched to Seller mode" else "Switched to Buyer mode")

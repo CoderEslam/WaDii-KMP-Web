@@ -50,7 +50,7 @@ class LoginViewModel(private val authUseCase: AuthUseCase) :
                 onSuccess = { data ->
                     val user = data.data
                     if (user != null && user.token != null) {
-                        AppState.login(user, user.token!!)
+                        AppState.saveUser(user, user.token!!)
                         AppState.toast("Welcome back, ${user.firstName}!")
                     } else {
                         AppState.toast("Invalid email or password", true)

@@ -10,7 +10,7 @@ data class User(
     @SerialName("backgroundImage")
     val backgroundImage: String? = null,
     @SerialName("city")
-    val city: City? = City(),
+    val city: City = City(),
     @SerialName("email")
     val email: String = "",
     @SerialName("firstName")

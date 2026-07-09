@@ -276,7 +276,7 @@ class EditProfileViewModel(
             userUseCase.userMe { r ->
                 r.handelState(
                     onSuccess = { data ->
-                        data.data?.let { AppState.login(it, AppState.token ?: "") }
+                        data.data?.let { AppState.saveUser(it, AppState.token ?: "") }
                         updateState { it.copy(saving = false, savedSuccessfully = true) }
                         AppState.toast("Profile updated!")
                     },

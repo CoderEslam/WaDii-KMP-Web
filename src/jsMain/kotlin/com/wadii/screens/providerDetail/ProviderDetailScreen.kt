@@ -22,7 +22,7 @@ import com.wadii.ui.SecondaryButton
 import org.jetbrains.compose.web.dom.*
 import org.koin.core.parameter.parametersOf
 
-class ProviderDetailScreen(val providerId: Int) : Screen {
+class ProviderDetailScreen(val providerId: Long) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -36,7 +36,7 @@ class ProviderDetailScreen(val providerId: Int) : Screen {
                 state.isLoading -> LoadingScreen()
                 state.error.isNotEmpty() -> Alert(variant = AlertVariant.Danger, body = state.error)
 
-                state.provider.id != 0 -> {
+                state.provider.id != 0L -> {
                     val provider = state.provider
                     val following = state.following
 

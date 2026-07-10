@@ -27,7 +27,10 @@ class ProviderOffersScreen : Screen {
     override fun Content() {
         val model = koinScreenModel<ProviderOffersViewModel>()
         Div(attrs = { classes("space-y-6") }) {
-            PageHeader("My Deals", "+ New Deal") { model.onEvent(ProviderOffersEvent.ShowModal(null)) }
+            PageHeader(
+                "My Deals",
+                "+ New Deal"
+            ) { model.onEvent(ProviderOffersEvent.ShowModal(null)) }
 
             val state by model.state.collectAsState()
             when {
@@ -41,15 +44,50 @@ class ProviderOffersScreen : Screen {
                         Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "gap-4") }) {
                             state.offers.forEach { offer ->
                                 Card(classes = "p-5") {
-                                    Div(attrs = { classes("flex", "items-start", "justify-between") }) {
+                                    Div(attrs = {
+                                        classes(
+                                            "flex",
+                                            "items-start",
+                                            "justify-between"
+                                        )
+                                    }) {
                                         Div(attrs = { classes("flex-1") }) {
-                                            P(attrs = { classes("font-semibold", "text-heading") }) { Text(offer.title) }
-                                            P(attrs = { classes("text-sm", "text-body-subtle", "mt-1") }) { Text(offer.description) }
-                                            P(attrs = { classes("text-xs", "text-body-subtle", "mt-2") }) { Text("Expires: ${offer.endDate.take(10)}") }
+                                            P(attrs = {
+                                                classes(
+                                                    "font-semibold",
+                                                    "text-heading"
+                                                )
+                                            }) { Text(offer.title) }
+                                            P(attrs = {
+                                                classes(
+                                                    "text-sm",
+                                                    "text-body-subtle",
+                                                    "mt-1"
+                                                )
+                                            }) { Text(offer.description) }
+                                            P(attrs = {
+                                                classes(
+                                                    "text-xs",
+                                                    "text-body-subtle",
+                                                    "mt-2"
+                                                )
+                                            }) { Text("Expires: ${offer.endDate.take(10)}") }
                                         }
                                         Div(attrs = { classes("flex", "gap-1", "ml-3") }) {
-                                            GhostButton("✏️") { model.onEvent(ProviderOffersEvent.ShowModal(offer)) }
-                                            GhostButton("🗑️") { model.onEvent(ProviderOffersEvent.Delete(offer.id.toLong())) }
+                                            GhostButton("✏️") {
+                                                model.onEvent(
+                                                    ProviderOffersEvent.ShowModal(
+                                                        offer
+                                                    )
+                                                )
+                                            }
+                                            GhostButton("🗑️") {
+                                                model.onEvent(
+                                                    ProviderOffersEvent.Delete(
+                                                        offer.id.toLong()
+                                                    )
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -106,15 +144,29 @@ private fun OfferModalContent(
     InputField("End Date", endDate, type = "date", required = true) { endDate = it }
     if (services.isNotEmpty()) {
         Div {
-            P(attrs = { classes("text-sm", "font-medium", "text-heading", "mb-2") }) { Text("Services") }
+            P(attrs = {
+                classes(
+                    "text-sm",
+                    "font-medium",
+                    "text-heading",
+                    "mb-2"
+                )
+            }) { Text("Services") }
             Div(attrs = { classes("flex", "flex-wrap", "gap-2") }) {
                 services.forEach { s ->
                     val sel = s.id in selectedServices
                     Span(attrs = {
                         style { property("cursor", "pointer") }
-                        onClick { selectedServices = if (sel) selectedServices - s.id else selectedServices + s.id }
+                        onClick {
+                            selectedServices =
+                                if (sel) selectedServices - s.id else selectedServices + s.id
+                        }
                     }) {
-                        Badge(s.name, variant = if (sel) BadgeVariant.Brand else BadgeVariant.Alternative, pill = true)
+                        Badge(
+                            s.name,
+                            variant = if (sel) BadgeVariant.Brand else BadgeVariant.Alternative,
+                            pill = true
+                        )
                     }
                 }
             }
@@ -122,6 +174,13 @@ private fun OfferModalContent(
     }
     Div(attrs = { classes("flex", "gap-3", "pt-2") }) {
         SecondaryButton("Cancel", fullWidth = true) { onClose() }
-        PrimaryButton("Save", loading = saving, fullWidth = true) { onSave(title, description, endDate, selectedServices) }
+        PrimaryButton("Save", loading = saving, fullWidth = true) {
+            onSave(
+                title,
+                description,
+                endDate,
+                selectedServices
+            )
+        }
     }
 }

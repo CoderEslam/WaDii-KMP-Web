@@ -8,7 +8,7 @@ data class CallSignal(
     @SerialName("channelName")
     val channelName: String = "",
     @SerialName("callType")
-    val callType: String = "VIDEO",
+    val callType: String = "",
     @SerialName("fromUserId")
     val fromUserId: Long = 0,
     @SerialName("toUserId")
@@ -18,7 +18,7 @@ data class CallSignal(
     @SerialName("fromUserImage")
     val fromUserImage: String? = null,
     @SerialName("provider")
-    val provider: String? = "LIVEKIT"
+    val provider: String? = ""
 )
 
 @Serializable

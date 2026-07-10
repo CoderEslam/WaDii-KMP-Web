@@ -2,7 +2,7 @@ package com.wadii.pages.shared.profile
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
-import com.wadii.data.api.readBytes
+import com.wadii.core.readBytes
 import com.wadii.domain.model.provider.ProviderRequest
 import com.wadii.domain.usecase.ProviderUseCase
 import com.wadii.state.AppState
@@ -82,7 +82,7 @@ class RequestProviderViewModel(
             updateState { it.copy(submitting = true, error = null) }
             val request = ProviderRequest(
                 name = s.name,
-                userId = userId.toLong(),
+                userId = userId,
                 frontIdImage = s.frontIdImage.readBytes(),
                 backIdImage = s.backIdImage.readBytes(),
                 taxCardFront = s.taxCardFront.readBytes(),

@@ -92,7 +92,7 @@ object Constants {
     const val INSERT_OFFER = "${BASE_URL}$VERSION/saved-offers/insert"
     const val REMOVE_SAVED_OFFER = "${BASE_URL}$VERSION/saved-offers/remove"
     const val MY_SAVED_OFFERS = "${BASE_URL}$VERSION/saved-offers/my-saved-offers"
-    const val CREATE_OFFER = "${BASE_URL}$VERSION/offers/create"
+    const val CREATE_OFFER = "${BASE_URL}$VERSION/offers/insert"
     const val UPDATE_OFFER = "${BASE_URL}$VERSION/offers/update"
     const val DELETE_OFFER = "${BASE_URL}$VERSION/offers/delete"
 

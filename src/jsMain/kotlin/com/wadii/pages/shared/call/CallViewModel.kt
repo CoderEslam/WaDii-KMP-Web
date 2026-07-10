@@ -90,7 +90,8 @@ class CallViewModel(
                 fromUserId = AppState.user?.id ?: 0L,
                 toUserId = remoteUserId,
                 fromUserName = AppState.user?.fullName ?: "",
-                fromUserImage = AppState.user?.image
+                fromUserImage = AppState.user?.image,
+                provider = "LIVEKIT"
             )
         )
     }

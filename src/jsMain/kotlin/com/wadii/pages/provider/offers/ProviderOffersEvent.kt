@@ -4,7 +4,6 @@ import com.wadii.domain.model.offers.OfferResponse
 
 
 sealed class ProviderOffersEvent {
-    object Load : ProviderOffersEvent()
     data class ShowModal(val offer: OfferResponse?) : ProviderOffersEvent()
     object CloseModal : ProviderOffersEvent()
     data class Delete(val offerId: Long) : ProviderOffersEvent()

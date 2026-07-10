@@ -244,7 +244,7 @@ class ProfileScreen : Screen {
                         )
                         style { property("border", "none"); property("cursor", "pointer") }
                         onClick {
-                            if (state.user.role == "PROVIDER" || state.user.provider != null && state.user.provider?.id != 0) {
+                            if (state.user.role == "PROVIDER" || state.user.provider != null && state.user.provider?.id != 0L) {
                                 model.onEvent(ProfileEvent.SwitchRole)
                             } else {
                                 navigator.push(RequestProviderScreen())

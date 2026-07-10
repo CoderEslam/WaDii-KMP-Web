@@ -39,7 +39,9 @@ import com.wadii.domain.model.serach.SearchModel
 import com.wadii.domain.model.service.InsertService
 import com.wadii.domain.model.service.Service
 import com.wadii.domain.model.user.UpdateUser
+import com.wadii.state.AppState
 import com.wadii.utils.Constants
+import com.wadii.utils.Constants.BASE_URL
 import com.wadii.utils.RequestState
 import com.wadii.utils.deleteApiResponse
 import com.wadii.utils.getApiResponse
@@ -52,6 +54,10 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.util.date.GMTDate
 import io.ktor.utils.io.InternalAPI
+import org.w3c.files.File
+import org.w3c.xhr.FormData
+import org.w3c.xhr.XMLHttpRequest
+import kotlin.coroutines.suspendCoroutine
 
 
 class ApiService(
@@ -394,13 +400,6 @@ class ApiService(
             )
         )
     }
-
-
-    //response
-//    suspend fun getResponseList(response: (RequestState<BaseResponse<List<OrderResponse>>>) -> Unit) {
-//        response(RequestState.Loading)
-//        response(client.getApiResponse<BaseResponse<List<OrderResponse>>>(urlString = Constants.RESPONSE_SHOW_ALL))
-//    }
 
     suspend fun getResponseList(response: (RequestState<BaseResponse<List<OrderResponse>>>) -> Unit) {
         response(RequestState.Loading)
@@ -749,5 +748,59 @@ class ApiService(
             )
         )
     }
+
+//    suspend fun apiUploadImage(file: File): String? {
+//        val token = AppState.token ?: return null
+//        return runCatching {
+//            val formData = FormData()
+//            formData.append("file", file, file.name)
+//            suspendCoroutine<String?> { cont ->
+//                val xhr = XMLHttpRequest()
+//                xhr.open("POST", "$BASE_URL/users/upload-image")
+//                xhr.setRequestHeader("Authorization", "Bearer $token")
+//                xhr.onload = {
+//                    if (xhr.status.toInt() in 200..299) {
+//                        try {
+//                            val parsed: dynamic = JSON.parse(xhr.responseText)
+//                            val data: String? = parsed.data?.toString()
+//                            cont.resumeWith(Result.success(data))
+//                        } catch (_: Exception) {
+//                            cont.resumeWith(Result.success(null))
+//                        }
+//                    } else cont.resumeWith(Result.success(null))
+//                    null
+//                }
+//                xhr.onerror = { cont.resumeWith(Result.success(null)); null }
+//                xhr.send(formData)
+//            }
+//        }.getOrNull()
+//    }
+//
+//    suspend fun apiUploadImageBackground(file: File): User {
+//        val token = AppState.token ?: return null
+//        return runCatching {
+//            val formData = FormData()
+//            formData.append("file", file, file.name)
+//            suspendCoroutine<User> { cont ->
+//                val xhr = XMLHttpRequest()
+//                xhr.open("POST", "$BASE_URL/users/upload-background-image")
+//                xhr.setRequestHeader("Authorization", "Bearer $token")
+//                xhr.onload = {
+//                    if (xhr.status.toInt() in 200..299) {
+//                        try {
+//                            val parsed: dynamic = JSON.parse(xhr.responseText)
+//                            val data: String? = parsed.data?.toString()
+//                            cont.resumeWith(Result.success(data))
+//                        } catch (_: Exception) {
+//                            cont.resumeWith(Result.success(null))
+//                        }
+//                    } else cont.resumeWith(Result.success(null))
+//                    null
+//                }
+//                xhr.onerror = { cont.resumeWith(Result.success(null)); null }
+//                xhr.send(formData)
+//            }
+//        }.getOrNull()
+//    }
 
 }

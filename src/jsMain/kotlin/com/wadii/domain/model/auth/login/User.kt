@@ -192,7 +192,7 @@ data class User(
         @SerialName("followersCount")
         val followersCount: Int = 0,
         @SerialName("id")
-        val id: Int = 0,
+        val id: Long = 0,
         @SerialName("links")
         val links: List<Link> = listOf(),
         @SerialName("name")

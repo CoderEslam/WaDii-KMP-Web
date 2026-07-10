@@ -2,8 +2,7 @@ package com.wadii.pages.shared.profile
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
-import com.wadii.data.api.apiUploadImage
-import com.wadii.data.api.apiUploadImageBackground
+import com.wadii.core.readBytes
 import com.wadii.domain.model.BaseResponse
 import com.wadii.domain.model.auth.login.User
 import com.wadii.domain.usecase.ProviderUseCase
@@ -65,37 +64,52 @@ class ProfileViewModel(
     }
 
     private fun uploadAvatar(file: File) = screenModelScope.launch {
-        updateState { it.copy(uploadingAvatar = true) }
-        val uploaded = apiUploadImage(file)
-        if (uploaded != null) {
-            updateState { it.copy(user = it.user.copy(image = uploaded), uploadingAvatar = false) }
-            AppState.toast("Avatar updated!")
-        } else {
-            updateState { it.copy(uploadingAvatar = false) }
-            AppState.toast("Upload failed", true)
+        userUseCase.updateImageUser(file.readBytes()) { response ->
+            response.handelState(
+                onLoading = {
+                    updateState { it.copy(uploadingAvatar = true) }
+                }, onSuccess = { data ->
+                    updateState {
+                        it.copy(
+                            user = data.data,
+                            uploadingAvatar = false
+                        )
+                    }
+                    AppState.saveUser(data.data, AppState.token ?: "")
+                    AppState.toast("Avatar updated!")
+                }, onError = { error, code ->
+                    updateState { it.copy(uploadingAvatar = false) }
+                    AppState.toast("Upload failed", true)
+                }
+            )
         }
     }
 
     private fun uploadBackground(file: File) = screenModelScope.launch {
-        updateState { it.copy(uploadingBg = true) }
-        val uploaded = apiUploadImageBackground(file)
-        if (uploaded != null) {
-            updateState {
-                it.copy(
-                    user = it.user.copy(backgroundImage = uploaded),
-                    uploadingBg = false
-                )
-            }
-            AppState.toast("Background updated!")
-        } else {
-            updateState { it.copy(uploadingBg = false) }
-            AppState.toast("Upload failed", true)
+        userUseCase.updateImageBackgroundUser(file.readBytes()) { response ->
+            response.handelState(
+                onLoading = {
+                    updateState { it.copy(uploadingBg = true) }
+                }, onSuccess = { data ->
+                    updateState {
+                        it.copy(
+                            user = data.data,
+                            uploadingBg = false
+                        )
+                    }
+                    AppState.saveUser(data.data, AppState.token ?: "")
+                    AppState.toast("Background updated!")
+                }, onError = { error, code ->
+                    updateState { it.copy(uploadingBg = false) }
+                    AppState.toast("Upload failed", true)
+                }
+            )
         }
     }
 
     private fun switchRole() = screenModelScope.launch {
         val user = _state.value.user ?: return@launch
-        val hasProviderProfile = user.provider != null && user.provider.id != 0
+        val hasProviderProfile = user.provider != null && user.provider.id != 0L
         updateState { it.copy(switchingRole = true) }
         val onResult: (RequestState<BaseResponse<User>>) -> Unit = { r ->
             r.handelState(

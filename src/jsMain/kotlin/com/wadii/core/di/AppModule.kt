@@ -156,7 +156,7 @@ val appModule = module {
     factory { ServicesViewModel(get()) }
     factory { ChatViewModel(get(), get()) }
     factory { ProviderOffersViewModel(get(), get()) }
-    factory { (orderId: Int) -> RespondToOrderViewModel(orderId, get()) }
+    factory { (orderId: Int) -> RespondToOrderViewModel(orderId, get(), get()) }
     factory { AdminDashboardScreenModel(get(), get(), get()) }
     factory { (ad: Ads?) -> AdsScreenModel(ad, get()) }
 }

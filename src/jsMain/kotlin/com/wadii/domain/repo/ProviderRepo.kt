@@ -36,12 +36,12 @@ interface ProviderRepo {
     )
 
     suspend fun followProvider(
-        providerId: Int,
+        providerId: Long,
         response: (RequestState<BaseResponse<FollowProviderResponse>>) -> Unit
     )
 
     suspend fun unfollowProvider(
-        providerId: Int,
+        providerId: Long,
         response: (RequestState<BaseResponse<Boolean>>) -> Unit
     )
 

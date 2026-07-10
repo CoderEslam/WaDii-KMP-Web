@@ -223,7 +223,7 @@ class ApiService(
     }
 
     suspend fun followProvider(
-        providerId: Int,
+        providerId: Long,
         response: (RequestState<BaseResponse<FollowProviderResponse>>) -> Unit
     ) {
         response(RequestState.Loading)
@@ -231,7 +231,7 @@ class ApiService(
     }
 
     suspend fun unfollowProvider(
-        providerId: Int,
+        providerId: Long,
         response: (RequestState<BaseResponse<Boolean>>) -> Unit
     ) {
         response(RequestState.Loading)

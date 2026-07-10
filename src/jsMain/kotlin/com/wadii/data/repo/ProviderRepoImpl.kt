@@ -37,11 +37,11 @@ class ProviderRepoImpl(private val apiService: ApiService) : ProviderRepo {
     ) = apiService.getProviderById(id, response)
 
     override suspend fun followProvider(
-        providerId: Int, response: (RequestState<BaseResponse<FollowProviderResponse>>) -> Unit
+        providerId: Long, response: (RequestState<BaseResponse<FollowProviderResponse>>) -> Unit
     ) = apiService.followProvider(providerId, response)
 
     override suspend fun unfollowProvider(
-        providerId: Int,
+        providerId: Long,
         response: (RequestState<BaseResponse<Boolean>>) -> Unit
     ) = apiService.unfollowProvider(providerId, response)
 

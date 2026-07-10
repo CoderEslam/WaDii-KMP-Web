@@ -55,7 +55,7 @@ class ProviderDetailViewModel(
         }
     }
 
-    private fun toggleFollow(id: Int) = screenModelScope.launch {
+    private fun toggleFollow(id: Long) = screenModelScope.launch {
         val following = _state.value.following
         if (following) {
             providerUseCase.unfollowProvider(id) { response ->

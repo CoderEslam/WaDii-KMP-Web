@@ -33,11 +33,11 @@ class ProviderUseCase(private val providerRepo: ProviderRepo) {
     ) = providerRepo.getProviderById(id, response)
 
     suspend fun followProvider(
-        providerId: Int, response: (RequestState<BaseResponse<FollowProviderResponse>>) -> Unit
+        providerId: Long, response: (RequestState<BaseResponse<FollowProviderResponse>>) -> Unit
     ) = providerRepo.followProvider(providerId, response)
 
     suspend fun unfollowProvider(
-        providerId: Int,
+        providerId: Long,
         response: (RequestState<BaseResponse<Boolean>>) -> Unit
     ) = providerRepo.unfollowProvider(providerId, response)
 

@@ -84,6 +84,7 @@ object Constants {
     const val ORDER_SHOW_ALL = "${BASE_URL}$VERSION/orders/show-all"
     const val ORDER_SHOW_ALL_ORDER_OF_USER = "${BASE_URL}$VERSION/orders/show-all-order-of-user"
     const val ORDER_INSERT = "${BASE_URL}$VERSION/orders/insert"
+    const val ORDER_CANCEL = "${BASE_URL}$VERSION/orders/cancel"
     const val SHOW_ALL_ORDER_OF_PROVIDER = "${BASE_URL}$VERSION/orders/show-all-order-of-provider"
 
     //offers

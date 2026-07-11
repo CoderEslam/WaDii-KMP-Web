@@ -3,6 +3,7 @@ package com.wadii.domain.repo
 import com.wadii.domain.model.BaseResponse
 import com.wadii.domain.model.carTypes.CarType
 import com.wadii.domain.model.order.OrderCallbackResponse
+import com.wadii.domain.model.order.OrderCancelRequest
 import com.wadii.domain.model.order.OrderModel
 import com.wadii.domain.model.order.OrderRequest
 import com.wadii.utils.RequestState
@@ -17,6 +18,11 @@ interface OrderRepo {
 
     suspend fun insertOrder(
         orderRequest: OrderRequest,
+        response: (RequestState<BaseResponse<OrderCallbackResponse>>) -> Unit
+    )
+
+    suspend fun cancelOrder(
+        request: OrderCancelRequest,
         response: (RequestState<BaseResponse<OrderCallbackResponse>>) -> Unit
     )
 

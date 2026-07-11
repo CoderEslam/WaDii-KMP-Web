@@ -24,6 +24,7 @@ import com.wadii.domain.model.offers.OfferResponse
 import com.wadii.domain.model.offers.SavedOfferRequest
 import com.wadii.domain.model.offers.saved.SavedOffer
 import com.wadii.domain.model.order.OrderCallbackResponse
+import com.wadii.domain.model.order.OrderCancelRequest
 import com.wadii.domain.model.order.OrderModel
 import com.wadii.domain.model.order.OrderRequest
 import com.wadii.domain.model.provider.ProviderModel
@@ -470,6 +471,19 @@ class ApiService(
             client.postApiResponse<OrderRequest, BaseResponse<OrderCallbackResponse>>(
                 urlString = Constants.ORDER_INSERT,
                 body = orderRequest
+            )
+        )
+    }
+
+    suspend fun cancelOrder(
+        request: OrderCancelRequest,
+        response: (RequestState<BaseResponse<OrderCallbackResponse>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<OrderCancelRequest, BaseResponse<OrderCallbackResponse>>(
+                urlString = Constants.ORDER_CANCEL,
+                body = request
             )
         )
     }

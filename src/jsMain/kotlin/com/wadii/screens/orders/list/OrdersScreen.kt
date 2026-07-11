@@ -6,16 +6,22 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wadii.screens.orders.detail.OrderDetailScreen
+import com.wadii.screens.orders.edit.EditOrderScreen
 import com.wadii.screens.orders.new.NewOrderScreen
 import com.wadii.ui.Alert
 import com.wadii.ui.AlertVariant
 import com.wadii.ui.Badge
 import com.wadii.ui.BadgeVariant
 import com.wadii.ui.Card
+import com.wadii.ui.DangerButton
 import com.wadii.ui.EmptyState
 import com.wadii.ui.LoadingScreen
+import com.wadii.ui.Modal
+import com.wadii.ui.ModalVariant
 import com.wadii.ui.PageHeader
 import com.wadii.ui.PrimaryButton
+import com.wadii.ui.SecondaryButton
+import com.wadii.ui.TextArea
 import org.jetbrains.compose.web.dom.*
 
 class OrdersScreen : Screen {
@@ -71,12 +77,43 @@ class OrdersScreen : Screen {
                                             }
                                         }
                                     }
+                                    Div(attrs = {
+                                        classes("flex", "items-center", "gap-2", "mt-4", "pt-4", "border-t", "border-default")
+                                        onClick { it.stopPropagation() }
+                                    }) {
+                                        SecondaryButton("✏️ Edit") { navigator.push(EditOrderScreen(order.id)) }
+                                        DangerButton("✕ Cancel") { model.onEvent(OrdersEvent.OpenCancelDialog(order)) }
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+        }
+
+        Modal(
+            open = state.cancelingOrder != null,
+            title = "Cancel order #${state.cancelingOrder?.id ?: 0}?",
+            onDismiss = { model.onEvent(OrdersEvent.DismissCancelDialog) },
+            variant = ModalVariant.Form,
+            footer = {
+                SecondaryButton("Keep Order", disabled = state.isCancelling) {
+                    model.onEvent(OrdersEvent.DismissCancelDialog)
+                }
+                DangerButton(
+                    "Confirm Cancel",
+                    loading = state.isCancelling,
+                    disabled = state.cancelReason.isBlank(),
+                    onClick = { model.onEvent(OrdersEvent.ConfirmCancel) }
+                )
+            }
+        ) {
+            TextArea(
+                label = "Reason for cancellation",
+                value = state.cancelReason,
+                placeholder = "Tell us why you're cancelling this order…"
+            ) { model.onEvent(OrdersEvent.SetCancelReason(it)) }
         }
     }
 }

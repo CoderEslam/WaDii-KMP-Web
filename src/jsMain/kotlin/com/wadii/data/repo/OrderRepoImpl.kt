@@ -4,6 +4,7 @@ import com.wadii.data.api.ApiService
 import com.wadii.domain.model.BaseResponse
 import com.wadii.domain.model.carTypes.CarType
 import com.wadii.domain.model.order.OrderCallbackResponse
+import com.wadii.domain.model.order.OrderCancelRequest
 import com.wadii.domain.model.order.OrderModel
 import com.wadii.domain.model.order.OrderRequest
 import com.wadii.domain.repo.OrderRepo
@@ -25,6 +26,11 @@ class OrderRepoImpl(private val apiService: ApiService) : OrderRepo {
         orderRequest: OrderRequest,
         response: (RequestState<BaseResponse<OrderCallbackResponse>>) -> Unit
     ) = apiService.insertOrder(orderRequest, response)
+
+    override suspend fun cancelOrder(
+        request: OrderCancelRequest,
+        response: (RequestState<BaseResponse<OrderCallbackResponse>>) -> Unit
+    ) = apiService.cancelOrder(request, response)
 
     override suspend fun getCarTypeList(response: (RequestState<BaseResponse<List<CarType>>>) -> Unit) =
         apiService.getCarTypeList(response)

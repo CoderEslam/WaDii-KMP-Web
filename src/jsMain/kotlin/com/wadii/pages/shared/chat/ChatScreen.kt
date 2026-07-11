@@ -268,7 +268,7 @@ class ChatScreen : Screen {
                                                 "py-2",
                                                 "rounded-neu-base",
                                                 "text-sm",
-                                                if (isMe) "bg-brand text-white" else "bg-surface-secondary text-heading"
+                                                if (isMe) "bg-brand text-on-brand" else "bg-surface-secondary text-heading"
                                             )
                                         )
                                     }) {

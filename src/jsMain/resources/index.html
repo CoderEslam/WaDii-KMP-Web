@@ -67,6 +67,7 @@
                         'light-medium': 'var(--border-light-medium)',
                         buffer: 'var(--border-buffer)',
                         'brand-subtle': 'var(--border-brand-subtle)',
+                        'on-brand': 'var(--on-brand)',
 
                         success: 'var(--success)',
                         'success-soft': 'var(--success-soft)',
@@ -138,136 +139,144 @@
            like dark tooltips, stacked-avatar counters, dark badges).
            ===================================================================== */
         :root {
-            --surface: #EEF0F1;
-            --surface-secondary: #E6E9EA;
-            --surface-secondary-medium: #E1E5E6;
-            --surface-primary-medium: #E9ECED;
-            --surface-tertiary: #DDE1E3;
-            --surface-tertiary-medium: #D4D9DC;
-            --surface-quaternary: #CBD1D5;
+            /* ===== WaDii Color Identity — "Pearl Cosmos" (light) — see COLOR_IDENTITY.md ===== */
+            --surface: #F5EEFF;
+            --surface-secondary: #EDE6FF;
+            --surface-secondary-medium: #E6DCFA;
+            --surface-primary-medium: #F8F4FF;
+            --surface-tertiary: #DFD2F5;
+            --surface-tertiary-medium: #D6C5F0;
+            --surface-quaternary: #CBBFEE;
 
-            --heading: #2B2E33;
-            --body: #4A4F57;
-            --body-subtle: #6B7280;
-            --fg-disabled: #9CA3AF;
+            --heading: #0E0527;
+            --body: #7060A0;
+            --body-subtle: #9186B8;
+            --fg-disabled: #B6ACD1;
             --bg-disabled: var(--surface-secondary);
 
-            --brand: #E8590C;
-            --brand-soft: #FBDCC4;
-            --brand-softer: #FDEEE2;
-            --fg-brand: #E8590C;
-            --fg-brand-strong: #B8440A;
-            --border-brand: #E8590C;
-            --border-brand-subtle: #F0A876;
+            /* Fill/border role = brand Yellow; text role = brand Red (yellow-on-light text is unreadable) */
+            --brand: #FFD300;
+            --brand-soft: #FCEFC2;
+            --brand-softer: #FFF8DE;
+            --fg-brand: #BB0000;
+            --fg-brand-strong: #8F0000;
+            --border-brand: #FFD300;
+            --border-brand-subtle: #FFE680;
 
-            --secondary: #52697E;
-            --secondary-soft: #E1E7EB;
+            --secondary: #7C3AED;
+            --secondary-soft: #E6D8FD;
 
-            --border-default: #D6DADD;
-            --border-default-medium: #C7CDD1;
-            --border-default-strong: #AEB6BC;
-            --border-light: #E4E7E9;
-            --border-light-medium: #DADEE1;
+            --border-default: rgba(14, 5, 39, 0.08);
+            --border-default-medium: rgba(14, 5, 39, 0.14);
+            --border-default-strong: rgba(14, 5, 39, 0.22);
+            --border-light: rgba(14, 5, 39, 0.05);
+            --border-light-medium: rgba(14, 5, 39, 0.10);
             --border-buffer: var(--surface);
 
-            --success: #1F9D55;
-            --success-soft: #E1F5E9;
-            --success-medium: #C3ECD3;
-            --border-success-subtle: #9EDBB7;
-            --fg-success: #1F9D55;
-            --fg-success-strong: #167A42;
+            --success: #0D9668;
+            --success-soft: #E1F3EA;
+            --success-medium: #C3E7D4;
+            --border-success-subtle: #7FCBA6;
+            --fg-success: #047857;
+            --fg-success-strong: #065F46;
 
-            --danger: #D92D2D;
-            --danger-soft: #FBE7E7;
-            --danger-medium: #F6C6C6;
-            --border-danger-subtle: #F0A8A8;
-            --fg-danger: #D92D2D;
-            --fg-danger-strong: #B71C1C;
+            --danger: #D32F2F;
+            --danger-soft: #FBE4E4;
+            --danger-medium: #F5C2C2;
+            --border-danger-subtle: #E58A8A;
+            --fg-danger: #D32F2F;
+            --fg-danger-strong: #A32424;
 
-            --warning: #B36B00;
-            --warning-soft: #FDF0DA;
-            --warning-medium: #FBDFB0;
-            --border-warning-subtle: #F0C27D;
-            --fg-warning: #B36B00;
+            --warning: #B45309;
+            --warning-soft: #FCEEDA;
+            --warning-medium: #F8DBAF;
+            --border-warning-subtle: #E8B25F;
+            --fg-warning: #B45309;
 
-            --dark: #2B2E33;
-            --dark-strong: #1D1F23;
+            --dark: #0E0527;
+            --dark-strong: #000814;
             --white: #FFFFFF;
+            --on-brand: #000814;
 
-            /* Dual-directional shadow pairs — light-mode neutrals per shadows.md */
-            --shadow-2xs: 1px 1px 2px #b8b9be, -1px -1px 2px #ffffff;
-            --shadow-xs: 2px 2px 4px #b8b9be, -2px -2px 4px #ffffff;
-            --shadow-sm: 3px 3px 6px #b8b9be, -3px -3px 6px #ffffff;
-            --shadow-md: 6px 6px 12px #b8b9be, -6px -6px 12px #ffffff;
-            --shadow-lg: 8px 8px 16px #b8b9be, -8px -8px 16px #ffffff;
-            --shadow-xl: 10px 10px 20px #b8b9be, -10px -10px 20px #ffffff;
-            --shadow-2xl: 12px 12px 24px #b8b9be, -12px -12px 24px #ffffff;
-            --shadow-inset: inset 2px 2px 5px #b8b9be, inset -3px -3px 7px #ffffff;
+            /* Dual-directional shadow pairs — violet-tinted neutrals derived from --surface */
+            --shadow-2xs: 1px 1px 2px #D9CBEE, -1px -1px 2px #ffffff;
+            --shadow-xs: 2px 2px 4px #D9CBEE, -2px -2px 4px #ffffff;
+            --shadow-sm: 3px 3px 6px #D9CBEE, -3px -3px 6px #ffffff;
+            --shadow-md: 6px 6px 12px #D9CBEE, -6px -6px 12px #ffffff;
+            --shadow-lg: 8px 8px 16px #D9CBEE, -8px -8px 16px #ffffff;
+            --shadow-xl: 10px 10px 20px #D9CBEE, -10px -10px 20px #ffffff;
+            --shadow-2xl: 12px 12px 24px #D9CBEE, -12px -12px 24px #ffffff;
+            --shadow-inset: inset 2px 2px 5px #D9CBEE, inset -3px -3px 7px #ffffff;
         }
 
         html.dark {
-            --surface: #23262B;
-            --surface-secondary: #292C32;
-            --surface-secondary-medium: #2C2F35;
-            --surface-primary-medium: #26292F;
-            --surface-tertiary: #32363D;
-            --surface-tertiary-medium: #383C44;
-            --surface-quaternary: #3E434B;
+            /* ===== WaDii Color Identity — "Space" (dark) — see COLOR_IDENTITY.md ===== */
+            --surface: #000814;
+            --surface-primary-medium: #020C1B;
+            --surface-secondary: #061224;
+            --surface-secondary-medium: #0A1930;
+            --surface-tertiary: #0D1F3C;
+            --surface-tertiary-medium: #142A4E;
+            --surface-quaternary: #1C3760;
 
-            --heading: #ECEEF0;
-            --body: #9AA0A8;
-            --body-subtle: #9AA0A8;
-            --fg-disabled: #6B7280;
+            --heading: #E8F0FE;
+            --body: #C8D6E8;
+            --body-subtle: #6B7E99;
+            --fg-disabled: #4A5A72;
             --bg-disabled: var(--surface-secondary);
 
-            --brand: #FF7A2E;
-            --brand-soft: #3A2314;
-            --brand-softer: #2E1C10;
-            --fg-brand: #FF7A2E;
-            --fg-brand-strong: #FF9955;
-            --border-brand: #FF7A2E;
-            --border-brand-subtle: #8A4A1E;
+            --brand: #FFD300;
+            --brand-soft: #3A2E00;
+            --brand-softer: #2E2400;
+            --fg-brand: #FFD300;
+            --fg-brand-strong: #FFE666;
+            --border-brand: #FFD300;
+            --border-brand-subtle: #8A7000;
 
-            --secondary: #7C93A8;
-            --secondary-soft: #223038;
+            --secondary: #7C3AED;
+            --secondary-soft: #1E1240;
 
-            --border-default: #313640;
-            --border-default-medium: #3A3F4A;
-            --border-default-strong: #474D59;
-            --border-light: #292D34;
-            --border-light-medium: #2F343B;
+            --border-default: #1A2D45;
+            --border-default-medium: #24405F;
+            --border-default-strong: #2F5478;
+            --border-light: #0F1E35;
+            --border-light-medium: #142640;
             --border-buffer: var(--surface);
 
-            --success: #2FBE72;
-            --success-soft: #163A26;
-            --success-medium: #1F4E33;
+            --success: #10B981;
+            --success-soft: rgba(6, 95, 70, 0.15);
+            --success-medium: rgba(6, 95, 70, 0.28);
             --border-success-subtle: #2C6B44;
-            --fg-success: #2FBE72;
-            --fg-success-strong: #4ED88C;
+            --fg-success: #6EE7B7;
+            --fg-success-strong: #9FF3D1;
 
-            --danger: #F0605F;
-            --danger-soft: #3A2020;
-            --danger-medium: #4E2626;
+            --danger: #EF4444;
+            --danger-soft: rgba(153, 27, 27, 0.15);
+            --danger-medium: rgba(153, 27, 27, 0.28);
             --border-danger-subtle: #6B3232;
-            --fg-danger: #F0605F;
-            --fg-danger-strong: #FF8A89;
+            --fg-danger: #FCA5A5;
+            --fg-danger-strong: #FFC9C9;
 
-            --warning: #F0A63C;
-            --warning-soft: #3A2E14;
-            --warning-medium: #4E3C1A;
+            --warning: #F59E0B;
+            --warning-soft: rgba(180, 83, 9, 0.15);
+            --warning-medium: rgba(180, 83, 9, 0.28);
             --border-warning-subtle: #6B5424;
-            --fg-warning: #F0A63C;
+            --fg-warning: #FCD34D;
 
-            /* Dual-directional shadow pairs — dark neutrals derived from the
-               dark surface (#23262B) instead of #b8b9be/#ffffff, per shadows.md */
-            --shadow-2xs: 1px 1px 2px #191b1f, -1px -1px 2px #2c2f36;
-            --shadow-xs: 2px 2px 4px #191b1f, -2px -2px 4px #2c2f36;
-            --shadow-sm: 3px 3px 6px #191b1f, -3px -3px 6px #2c2f36;
-            --shadow-md: 6px 6px 12px #191b1f, -6px -6px 12px #2c2f36;
-            --shadow-lg: 8px 8px 16px #191b1f, -8px -8px 16px #2c2f36;
-            --shadow-xl: 10px 10px 20px #191b1f, -10px -10px 20px #2c2f36;
-            --shadow-2xl: 12px 12px 24px #191b1f, -12px -12px 24px #2c2f36;
-            --shadow-inset: inset 2px 2px 5px #191b1f, inset -3px -3px 7px #2c2f36;
+            --dark: #0E0527;
+            --dark-strong: #000814;
+            --white: #FFFFFF;
+            --on-brand: #000814;
+
+            /* Dual-directional shadow pairs — navy neutrals derived from --surface (#000814) */
+            --shadow-2xs: 1px 1px 2px #00040A, -1px -1px 2px #0C1B33;
+            --shadow-xs: 2px 2px 4px #00040A, -2px -2px 4px #0C1B33;
+            --shadow-sm: 3px 3px 6px #00040A, -3px -3px 6px #0C1B33;
+            --shadow-md: 6px 6px 12px #00040A, -6px -6px 12px #0C1B33;
+            --shadow-lg: 8px 8px 16px #00040A, -8px -8px 16px #0C1B33;
+            --shadow-xl: 10px 10px 20px #00040A, -10px -10px 20px #0C1B33;
+            --shadow-2xl: 12px 12px 24px #00040A, -12px -12px 24px #0C1B33;
+            --shadow-inset: inset 2px 2px 5px #00040A, inset -3px -3px 7px #0C1B33;
         }
 
         body {
@@ -283,7 +292,7 @@
         #root { position: relative; z-index: 1; }
 
         /* ===== MODAL BACKDROP DARK ===== */
-        html.dark .bg-black\/50 { background: rgba(0,5,25,.75) !important; backdrop-filter: blur(4px); }
+        html.dark .bg-black\/50 { background: rgba(0,8,20,.75) !important; backdrop-filter: blur(4px); }
 
         /* ===== TOAST ===== */
         .toast-enter { animation: slideIn .35s cubic-bezier(.34,1.56,.64,1); }
@@ -305,9 +314,10 @@
         }
 
         /* Brand wordmark — solid brand color, no gradient (structural elements
-           don't get decorative gradients under neumorphism). */
+           don't get decorative gradients under neumorphism). Uses --fg-brand
+           (not --brand/Yellow) since Yellow text is unreadable on light surfaces. */
         .brand-text {
-            color: var(--brand);
+            color: var(--fg-brand);
         }
 
         /* ===== GLOBAL TRANSITIONS ===== */
@@ -320,10 +330,10 @@
         /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(148,163,184,.4); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,.7); }
-        html.dark ::-webkit-scrollbar-thumb { background: rgba(100,130,230,.25); }
-        html.dark ::-webkit-scrollbar-thumb:hover { background: rgba(100,130,230,.45); }
+        ::-webkit-scrollbar-thumb { background: rgba(112,96,160,.4); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(112,96,160,.7); }
+        html.dark ::-webkit-scrollbar-thumb { background: rgba(255,211,0,.25); }
+        html.dark ::-webkit-scrollbar-thumb:hover { background: rgba(255,211,0,.45); }
 
         /* ===== SPINNER ===== */
         .spinner {
@@ -337,7 +347,7 @@
         }
 
         /* ===== FOCUS RING OVERRIDE DARK ===== */
-        html.dark .focus\:ring-amber-400:focus { --tw-ring-color: rgba(251,191,36,.5) !important; }
+        html.dark .focus\:ring-amber-400:focus { --tw-ring-color: rgba(255,211,0,.5) !important; }
 
         /* ===== MISC ===== */
         textarea { font-family: inherit; }

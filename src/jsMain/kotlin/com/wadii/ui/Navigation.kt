@@ -44,7 +44,7 @@ fun Tabs(
                     classes(*classNames(
                         "px-4", "py-2.5", "rounded-neu-base", "text-sm", "font-medium", "transition-all",
                         "flex", "items-center", "gap-2",
-                        if (active) "bg-brand text-white shadow-neu-sm" else "bg-transparent text-body hover:bg-surface-secondary hover:text-heading"
+                        if (active) "bg-brand text-on-brand shadow-neu-sm" else "bg-transparent text-body hover:bg-surface-secondary hover:text-heading"
                     ))
                     style { property("border", "none"); property("cursor", "pointer") }
                     onClick { onSelect(i) }

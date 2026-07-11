@@ -85,8 +85,8 @@ class ProviderRequestsScreen : Screen {
                                                             classes(
                                                                 "px-2",
                                                                 "py-0.5",
-                                                                "bg-amber-50",
-                                                                "text-amber-700",
+                                                                "bg-warning-soft",
+                                                                "text-fg-warning",
                                                                 "text-xs",
                                                                 "rounded-full"
                                                             )
@@ -102,7 +102,7 @@ class ProviderRequestsScreen : Screen {
                                                             attrs = {
                                                                 classes(
                                                                     "text-sm",
-                                                                    "text-amber-600",
+                                                                    "text-fg-warning",
                                                                     "hover:underline",
                                                                     "block"
                                                                 )
@@ -122,12 +122,12 @@ class ProviderRequestsScreen : Screen {
                                                     "gap-2",
                                                     "px-4",
                                                     "py-2",
-                                                    "bg-green-500",
+                                                    "bg-success",
                                                     "text-white",
                                                     "text-sm",
                                                     "font-medium",
                                                     "rounded-xl",
-                                                    "hover:bg-green-600",
+                                                    "hover:opacity-90",
                                                     "disabled:opacity-60"
                                                 )
                                                 onClick { model.onEvent(ProviderRequestsEvent.Accept(req)) }
@@ -142,12 +142,12 @@ class ProviderRequestsScreen : Screen {
                                                     "gap-2",
                                                     "px-4",
                                                     "py-2",
-                                                    "bg-red-500",
+                                                    "bg-danger",
                                                     "text-white",
                                                     "text-sm",
                                                     "font-medium",
                                                     "rounded-xl",
-                                                    "hover:bg-red-600",
+                                                    "hover:opacity-90",
                                                     "disabled:opacity-60"
                                                 )
                                                 onClick { model.onEvent(ProviderRequestsEvent.Reject(req)) }

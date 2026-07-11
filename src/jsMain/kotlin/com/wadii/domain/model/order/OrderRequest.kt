@@ -23,7 +23,7 @@ data class OrderRequest(
     @SerialName("spareParts")
     val spareParts: List<SparePart> = listOf(),
     @SerialName("userId")
-    val userId: Int = 0
+    val userId: Long = 0
 ) {
     @Serializable
     data class SparePart(

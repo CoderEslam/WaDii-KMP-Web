@@ -20,7 +20,9 @@ class ProviderDetailViewModel(
 
     override val state: StateFlow<ProviderDetailState> = _state
         .onStart { load() }
-        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), initialState)
+        .stateIn(screenModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            initialState)
 
     override fun onEvent(event: ProviderDetailEvent) {
         when (event) {

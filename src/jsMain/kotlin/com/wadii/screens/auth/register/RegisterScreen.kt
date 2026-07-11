@@ -123,7 +123,7 @@ class RegisterScreen : Screen {
                                 ) { model.onEvent(RegisterEvent.SelectProvince(it)) }
                             if (s.cities.isNotEmpty())
                                 SelectField(
-                                    "City",
+                                    "Area",
                                     s.cities.map { it.id to it.name },
                                     s.selectedCity
                                 ) { model.onEvent(RegisterEvent.SelectCity(it)) }

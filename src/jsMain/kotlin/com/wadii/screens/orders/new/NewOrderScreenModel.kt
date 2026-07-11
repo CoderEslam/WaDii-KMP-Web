@@ -73,6 +73,7 @@ class NewOrderViewModel(
         updateState { it.copy(submitting = true) }
         orderUseCase.insertOrder(
             OrderRequest(
+                userId = AppState.user?.id ?: 0L,
                 carModelYear = d.carModelYear,
                 comment = d.comment,
                 date = js("new Date().toISOString()").toString(),

@@ -13,7 +13,7 @@ object Constants {
 //    const val BASE_URL = "https://$IP"
 //    const val WS_URL = "wss://$IP/web-socket"
 
-    const val IP = "192.168.1.7"
+    const val IP = "172.20.10.2"
     const val BASE_URL = "http://$IP:8080"
     const val WS_URL = "ws://$IP:8080/web-socket"
     const val BASE_URL_USER_IMAGES = "${BASE_URL}/users"

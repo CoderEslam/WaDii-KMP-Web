@@ -116,7 +116,7 @@ class RegisterViewModel(
             return@launch
         }
         updateState { it.copy(loading = true) }
-        val fcmToken = FcmService.fetchToken().orEmpty()
+        val fcmToken = FcmService.fetchToken() ?: "no fcm token"
         authUseCase.register(
             RegisterRequest(
                 email = s.email,

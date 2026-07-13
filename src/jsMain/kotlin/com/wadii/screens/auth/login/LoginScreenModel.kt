@@ -26,7 +26,7 @@ class LoginViewModel(private val authUseCase: AuthUseCase) :
             is LoginEvent.SetEmail -> updateState { it.copy(email = event.value) }
             is LoginEvent.SetPassword -> updateState { it.copy(password = event.value) }
             LoginEvent.Submit -> {
-              submit()
+                submit()
             }
         }
     }
@@ -36,7 +36,7 @@ class LoginViewModel(private val authUseCase: AuthUseCase) :
         if (current.loading) return@launch
         updateState { it.copy(loading = true) }
         console.log("Permission:", permission)
-        val fcmToken = FcmService.fetchToken().orEmpty()
+        val fcmToken = FcmService.fetchToken() ?: "no fcm token"
         console.log("FCM token:", fcmToken)
         authUseCase.login(
             LoginRequest(

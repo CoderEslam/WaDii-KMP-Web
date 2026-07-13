@@ -8,6 +8,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wadii.pages.admin.ads.AdsScreen
 import com.wadii.pages.admin.dashboard.AdminDashboardScreen
 import com.wadii.pages.admin.provider.ProviderRequestsScreen
+import com.wadii.pages.admin.reason.ReasonsScreen
 import com.wadii.pages.admin.service.ServicesScreen
 import com.wadii.pages.provider.dashboard.ProviderDashboardScreen
 import com.wadii.pages.provider.offers.ProviderOffersScreen
@@ -51,6 +52,7 @@ fun Layout(content: @Composable () -> Unit) {
         NavLink("Seller Requests", "◈", ProviderRequestsScreen()),
         NavLink("Ads", "◉", AdsScreen()),
         NavLink("Categories", "⊹", ServicesScreen()),
+        NavLink("Reasons", "🏷", ReasonsScreen()),
     )
 
     val links = when (user.role) {

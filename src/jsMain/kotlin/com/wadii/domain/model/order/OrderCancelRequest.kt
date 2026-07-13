@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 data class OrderCancelRequest(
     @SerialName("orderId")
     val orderId: Int = 0,
-    @SerialName("reason")
-    val reason: String = ""
+    @SerialName("reasonId")
+    val reasonId: Int = 0
 )

@@ -9,13 +9,13 @@ object Constants {
     const val THEME_KEY = "THEME_KEY"
     const val PORT = ""
 
-//    const val IP = "wadii-spring-production.up.railway.app"//"172.28.0.65"
-//    const val BASE_URL = "https://$IP"
-//    const val WS_URL = "wss://$IP/web-socket"
+    const val IP = "wadii-spring-production.up.railway.app"//"172.28.0.65"
+    const val BASE_URL = "https://$IP"
+    const val WS_URL = "wss://$IP/web-socket"
 
-    const val IP = "172.20.10.2"
-    const val BASE_URL = "http://$IP:8080"
-    const val WS_URL = "ws://$IP:8080/web-socket"
+//    const val IP = "192.168.1.7"
+//    const val BASE_URL = "http://$IP:8080"
+//    const val WS_URL = "ws://$IP:8080/web-socket"
     const val BASE_URL_USER_IMAGES = "${BASE_URL}/users"
     const val VERSION = ""
     const val euroSign = "\u20AC"
@@ -86,6 +86,12 @@ object Constants {
     const val ORDER_INSERT = "${BASE_URL}$VERSION/orders/insert"
     const val ORDER_CANCEL = "${BASE_URL}$VERSION/orders/cancel"
     const val SHOW_ALL_ORDER_OF_PROVIDER = "${BASE_URL}$VERSION/orders/show-all-order-of-provider"
+
+    //cancel reasons
+    const val ORDER_CANCEL_REASONS_LIST = "${BASE_URL}$VERSION/reasons/show-all"
+    const val REASON_INSERT = "${BASE_URL}$VERSION/reasons/insert"
+    const val REASON_UPDATE = "${BASE_URL}$VERSION/reasons/insert"
+    fun REASON_DELETE(id: Int) = "${BASE_URL}$VERSION/reasons/delete/$id"
 
     //offers
     const val OFFERS_SHOW_ALL = "${BASE_URL}$VERSION/offers/show-all"

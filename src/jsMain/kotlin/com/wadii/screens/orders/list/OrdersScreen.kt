@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.wadii.domain.model.order.CancelReason
 import com.wadii.screens.orders.detail.OrderDetailScreen
 import com.wadii.screens.orders.edit.EditOrderScreen
 import com.wadii.screens.orders.new.NewOrderScreen
@@ -20,8 +21,9 @@ import com.wadii.ui.Modal
 import com.wadii.ui.ModalVariant
 import com.wadii.ui.PageHeader
 import com.wadii.ui.PrimaryButton
+import com.wadii.ui.RadioGroup
 import com.wadii.ui.SecondaryButton
-import com.wadii.ui.TextArea
+import com.wadii.ui.Spinner
 import org.jetbrains.compose.web.dom.*
 
 class OrdersScreen : Screen {
@@ -104,16 +106,26 @@ class OrdersScreen : Screen {
                 DangerButton(
                     "Confirm Cancel",
                     loading = state.isCancelling,
-                    disabled = state.cancelReason.isBlank(),
+                    disabled = state.selectedReasonId == null,
                     onClick = { model.onEvent(OrdersEvent.ConfirmCancel) }
                 )
             }
         ) {
-            TextArea(
-                label = "Reason for cancellation",
-                value = state.cancelReason,
-                placeholder = "Tell us why you're cancelling this order…"
-            ) { model.onEvent(OrdersEvent.SetCancelReason(it)) }
+            when {
+                state.loadingCancelReasons -> Div(attrs = { classes("flex", "justify-center", "py-4") }) { Spinner() }
+                state.cancelReasons.isEmpty() -> P(attrs = { classes("text-sm", "text-body-subtle") }) {
+                    Text("No cancellation reasons available.")
+                }
+                else -> {
+                    P(attrs = { classes("text-sm", "font-medium", "text-heading", "mb-3") }) { Text("Select a reason for cancellation") }
+                    RadioGroup(
+                        name = "cancel-reason",
+                        options = state.cancelReasons,
+                        selected = state.cancelReasons.find { it.id == state.selectedReasonId } ?: CancelReason(),
+                        itemLabel = { it.reason }
+                    ) { model.onEvent(OrdersEvent.SelectCancelReason(it.id)) }
+                }
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ package com.wadii.domain.usecase
 
 import com.wadii.domain.model.BaseResponse
 import com.wadii.domain.model.carTypes.CarType
+import com.wadii.domain.model.order.CancelReason
 import com.wadii.domain.model.order.OrderCallbackResponse
 import com.wadii.domain.model.order.OrderCancelRequest
 import com.wadii.domain.model.order.OrderModel
@@ -36,4 +37,7 @@ class OrderUseCase(private val orderRepo: OrderRepo) {
         request: OrderCancelRequest,
         response: (RequestState<BaseResponse<OrderCallbackResponse>>) -> Unit
     ) = orderRepo.cancelOrder(request, response)
+
+    suspend fun getCancelReasons(response: (RequestState<BaseResponse<List<CancelReason>>>) -> Unit) =
+        orderRepo.getCancelReasons(response)
 }

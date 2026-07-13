@@ -23,6 +23,8 @@ import com.wadii.domain.model.offers.NewOfferRequest
 import com.wadii.domain.model.offers.OfferResponse
 import com.wadii.domain.model.offers.SavedOfferRequest
 import com.wadii.domain.model.offers.saved.SavedOffer
+import com.wadii.domain.model.order.CancelReason
+import com.wadii.domain.model.order.InsertReason
 import com.wadii.domain.model.order.OrderCallbackResponse
 import com.wadii.domain.model.order.OrderCancelRequest
 import com.wadii.domain.model.order.OrderModel
@@ -484,6 +486,49 @@ class ApiService(
             client.postApiResponse<OrderCancelRequest, BaseResponse<OrderCallbackResponse>>(
                 urlString = Constants.ORDER_CANCEL,
                 body = request
+            )
+        )
+    }
+
+    suspend fun getCancelReasons(response: (RequestState<BaseResponse<List<CancelReason>>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.getApiResponse<BaseResponse<List<CancelReason>>>(urlString = Constants.ORDER_CANCEL_REASONS_LIST))
+    }
+
+    suspend fun addReason(
+        insertReason: InsertReason,
+        response: (RequestState<BaseResponse<CancelReason>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<InsertReason, BaseResponse<CancelReason>>(
+                urlString = Constants.REASON_INSERT,
+                body = insertReason
+            )
+        )
+    }
+
+    suspend fun updateReason(
+        insertReason: InsertReason,
+        response: (RequestState<BaseResponse<CancelReason>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<InsertReason, BaseResponse<CancelReason>>(
+                urlString = Constants.REASON_UPDATE,
+                body = insertReason
+            )
+        )
+    }
+
+    suspend fun deleteReason(
+        id: Int,
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.deleteApiResponse<BaseResponse<Boolean>>(
+                urlString = Constants.REASON_DELETE(id),
             )
         )
     }

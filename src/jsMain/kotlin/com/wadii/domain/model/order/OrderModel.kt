@@ -1,7 +1,6 @@
 package com.wadii.domain.model.order
 
 
-import com.wadii.domain.model.city.City
 import com.wadii.domain.model.sparePart.SparePart
 import com.wadii.domain.model.sparePart.SparePartsPrice
 import kotlinx.serialization.SerialName
@@ -17,6 +16,8 @@ data class OrderModel(
     val date: String = "",
     @SerialName("id")
     val id: Int = 0,
+    @SerialName("status")
+    val status: String = "",
     @SerialName("responses")
     val responses: List<OrderResponse> = listOf(),
     @SerialName("services")
@@ -26,6 +27,12 @@ data class OrderModel(
     @SerialName("user")
     val user: User = User()
 ) {
+
+
+    enum class OrderStatus {
+        PENDING,
+        CANCELED
+    }
 
     @Serializable
     data class OrderResponse(
@@ -89,7 +96,6 @@ data class OrderModel(
         @SerialName("name")
         val name: String = ""
     )
-
 
 
     @Serializable

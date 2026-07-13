@@ -3,6 +3,7 @@ package com.wadii.data.repo
 import com.wadii.data.api.ApiService
 import com.wadii.domain.model.BaseResponse
 import com.wadii.domain.model.carTypes.CarType
+import com.wadii.domain.model.order.CancelReason
 import com.wadii.domain.model.order.OrderCallbackResponse
 import com.wadii.domain.model.order.OrderCancelRequest
 import com.wadii.domain.model.order.OrderModel
@@ -37,5 +38,8 @@ class OrderRepoImpl(private val apiService: ApiService) : OrderRepo {
 
     override suspend fun getOrderById(id: Int, response: (RequestState<BaseResponse<OrderModel>>) -> Unit) =
         apiService.getOrderById(id, response)
+
+    override suspend fun getCancelReasons(response: (RequestState<BaseResponse<List<CancelReason>>>) -> Unit) =
+        apiService.getCancelReasons(response)
 
 }

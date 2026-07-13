@@ -3,6 +3,7 @@ package com.wadii.screens.orders.list
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
 import com.wadii.domain.model.order.OrderCancelRequest
+import com.wadii.domain.model.order.OrderModel
 import com.wadii.domain.usecase.OrderUseCase
 import com.wadii.state.AppState
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,9 +24,9 @@ class OrdersViewModel(private val orderUseCase: OrderUseCase) : BaseViewModel<Or
     override fun onEvent(event: OrdersEvent) {
         when (event) {
             OrdersEvent.Load -> load()
-            is OrdersEvent.OpenCancelDialog -> updateState { it.copy(cancelingOrder = event.order, cancelReason = "") }
-            OrdersEvent.DismissCancelDialog -> updateState { it.copy(cancelingOrder = null, cancelReason = "") }
-            is OrdersEvent.SetCancelReason -> updateState { it.copy(cancelReason = event.value) }
+            is OrdersEvent.OpenCancelDialog -> openCancelDialog(event.order)
+            OrdersEvent.DismissCancelDialog -> updateState { it.copy(cancelingOrder = null, selectedReasonId = null) }
+            is OrdersEvent.SelectCancelReason -> updateState { it.copy(selectedReasonId = event.reasonId) }
             OrdersEvent.ConfirmCancel -> confirmCancel()
         }
     }
@@ -40,14 +41,32 @@ class OrdersViewModel(private val orderUseCase: OrderUseCase) : BaseViewModel<Or
         }
     }
 
+    private fun openCancelDialog(order: OrderModel) {
+        updateState { it.copy(cancelingOrder = order, selectedReasonId = null) }
+        if (_state.value.cancelReasons.isEmpty()) loadCancelReasons()
+    }
+
+    private fun loadCancelReasons() = screenModelScope.launch {
+        orderUseCase.getCancelReasons { response ->
+            response.handelState(
+                onLoading = { updateState { it.copy(loadingCancelReasons = true) } },
+                onSuccess = { data -> updateState { it.copy(cancelReasons = data.data ?: emptyList(), loadingCancelReasons = false) } },
+                onError = { _, _ ->
+                    AppState.toast("Failed to load cancellation reasons", true)
+                    updateState { it.copy(loadingCancelReasons = false) }
+                }
+            )
+        }
+    }
+
     private fun confirmCancel() = screenModelScope.launch {
         val order = _state.value.cancelingOrder ?: return@launch
-        val reason = _state.value.cancelReason
-        if (reason.isBlank()) {
-            AppState.toast("Please provide a reason for cancelling", true)
+        val reasonId = _state.value.selectedReasonId
+        if (reasonId == null) {
+            AppState.toast("Please select a reason for cancelling", true)
             return@launch
         }
-        orderUseCase.cancelOrder(OrderCancelRequest(orderId = order.id, reason = reason)) { response ->
+        orderUseCase.cancelOrder(OrderCancelRequest(orderId = order.id, reasonId = reasonId)) { response ->
             response.handelState(
                 onLoading = { updateState { it.copy(isCancelling = true) } },
                 onSuccess = {
@@ -57,7 +76,7 @@ class OrdersViewModel(private val orderUseCase: OrderUseCase) : BaseViewModel<Or
                             orders = it.orders.filter { o -> o.id != order.id },
                             isCancelling = false,
                             cancelingOrder = null,
-                            cancelReason = ""
+                            selectedReasonId = null
                         )
                     }
                 },

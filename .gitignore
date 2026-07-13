@@ -1,8 +1,7 @@
 # Project exclude paths
 /.gradle/
-/build/
-/build/classes/
-/build/classes/kotlin/js/main/
+#/build/classes/
+#/build/classes/kotlin/js/main/
 
 # Firebase Admin SDK service account key — server-side secret, must never ship in the web bundle
-src/jsMain/wadii.json
+#src/jsMain/wadii.json

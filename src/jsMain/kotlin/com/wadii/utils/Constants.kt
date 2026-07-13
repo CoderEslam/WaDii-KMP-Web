@@ -119,8 +119,22 @@ object Constants {
 
     //country
     const val COUNTRY_SHOW_ALL = "${BASE_URL}$VERSION/countries/show-all"
+    const val COUNTRY_INSERT = "${BASE_URL}$VERSION/countries/insert"
+    const val COUNTRY_UPDATE = "${BASE_URL}$VERSION/countries/update"
+    fun COUNTRY_DELETE(id: Long) = "${BASE_URL}$VERSION/countries/delete/$id"
 
+    //province
+    const val PROVINCE_SHOW_ALL = "${BASE_URL}$VERSION/provinces/show-all"
+    const val PROVINCE_INSERT = "${BASE_URL}$VERSION/provinces/insert"
+    const val PROVINCE_UPDATE = "${BASE_URL}$VERSION/provinces/update"
+    fun PROVINCE_DELETE(id: Long) = "${BASE_URL}$VERSION/provinces/delete/$id"
     const val PROVINCE_BY_COUNTRY_ID = "${BASE_URL}$VERSION/provinces/by-country"
+
+    //city
+    const val CITY_SHOW_ALL = "${BASE_URL}$VERSION/cities/show-all"
+    const val CITY_INSERT = "${BASE_URL}$VERSION/cities/insert"
+    const val CITY_UPDATE = "${BASE_URL}$VERSION/cities/update"
+    fun CITY_DELETE(id: Long) = "${BASE_URL}$VERSION/cities/delete/$id"
     const val CITY_BY_PROVINCE_ID = "${BASE_URL}$VERSION/cities/by-province"
 
     //delete account

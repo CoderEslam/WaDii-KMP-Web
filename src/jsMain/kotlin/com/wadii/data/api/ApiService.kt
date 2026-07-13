@@ -16,7 +16,9 @@ import com.wadii.domain.model.chat.InsertResponse
 import com.wadii.domain.model.chat.PageMessages
 import com.wadii.domain.model.chat.ShowAllMessagesResponse
 import com.wadii.domain.model.city.City
+import com.wadii.domain.model.city.InsertCity
 import com.wadii.domain.model.country.Country
+import com.wadii.domain.model.country.InsertCountry
 import com.wadii.domain.model.follow.FollowProviderResponse
 import com.wadii.domain.model.follow.Followers
 import com.wadii.domain.model.offers.NewOfferRequest
@@ -34,6 +36,7 @@ import com.wadii.domain.model.provider.ProviderRequest
 import com.wadii.domain.model.provider.ProviderRequestCallback
 import com.wadii.domain.model.provider.UpdateProviderRequest
 import com.wadii.domain.model.providerRequests.ProviderRequestModel
+import com.wadii.domain.model.province.InsertProvince
 import com.wadii.domain.model.province.Province
 import com.wadii.domain.model.response.OrderResponse
 import com.wadii.domain.model.response.ResponseCallback
@@ -683,6 +686,120 @@ class ApiService(
     ) {
         response(RequestState.Loading)
         response(client.getApiResponse<BaseResponse<List<City>>>(urlString = "${Constants.CITY_BY_PROVINCE_ID}/$provinceId"))
+    }
+
+    suspend fun insertCountry(
+        insertCountry: InsertCountry,
+        response: (RequestState<BaseResponse<Country>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<InsertCountry, BaseResponse<Country>>(
+                urlString = Constants.COUNTRY_INSERT,
+                body = insertCountry
+            )
+        )
+    }
+
+    suspend fun updateCountry(
+        insertCountry: InsertCountry,
+        response: (RequestState<BaseResponse<Country>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<InsertCountry, BaseResponse<Country>>(
+                urlString = Constants.COUNTRY_UPDATE,
+                body = insertCountry
+            )
+        )
+    }
+
+    suspend fun deleteCountry(
+        id: Long,
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = Constants.COUNTRY_DELETE(id)))
+    }
+
+    //province
+    suspend fun getProvinceList(response: (RequestState<BaseResponse<List<Province>>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.getApiResponse<BaseResponse<List<Province>>>(urlString = Constants.PROVINCE_SHOW_ALL))
+    }
+
+    suspend fun insertProvince(
+        insertProvince: InsertProvince,
+        response: (RequestState<BaseResponse<Province>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<InsertProvince, BaseResponse<Province>>(
+                urlString = Constants.PROVINCE_INSERT,
+                body = insertProvince
+            )
+        )
+    }
+
+    suspend fun updateProvince(
+        insertProvince: InsertProvince,
+        response: (RequestState<BaseResponse<Province>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<InsertProvince, BaseResponse<Province>>(
+                urlString = Constants.PROVINCE_UPDATE,
+                body = insertProvince
+            )
+        )
+    }
+
+    suspend fun deleteProvince(
+        id: Long,
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = Constants.PROVINCE_DELETE(id)))
+    }
+
+    //city
+    suspend fun getCityList(response: (RequestState<BaseResponse<List<City>>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.getApiResponse<BaseResponse<List<City>>>(urlString = Constants.CITY_SHOW_ALL))
+    }
+
+    suspend fun insertCity(
+        insertCity: InsertCity,
+        response: (RequestState<BaseResponse<City>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<InsertCity, BaseResponse<City>>(
+                urlString = Constants.CITY_INSERT,
+                body = insertCity
+            )
+        )
+    }
+
+    suspend fun updateCity(
+        insertCity: InsertCity,
+        response: (RequestState<BaseResponse<City>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<InsertCity, BaseResponse<City>>(
+                urlString = Constants.CITY_UPDATE,
+                body = insertCity
+            )
+        )
+    }
+
+    suspend fun deleteCity(
+        id: Long,
+        response: (RequestState<BaseResponse<Boolean>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = Constants.CITY_DELETE(id)))
     }
 
     //notifications

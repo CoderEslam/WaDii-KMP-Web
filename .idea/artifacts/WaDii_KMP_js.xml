@@ -1,8 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="WaDii-KMP-js">
     <output-path>$PROJECT_DIR$/build/libs</output-path>
-    <root id="archive" name="WaDii-KMP-js.jar">
-      <element id="module-output" name="WaDii-KMP.jsMain" />
-    </root>
+    <root id="archive" name="WaDii-KMP-js.jar" />
   </artifact>
 </component>

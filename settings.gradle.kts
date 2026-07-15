@@ -15,4 +15,4 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "WaDii-KMP"
+rootProject.name = "TeacherOnline-KMP"

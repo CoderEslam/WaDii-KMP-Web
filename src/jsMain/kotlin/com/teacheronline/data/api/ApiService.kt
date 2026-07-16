@@ -20,6 +20,8 @@ import com.teacheronline.domain.model.PaymentOutDto
 import com.teacheronline.domain.model.PaymentStudent
 import com.teacheronline.domain.model.PaymentStudentDto
 import com.teacheronline.domain.model.PaymentStudentSubjectResponse
+import com.teacheronline.domain.model.EnrollRequest
+import com.teacheronline.domain.model.Parent
 import com.teacheronline.domain.model.Schedule
 import com.teacheronline.domain.model.ScheduleDto
 import com.teacheronline.domain.model.Secretary
@@ -214,6 +216,27 @@ class ApiService(private val client: HttpClient) {
     suspend fun studentsByCourse(courseId: Long, response: (RequestState<BaseResponse<List<Student>>>) -> Unit) {
         response(RequestState.Loading)
         response(client.getApiResponse<BaseResponse<List<Student>>>(urlString = Constants.STUDENTS_BY_COURSE(courseId)))
+    }
+
+    //parents (PARENTS_API.md)
+    suspend fun parentEnroll(request: EnrollRequest, response: (RequestState<BaseResponse<Parent>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<EnrollRequest, BaseResponse<Parent>>(urlString = Constants.PARENTS_ENROLL, body = request))
+    }
+
+    suspend fun parentAddStudents(parentId: Long, students: List<StudentRequest>, response: (RequestState<BaseResponse<Parent>>) -> Unit) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<List<StudentRequest>, BaseResponse<Parent>>(
+                urlString = Constants.PARENTS_ADD_STUDENTS(parentId),
+                body = students
+            )
+        )
+    }
+
+    suspend fun parentsAll(response: (RequestState<BaseResponse<List<Parent>>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.getApiResponse<BaseResponse<List<Parent>>>(urlString = Constants.PARENTS_ALL))
     }
 
     //attendance (doc §8)

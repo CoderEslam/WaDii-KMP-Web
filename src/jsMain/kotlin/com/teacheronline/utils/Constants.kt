@@ -10,9 +10,9 @@ object Constants {
 
     // Placeholder — no real backend deployed yet. Swap once the TeacherOnline server is hosted.
     // Doc: base is `http://<host>:8080`, no `/api/v1` prefix in practice.
-    const val IP = "192.168.100.22"
-    const val BASE_URL = "http://$IP:8080"
-    const val WS_URL = "ws://$IP:8080/web-socket"
+    const val IP = "172.28.0.61"
+    const val BASE_URL = "http://$IP:1010"
+    const val WS_URL = "ws://$IP:1010/web-socket"
 
     //auth (doc §2)
     const val REGISTER = "$BASE_URL/auth/register"
@@ -56,6 +56,11 @@ object Constants {
     fun STUDENTS_BY_PHONE(phone: String) = "$BASE_URL/students/student-by-phone/$phone"
     fun STUDENTS_DELETE(id: Long) = "$BASE_URL/students/delete-student/$id"
     fun STUDENTS_BY_COURSE(courseId: Long) = "$BASE_URL/students/students-by-course/$courseId"
+
+    //parents (PARENTS_API.md)
+    const val PARENTS_ENROLL = "$BASE_URL/parents/enroll"
+    fun PARENTS_ADD_STUDENTS(parentId: Long) = "$BASE_URL/parents/$parentId/students"
+    const val PARENTS_ALL = "$BASE_URL/parents/all-parents"
 
     //attendance (doc §8)
     const val ATTENDANCE_CREATE = "$BASE_URL/attendance/create-attendance"

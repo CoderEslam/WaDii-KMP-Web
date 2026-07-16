@@ -12,6 +12,7 @@ import com.teacheronline.data.repo.LanguageRepoImpl
 import com.teacheronline.data.repo.LevelRepoImpl
 import com.teacheronline.data.repo.LiveKitRepoImpl
 import com.teacheronline.data.repo.MessagesRepoImpl
+import com.teacheronline.data.repo.ParentRepoImpl
 import com.teacheronline.data.repo.PaymentRepoImpl
 import com.teacheronline.data.repo.ScheduleRepoImpl
 import com.teacheronline.data.repo.SecretaryRepoImpl
@@ -29,6 +30,7 @@ import com.teacheronline.domain.repo.LanguageRepo
 import com.teacheronline.domain.repo.LevelRepo
 import com.teacheronline.domain.repo.LiveKitRepo
 import com.teacheronline.domain.repo.MessagesRepo
+import com.teacheronline.domain.repo.ParentRepo
 import com.teacheronline.domain.repo.PaymentRepo
 import com.teacheronline.domain.repo.ScheduleRepo
 import com.teacheronline.domain.repo.SecretaryRepo
@@ -44,6 +46,7 @@ import com.teacheronline.domain.usecase.LanguageUseCase
 import com.teacheronline.domain.usecase.LevelUseCase
 import com.teacheronline.domain.usecase.LiveKitUseCase
 import com.teacheronline.domain.usecase.MessageUseCase
+import com.teacheronline.domain.usecase.ParentUseCase
 import com.teacheronline.domain.usecase.PaymentUseCase
 import com.teacheronline.domain.usecase.ScheduleUseCase
 import com.teacheronline.domain.usecase.SecretaryUseCase
@@ -99,6 +102,7 @@ val appModule = module {
     single<LanguageRepo> { LanguageRepoImpl(get()) }
     single<EducationalCenterRepo> { EducationalCenterRepoImpl(get()) }
     single<StudentRepo> { StudentRepoImpl(get()) }
+    single<ParentRepo> { ParentRepoImpl(get()) }
     single<AttendanceRepo> { AttendanceRepoImpl(get()) }
     single<ConfigRepo> { ConfigRepoImpl(get()) }
     single<LevelRepo> { LevelRepoImpl(get()) }
@@ -116,6 +120,7 @@ val appModule = module {
     single { LanguageUseCase(get()) }
     single { EducationalCenterUseCase(get()) }
     single { StudentUseCase(get()) }
+    single { ParentUseCase(get()) }
     single { AttendanceUseCase(get()) }
     single { ConfigUseCase(get()) }
     single { LevelUseCase(get()) }
@@ -152,7 +157,7 @@ val appModule = module {
     factory { TeachersViewModel(get(), get()) }
     factory { SubjectsViewModel(get()) }
     factory { LanguagesViewModel(get()) }
-    factory { AdminStudentsViewModel(get(), get(), get()) }
+    factory { AdminStudentsViewModel(get(), get(), get(), get()) }
     factory { SecretariesViewModel(get(), get()) }
     factory { LevelsViewModel(get()) }
     factory { AdminScheduleViewModel(get(), get(), get()) }

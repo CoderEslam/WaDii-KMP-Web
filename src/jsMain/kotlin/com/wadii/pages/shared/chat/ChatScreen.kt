@@ -24,13 +24,17 @@ import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.dom.*
 import org.w3c.dom.HTMLDivElement
 
-class ChatScreen : Screen {
+class ChatScreen(private val initialContact: ChatContact? = null) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val model = koinScreenModel<ChatViewModel>()
         val state by model.state.collectAsState()
         val myId = AppState.user?.id
+
+        LaunchedEffect(initialContact?.contact?.id) {
+            initialContact?.let { model.onEvent(ChatEvent.SelectContact(it)) }
+        }
 
         Div(attrs = {
             classes(

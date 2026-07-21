@@ -9,8 +9,8 @@ object Constants {
     const val THEME_KEY = "THEME_KEY"
     const val PORT = ""
 
-    const val IP = "wadii-spring-production.up.railway.app"//"172.28.0.65"
-    const val BASE_URL = "https://$IP"
+    const val IP = "localhost:8080"//"wadii-spring-production.up.railway.app"//"172.28.0.65"
+    const val BASE_URL = "http://$IP"
     const val WS_URL = "wss://$IP/web-socket"
 
 //    const val IP = "192.168.1.7"

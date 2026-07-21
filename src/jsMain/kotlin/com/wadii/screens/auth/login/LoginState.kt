@@ -1,7 +1,0 @@
-package com.wadii.screens.auth.login
-
-data class LoginState(
-    val email: String = "",
-    val password: String = "",
-    val loading: Boolean = false
-)

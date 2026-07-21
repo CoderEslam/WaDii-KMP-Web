@@ -9,7 +9,7 @@ kotlin {
     js(IR) {
         browser {
             commonWebpackConfig {
-                outputFileName = "wadii.js"
+                outputFileName = "teacher-online-web.js"
                 cssSupport { enabled.set(true) }
             }
         }

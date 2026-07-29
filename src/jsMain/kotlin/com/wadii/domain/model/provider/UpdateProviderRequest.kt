@@ -35,14 +35,14 @@ data class BranchRequest(
     @SerialName("address")
     val address: String,
     @SerialName("workTimes")
-    val workTimes: List<WorkTimeRequest>
+    val workTimes: List<com.wadii.domain.model.provider.WorkTimeRequest>
 )
 
 data class EditableBranch(
     val id: Int,
     val name: String,
     val address: String,
-    val workTimes: List<EditableWorkTime>
+    val workTimes: List<com.wadii.domain.model.provider.EditableWorkTime>
 )
 
 @Serializable

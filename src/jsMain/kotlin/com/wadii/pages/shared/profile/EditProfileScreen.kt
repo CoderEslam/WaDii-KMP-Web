@@ -8,8 +8,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wadii.ui.Alert
 import com.wadii.ui.AlertVariant
 import com.wadii.ui.BackButton
+import com.wadii.ui.Badge
+import com.wadii.ui.BadgeVariant
 import com.wadii.ui.Card
-import com.wadii.ui.classNames
 import com.wadii.ui.GhostButton
 import com.wadii.ui.InputField
 import com.wadii.ui.LoadingScreen
@@ -85,42 +86,19 @@ class EditProfileScreen : Screen {
 
                 if (s.role == "PROVIDER") {
                     Card(classes = "p-6") {
-                        Div(attrs = { classes("flex", "items-center", "justify-between", "mb-1") }) {
-                            H2(attrs = { classes("font-semibold", "text-heading") }) { Text("Services") }
-                            if (s.allServices.isNotEmpty()) {
-                                Span(attrs = { classes("text-xs", "font-medium", "text-fg-brand") }) {
-                                    Text("${s.selectedServiceIds.size} selected")
-                                }
-                            }
-                        }
-                        P(attrs = { classes("text-xs", "text-body-subtle", "mb-4") }) {
-                            Text("Choose the categories of parts your shop offers — customers filter by these.")
-                        }
+                        H2(attrs = { classes("font-semibold", "text-heading", "mb-4") }) { Text("Services") }
                         if (s.allServices.isEmpty()) {
                             P(attrs = { classes("text-sm", "text-body-subtle") }) { Text("No services available yet.") }
                         } else {
                             Div(attrs = { classes("flex", "flex-wrap", "gap-2") }) {
                                 s.allServices.forEach { svc ->
                                     val selected = svc.id.toInt() in s.selectedServiceIds
-                                    Button(attrs = {
-                                        classes(*classNames(
-                                            "px-4", "py-2", "rounded-full", "text-sm", "font-medium", "border", "transition-all",
-                                            if (selected) "bg-surface shadow-neu-inset text-fg-brand border-brand-subtle"
-                                            else "bg-surface shadow-neu-sm border-default text-body hover:shadow-neu-md hover:text-heading"
-                                        ))
+                                    Span(attrs = {
                                         style { property("cursor", "pointer") }
-                                        attr("type", "button")
-                                        attr("aria-pressed", selected.toString())
                                         onClick { model.onEvent(EditProfileEvent.ToggleService(svc.id.toInt())) }
                                     }) {
-                                        if (selected) Span(attrs = { classes("mr-1") }) { Text("✓") }
-                                        Text(svc.name)
+                                        Badge(svc.name, variant = if (selected) BadgeVariant.Brand else BadgeVariant.Alternative, pill = true)
                                     }
-                                }
-                            }
-                            if (s.selectedServiceIds.isEmpty()) {
-                                P(attrs = { classes("text-xs", "text-fg-warning", "mt-3") }) {
-                                    Text("Select at least one service so customers can find your shop.")
                                 }
                             }
                         }
@@ -140,23 +118,23 @@ class EditProfileScreen : Screen {
                                         }
                                     }
                                     Div(attrs = { classes("space-y-2") }) {
-                                        P(attrs = { classes("text-xs", "font-medium", "text-body-subtle", "uppercase", "tracking-wide") }) {
-                                            Text("Opening Hours")
-                                        }
                                         branch.workTimes.forEachIndexed { wtIndex, wt ->
-                                            Div(attrs = { classes("flex", "items-center", "gap-2") }) {
-                                                Span(attrs = { classes("w-24", "shrink-0", "text-sm", "text-body") }) { Text(wt.day) }
+                                            Div(attrs = { classes("flex", "items-end", "gap-2") }) {
+                                                InputField("Day", wt.day, placeholder = "Monday") {
+                                                    model.onEvent(EditProfileEvent.SetWorkTimeDay(branchIndex, wtIndex, it))
+                                                }
                                                 InputField("Open", wt.startTime, type = "time") {
                                                     model.onEvent(EditProfileEvent.SetWorkTimeStart(branchIndex, wtIndex, it))
                                                 }
                                                 InputField("Close", wt.closeTime, type = "time") {
                                                     model.onEvent(EditProfileEvent.SetWorkTimeClose(branchIndex, wtIndex, it))
                                                 }
+                                                GhostButton("🗑️") {
+                                                    model.onEvent(EditProfileEvent.RemoveWorkTime(branchIndex, wtIndex))
+                                                }
                                             }
                                         }
-                                        P(attrs = { classes("text-xs", "text-body-subtle") }) {
-                                            Text("Leave a day's times blank if you're closed that day.")
-                                        }
+                                        SecondaryButton("+ Add work time") { model.onEvent(EditProfileEvent.AddWorkTime(branchIndex)) }
                                     }
                                     GhostButton("🗑️ Remove branch") { model.onEvent(EditProfileEvent.RemoveBranch(branchIndex)) }
                                 }

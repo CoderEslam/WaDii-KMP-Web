@@ -31,6 +31,8 @@ import com.wadii.ui.PrimaryButton
 import kotlinx.browser.window
 import org.jetbrains.compose.web.dom.*
 
+private external fun encodeURIComponent(str: String): String
+
 class HomeScreen : Screen {
 
     @Composable
@@ -45,25 +47,13 @@ class HomeScreen : Screen {
                 H1(attrs = { classes("text-3xl", "font-semibold", "text-heading", "mb-2") }) {
                     Text("Welcome back, ${user?.firstName}!")
                 }
-                P(attrs = {
-                    classes(
-                        "text-body",
-                        "mb-4"
-                    )
-                }) { Text("Find the best spare parts sellers near you") }
+                P(attrs = { classes("text-body", "mb-4") }) { Text("Find the best spare parts sellers near you") }
                 PrimaryButton("Search Parts Sellers") { navigator.replaceAll(SearchScreen()) }
             }
 
             if (state.services.isNotEmpty()) {
                 Div {
-                    P(attrs = {
-                        classes(
-                            "text-lg",
-                            "font-semibold",
-                            "text-heading",
-                            "mb-3"
-                        )
-                    }) { Text("⚙️ Categories") }
+                    P(attrs = { classes("text-lg", "font-semibold", "text-heading", "mb-3") }) { Text("⚙️ Categories") }
                     Div(attrs = { classes("flex", "flex-wrap", "gap-2") }) {
                         if (state.selectedService.name.isNotNullOrEmptyString()) {
                             Button(attrs = {
@@ -78,19 +68,11 @@ class HomeScreen : Screen {
                         state.services.forEach { service ->
                             val active = state.selectedService.id == service.id
                             Button(attrs = {
-                                classes(
-                                    *classNames(
-                                        "px-4",
-                                        "py-2",
-                                        "rounded-full",
-                                        "text-sm",
-                                        "font-medium",
-                                        "border",
-                                        "transition-all",
-                                        if (active) "bg-surface shadow-neu-inset text-fg-brand border-brand-subtle"
-                                        else "bg-surface shadow-neu-sm border-default text-body hover:shadow-neu-md hover:text-heading"
-                                    )
-                                )
+                                classes(*classNames(
+                                    "px-4", "py-2", "rounded-full", "text-sm", "font-medium", "border", "transition-all",
+                                    if (active) "bg-surface shadow-neu-inset text-fg-brand border-brand-subtle"
+                                    else "bg-surface shadow-neu-sm border-default text-body hover:shadow-neu-md hover:text-heading"
+                                ))
                                 onClick { homeViewModel.onEvent(HomeEvent.SelectService(service)) }
                             }) { Text(service.name) }
                         }
@@ -100,14 +82,7 @@ class HomeScreen : Screen {
 
             if (state.ads.isNotEmpty()) {
                 Div {
-                    P(attrs = {
-                        classes(
-                            "text-lg",
-                            "font-semibold",
-                            "text-heading",
-                            "mb-3"
-                        )
-                    }) { Text("📣 Featured") }
+                    P(attrs = { classes("text-lg", "font-semibold", "text-heading", "mb-3") }) { Text("📣 Featured") }
                     Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-3", "gap-4") }) {
                         state.ads.forEach { ad ->
                             Div(attrs = {
@@ -116,30 +91,12 @@ class HomeScreen : Screen {
                             }) {
                                 Card(classes = "overflow-hidden hover:shadow-neu-md transition-all") {
                                     ad.imageUrl?.let {
-                                        Img(
-                                            src = it,
-                                            attrs = { classes("w-full", "h-32", "object-cover") })
+                                        Img(src = it, attrs = { classes("w-full", "h-32", "object-cover") })
                                     }
                                     Div(attrs = { classes("p-4") }) {
-                                        Badge(
-                                            ad.advertiserName,
-                                            variant = BadgeVariant.Brand,
-                                            pill = true
-                                        )
-                                        P(attrs = {
-                                            classes(
-                                                "font-semibold",
-                                                "mt-2",
-                                                "text-heading"
-                                            )
-                                        }) { Text(ad.title) }
-                                        P(attrs = {
-                                            classes(
-                                                "text-sm",
-                                                "text-body-subtle",
-                                                "mt-1"
-                                            )
-                                        }) { Text(ad.description) }
+                                        Badge(ad.advertiserName, variant = BadgeVariant.Brand, pill = true)
+                                        P(attrs = { classes("font-semibold", "mt-2", "text-heading") }) { Text(ad.title) }
+                                        P(attrs = { classes("text-sm", "text-body-subtle", "mt-1") }) { Text(ad.description) }
                                     }
                                 }
                             }
@@ -149,14 +106,7 @@ class HomeScreen : Screen {
             }
 
             Div {
-                P(attrs = {
-                    classes(
-                        "text-lg",
-                        "font-semibold",
-                        "text-heading",
-                        "mb-3"
-                    )
-                }) { Text("🔩 Parts Sellers") }
+                P(attrs = { classes("text-lg", "font-semibold", "text-heading", "mb-3") }) { Text("🔩 Parts Sellers") }
                 if (state.filterLoading) {
                     LoadingSkeletons(4, "h-28")
                 } else if (state.filteredProviders.isEmpty()) {
@@ -165,29 +115,14 @@ class HomeScreen : Screen {
                         if (state.selectedService.name.isNotNullOrEmptyString()) "No sellers for this category." else "No sellers available yet."
                     )
                 } else {
-                    Div(attrs = {
-                        classes(
-                            "grid",
-                            "grid-cols-1",
-                            "md:grid-cols-2",
-                            "lg:grid-cols-3",
-                            "gap-4"
-                        )
-                    }) {
+                    Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-3", "gap-4") }) {
                         state.filteredProviders.forEach { ProviderCard(navigator, it) }
                     }
                 }
             }
 
             Div {
-                P(attrs = {
-                    classes(
-                        "text-lg",
-                        "font-semibold",
-                        "text-heading",
-                        "mb-4"
-                    )
-                }) { Text("🏷️ Latest Deals") }
+                P(attrs = { classes("text-lg", "font-semibold", "text-heading", "mb-4") }) { Text("🏷️ Latest Deals") }
                 val visible = state.offers
                 if (visible.isEmpty()) {
                     EmptyState(
@@ -195,26 +130,12 @@ class HomeScreen : Screen {
                         if (state.selectedService.name.isNotNullOrEmptyString()) "No deals for this category." else "No deals available yet."
                     )
                 } else {
-                    Div(attrs = {
-                        classes(
-                            "grid",
-                            "grid-cols-1",
-                            "md:grid-cols-2",
-                            "lg:grid-cols-3",
-                            "gap-4"
-                        )
-                    }) {
+                    Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-3", "gap-4") }) {
                         visible.forEach { offer ->
                             OfferCard(
                                 navigator = navigator,
                                 offer = offer,
-                                onSaveToggle = {
-                                    homeViewModel.onEvent(
-                                        HomeEvent.ToggleSaveOffer(
-                                            offer
-                                        )
-                                    )
-                                }
+                                onSaveToggle = { homeViewModel.onEvent(HomeEvent.ToggleSaveOffer(offer)) }
                             )
                         }
                     }
@@ -229,26 +150,24 @@ class HomeScreen : Screen {
         Button(attrs = {
             classes(
                 "fixed", "bottom-6", "right-6", "z-40",
-                "w-14", "h-14", "flex", "items-center", "justify-center",
-                "rounded-full", "bg-surface", "border", "border-default",
-                "shadow-neu-lg", "text-fg-brand", "text-2xl", "font-bold",
-                "hover:shadow-neu-md", "active:shadow-neu-inset", "transition-all"
+                "w-14", "h-14", "rounded-full", "bg-surface", "shadow-neu-lg",
+                "hover:shadow-neu-xl", "active:shadow-neu-inset", "transition-all",
+                "flex", "items-center", "justify-center", "text-fg-brand"
             )
-            style { property("cursor", "pointer") }
-            attr("title", "New Order")
-            attr("aria-label", "New Order")
+            style { property("border", "none"); property("cursor", "pointer") }
+            attr("title", "Make an order")
+            attr("aria-label", "Make an order")
             onClick { navigator.push(NewOrderScreen()) }
-        }) { Text("+") }
+        }) {
+            Span(attrs = { classes("text-3xl", "font-bold", "leading-none") }) { Text("+") }
+        }
     }
 }
 
-private val googleMapsHosts =
-    listOf("google.com/maps", "maps.google", "goo.gl/maps", "maps.app.goo.gl")
-
 @Composable
 fun ProviderCard(navigator: Navigator, provider: ProviderModel) {
-    var showPhone by remember { mutableStateOf(false) }
-    var showLocation by remember { mutableStateOf(false) }
+    var showCallDialog by remember { mutableStateOf(false) }
+    var showAddressDialog by remember { mutableStateOf(false) }
 
     Div(attrs = {
         style { property("cursor", "pointer") }
@@ -258,217 +177,86 @@ fun ProviderCard(navigator: Navigator, provider: ProviderModel) {
             Div(attrs = { classes("flex", "items-center", "gap-4") }) {
                 Avatar(initials = provider.name.take(1).uppercase())
                 Div(attrs = { classes("flex-1", "min-w-0") }) {
-                    P(attrs = { classes("font-semibold", "text-heading", "truncate") }) {
-                        Text(
-                            provider.name
-                        )
-                    }
+                    P(attrs = { classes("font-semibold", "text-heading", "truncate") }) { Text(provider.name) }
                     Div(attrs = { classes("flex", "items-center", "gap-3", "mt-1") }) {
-                        Span(attrs = {
-                            classes(
-                                "text-sm",
-                                "text-warning"
-                            )
-                        }) { Text("⭐ ${provider.rate.to1dp()}") }
-                        Span(attrs = {
-                            classes(
-                                "text-xs",
-                                "text-body-subtle"
-                            )
-                        }) { Text("${provider.followersCount} followers") }
+                        Span(attrs = { classes("text-sm", "text-warning") }) { Text("⭐ ${provider.rate.to1dp()}") }
+                        Span(attrs = { classes("text-xs", "text-body-subtle") }) { Text("${provider.followersCount} followers") }
                     }
-                    provider.services.takeIf { it.isNotEmpty() }?.let { svcs ->
-                        Div(attrs = {
-                            classes(
-                                "flex",
-                                "flex-wrap",
-                                "gap-1",
-                                "mt-2",
-                                "items-center"
-                            )
-                        }) {
-                            svcs.take(3).forEach { s ->
-                                Badge(
-                                    s.name,
-                                    variant = BadgeVariant.Alternative,
-                                    pill = true
-                                )
-                            }
-                            if (svcs.size > 3) Span(attrs = {
-                                classes(
-                                    "text-xs",
-                                    "text-body-subtle"
-                                )
-                            }) { Text("+${svcs.size - 3}") }
+                    provider.services?.takeIf { it.isNotEmpty() }?.let { svcs ->
+                        Div(attrs = { classes("flex", "flex-wrap", "gap-1", "mt-2", "items-center") }) {
+                            svcs.take(3).forEach { s -> Badge(s.name, variant = BadgeVariant.Alternative, pill = true) }
+                            if (svcs.size > 3) Span(attrs = { classes("text-xs", "text-body-subtle") }) { Text("+${svcs.size - 3}") }
                         }
                     }
                 }
             }
 
             Div(attrs = {
-                classes(
-                    "flex",
-                    "items-center",
-                    "gap-2",
-                    "mt-4",
-                    "pt-4",
-                    "border-t",
-                    "border-default"
-                )
+                classes("flex", "items-center", "gap-2", "mt-4", "pt-4", "border-t", "border-default")
+                onClick { it.stopPropagation() }
             }) {
-                ProviderActionButton(icon = "📞", label = "Call") { showPhone = true }
-                ProviderActionButton(icon = "💬", label = "Chat") {
-                    navigator.push(ChatScreen(initialContact = provider.toChatContent()))
-                }
-                ProviderActionButton(icon = "📍", label = "Location") { showLocation = true }
+                ProviderQuickAction("💬", "Chat") { navigator.push(ChatScreen(provider.toChatContent())) }
+                ProviderQuickAction("📞", "Call") { showCallDialog = true }
+                ProviderQuickAction("📍", "Address") { showAddressDialog = true }
             }
         }
     }
 
     Modal(
-        open = showPhone,
+        open = showCallDialog,
         title = provider.name,
-        onDismiss = { showPhone = false },
+        onDismiss = { showCallDialog = false },
         variant = ModalVariant.PopUp,
         icon = "📞"
     ) {
-        if (provider.user.phone.isNotNullOrEmptyString()) {
-            Div(attrs = { classes("space-y-4") }) {
-                P(attrs = {
-                    classes(
-                        "text-lg",
-                        "font-semibold",
-                        "text-heading"
-                    )
-                }) { Text(provider.user.phone) }
-                A(href = "tel:${provider.user.phone}", attrs = {
-                    classes(
-                        "inline-flex",
-                        "items-center",
-                        "justify-center",
-                        "gap-2",
-                        "px-5",
-                        "py-2.5",
-                        "bg-surface",
-                        "border",
-                        "border-default",
-                        "text-fg-brand",
-                        "font-medium",
-                        "rounded-neu-base",
-                        "shadow-neu-sm",
-                        "hover:shadow-neu-md",
-                        "active:shadow-neu-inset",
-                        "transition-all"
-                    )
-                }) { Text("📞 Call now") }
-            }
+        val phone = provider.user.phone
+        if (phone.isNotEmpty()) {
+            A(href = "tel:$phone", attrs = { classes("text-lg", "font-semibold", "text-fg-brand", "hover:underline") }) { Text(phone) }
         } else {
-            P(attrs = { classes("text-body-subtle") }) { Text("No phone number available for this seller.") }
+            P(attrs = { classes("text-body-subtle") }) { Text("No phone number available.") }
         }
     }
 
     Modal(
-        open = showLocation,
-        title = "${provider.name} — Location",
-        onDismiss = { showLocation = false }) {
+        open = showAddressDialog,
+        title = "${provider.name} — Locations",
+        onDismiss = { showAddressDialog = false }
+    ) {
         if (provider.branches.isEmpty()) {
-            P(attrs = {
-                classes(
-                    "text-body-subtle",
-                    "text-sm"
-                )
-            }) { Text("No address available for this seller.") }
+            P(attrs = { classes("text-sm", "text-body-subtle") }) { Text("No address available.") }
         } else {
-            Div(attrs = { classes("space-y-3") }) {
+            Div(attrs = { classes("space-y-4") }) {
                 provider.branches.forEach { b ->
-                    Div(attrs = {
-                        classes(
-                            "border",
-                            "border-default",
-                            "rounded-neu-base",
-                            "p-3"
-                        )
-                    }) {
-                        P(attrs = {
-                            classes(
-                                "font-medium",
-                                "text-heading",
-                                "text-sm"
-                            )
-                        }) { Text(b.name) }
-                        P(attrs = {
-                            classes(
-                                "text-sm",
-                                "text-body-subtle",
-                                "mt-1"
-                            )
-                        }) { Text(b.address) }
+                    Div(attrs = { classes("flex", "items-start", "justify-between", "gap-3") }) {
+                        Div {
+                            P(attrs = { classes("font-medium", "text-heading") }) { Text(b.name) }
+                            P(attrs = { classes("text-sm", "text-body-subtle", "mt-0.5") }) { Text(b.address) }
+                        }
+                        Button(attrs = {
+                            classes("text-xs", "text-fg-brand", "font-medium", "hover:underline", "flex-shrink-0", "whitespace-nowrap")
+                            style { property("background", "none"); property("border", "none"); property("cursor", "pointer") }
+                            onClick { window.open("https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.address)}", "_blank") }
+                        }) { Text("Open in Maps →") }
                     }
                 }
             }
-        }
-        val mapLink = provider.links.firstOrNull { l ->
-            googleMapsHosts.any {
-                l.link.contains(
-                    it,
-                    ignoreCase = true
-                )
-            }
-        }
-        if (mapLink != null) {
-            Button(attrs = {
-                classes(
-                    "mt-4",
-                    "w-full",
-                    "inline-flex",
-                    "items-center",
-                    "justify-center",
-                    "gap-2",
-                    "px-5",
-                    "py-2.5",
-                    "bg-surface",
-                    "border",
-                    "border-default",
-                    "text-fg-brand",
-                    "font-medium",
-                    "rounded-neu-base",
-                    "shadow-neu-sm",
-                    "hover:shadow-neu-md",
-                    "active:shadow-neu-inset",
-                    "transition-all"
-                )
-                style { property("cursor", "pointer") }
-                onClick { window.open(mapLink.link, "_blank") }
-            }) { Text("🗺️ Open in Google Maps") }
         }
     }
 }
 
 @Composable
-private fun ProviderActionButton(icon: String, label: String, onClick: () -> Unit) {
+private fun ProviderQuickAction(icon: String, label: String, onClick: () -> Unit) {
     Button(attrs = {
         classes(
-            "flex-1",
-            "flex",
-            "items-center",
-            "justify-center",
-            "gap-1.5",
-            "py-2",
-            "bg-surface",
-            "text-body",
-            "text-xs",
-            "font-medium",
-            "rounded-neu-base",
-            "shadow-neu-sm",
-            "hover:shadow-neu-md",
-            "hover:text-fg-brand",
-            "active:shadow-neu-inset",
-            "transition-all"
+            "flex-1", "flex", "items-center", "justify-center", "gap-1.5",
+            "px-3", "py-2", "rounded-neu-default", "bg-surface", "text-body-subtle",
+            "text-xs", "font-medium", "hover:shadow-neu-sm", "hover:text-fg-brand",
+            "active:shadow-neu-inset", "transition-all"
         )
         style { property("border", "none"); property("cursor", "pointer") }
-        onClick { event -> event.stopPropagation(); onClick() }
+        onClick { onClick() }
     }) {
-        Span { Text(icon) }
+        Span(attrs = { classes("text-sm") }) { Text(icon) }
         Span { Text(label) }
     }
 }
@@ -482,36 +270,17 @@ fun OfferCard(
     Card(classes = "p-5 hover:shadow-neu-md transition-all") {
         Div(attrs = { classes("flex", "items-start", "justify-between") }) {
             Div(attrs = { classes("flex-1") }) {
-                P(attrs = {
-                    classes(
-                        "font-semibold",
-                        "text-heading",
-                        "mb-1"
-                    )
-                }) { Text(offer.title) }
-                P(attrs = {
-                    classes(
-                        "text-sm",
-                        "text-body-subtle",
-                        "mb-3"
-                    )
-                }) { Text(offer.description) }
-                P(attrs = {
-                    classes(
-                        "text-xs",
-                        "text-fg-disabled"
-                    )
-                }) { Text("Expires: ${offer.endDate.take(10)}") }
+                P(attrs = { classes("font-semibold", "text-heading", "mb-1") }) { Text(offer.title) }
+                P(attrs = { classes("text-sm", "text-body-subtle", "mb-3") }) { Text(offer.description) }
+                P(attrs = { classes("text-xs", "text-fg-disabled") }) { Text("Expires: ${offer.endDate.take(10)}") }
             }
             if (onSaveToggle != null) {
                 Button(attrs = {
-                    classes(
-                        *classNames(
-                            "ml-3", "p-2", "rounded-neu-default", "bg-surface", "transition-all",
-                            if (offer.saved) "text-fg-brand shadow-neu-inset"
-                            else "text-body-subtle hover:text-fg-brand hover:shadow-neu-sm"
-                        )
-                    )
+                    classes(*classNames(
+                        "ml-3", "p-2", "rounded-neu-default", "bg-surface", "transition-all",
+                        if (offer.saved) "text-fg-brand shadow-neu-inset"
+                        else "text-body-subtle hover:text-fg-brand hover:shadow-neu-sm"
+                    ))
                     style { property("border", "none"); property("cursor", "pointer") }
                     onClick { onSaveToggle(offer.saved) }
                 }) { Text("⭐") }
@@ -520,12 +289,7 @@ fun OfferCard(
         offer.provider?.let { p ->
             Button(attrs = {
                 classes("mt-3", "text-xs", "text-fg-brand-strong", "font-medium", "hover:underline")
-                style {
-                    property("background", "none"); property(
-                    "border",
-                    "none"
-                ); property("cursor", "pointer")
-                }
+                style { property("background", "none"); property("border", "none"); property("cursor", "pointer") }
                 onClick { navigator.push(ProviderDetailScreen(p.id)) }
             }) { Text("By ${p.name} →") }
         }

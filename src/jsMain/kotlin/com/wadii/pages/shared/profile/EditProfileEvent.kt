@@ -18,6 +18,9 @@ sealed class EditProfileEvent {
     data class RemoveBranch(val branchIndex: Int) : EditProfileEvent()
     data class SetBranchName(val branchIndex: Int, val value: String) : EditProfileEvent()
     data class SetBranchAddress(val branchIndex: Int, val value: String) : EditProfileEvent()
+    data class AddWorkTime(val branchIndex: Int) : EditProfileEvent()
+    data class RemoveWorkTime(val branchIndex: Int, val workTimeIndex: Int) : EditProfileEvent()
+    data class SetWorkTimeDay(val branchIndex: Int, val workTimeIndex: Int, val value: String) : EditProfileEvent()
     data class SetWorkTimeStart(val branchIndex: Int, val workTimeIndex: Int, val value: String) : EditProfileEvent()
     data class SetWorkTimeClose(val branchIndex: Int, val workTimeIndex: Int, val value: String) : EditProfileEvent()
 

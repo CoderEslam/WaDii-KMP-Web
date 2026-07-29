@@ -31,9 +31,6 @@ class EditProfileViewModel(
     private val servicesUseCase: ServicesUseCase
 ) : BaseViewModel<EditProfileState, EditProfileEvent>() {
 
-    private val weekDays =
-        listOf("Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
-
     override val initialState: EditProfileState get() = EditProfileState()
 
     override val state: StateFlow<EditProfileState> = _state
@@ -58,86 +55,43 @@ class EditProfileViewModel(
             }
 
             EditProfileEvent.AddBranch -> updateState {
-                it.copy(
-                    branches = it.branches + EditableBranch(
-                        id = 0,
-                        name = "",
-                        address = "",
-                        workTimes = weekDays.map { day ->
-                            EditableWorkTime(
-                                id = 0,
-                                day = day,
-                                startTime = "",
-                                closeTime = ""
-                            )
-                        }
-                    )
-                )
+                it.copy(branches = it.branches + EditableBranch(id = 0, name = "", address = "", workTimes = emptyList()))
             }
-
             is EditProfileEvent.RemoveBranch -> updateState {
                 it.copy(branches = it.branches.filterIndexed { i, _ -> i != event.branchIndex })
             }
-
             is EditProfileEvent.SetBranchName -> updateBranch(event.branchIndex) { it.copy(name = event.value) }
-            is EditProfileEvent.SetBranchAddress -> updateBranch(event.branchIndex) {
-                it.copy(
-                    address = event.value
-                )
+            is EditProfileEvent.SetBranchAddress -> updateBranch(event.branchIndex) { it.copy(address = event.value) }
+
+            is EditProfileEvent.AddWorkTime -> updateBranch(event.branchIndex) { branch ->
+                branch.copy(workTimes = branch.workTimes + EditableWorkTime(id = 0, day = "", startTime = "", closeTime = ""))
             }
-
-            is EditProfileEvent.SetWorkTimeStart -> updateWorkTime(
-                event.branchIndex,
-                event.workTimeIndex
-            ) { it.copy(startTime = event.value) }
-
-            is EditProfileEvent.SetWorkTimeClose -> updateWorkTime(
-                event.branchIndex,
-                event.workTimeIndex
-            ) { it.copy(closeTime = event.value) }
-
-            EditProfileEvent.AddLink -> updateState {
-                it.copy(
-                    links = it.links + EditableLink(
-                        id = 0,
-                        link = ""
-                    )
-                )
+            is EditProfileEvent.RemoveWorkTime -> updateBranch(event.branchIndex) { branch ->
+                branch.copy(workTimes = branch.workTimes.filterIndexed { i, _ -> i != event.workTimeIndex })
             }
+            is EditProfileEvent.SetWorkTimeDay -> updateWorkTime(event.branchIndex, event.workTimeIndex) { it.copy(day = event.value) }
+            is EditProfileEvent.SetWorkTimeStart -> updateWorkTime(event.branchIndex, event.workTimeIndex) { it.copy(startTime = event.value) }
+            is EditProfileEvent.SetWorkTimeClose -> updateWorkTime(event.branchIndex, event.workTimeIndex) { it.copy(closeTime = event.value) }
 
+            EditProfileEvent.AddLink -> updateState { it.copy(links = it.links + EditableLink(id = 0, link = "")) }
             is EditProfileEvent.RemoveLink -> updateState {
                 it.copy(links = it.links.filterIndexed { i, _ -> i != event.linkIndex })
             }
-
             is EditProfileEvent.SetLink -> updateState {
-                it.copy(links = it.links.mapIndexed { i, l ->
-                    if (i == event.linkIndex) EditableLink(
-                        l.id,
-                        event.value
-                    ) else l
-                })
+                it.copy(links = it.links.mapIndexed { i, l -> if (i == event.linkIndex) EditableLink(l.id, event.value) else l })
             }
 
             EditProfileEvent.Submit -> submit()
         }
     }
 
-    private fun updateBranch(branchIndex: Int, reducer: (EditableBranch) -> EditableBranch) =
-        updateState {
-            it.copy(branches = it.branches.mapIndexed { i, b -> if (i == branchIndex) reducer(b) else b })
-        }
+    private fun updateBranch(branchIndex: Int, reducer: (EditableBranch) -> EditableBranch) = updateState {
+        it.copy(branches = it.branches.mapIndexed { i, b -> if (i == branchIndex) reducer(b) else b })
+    }
 
-    private fun updateWorkTime(
-        branchIndex: Int,
-        workTimeIndex: Int,
-        reducer: (EditableWorkTime) -> EditableWorkTime
-    ) =
+    private fun updateWorkTime(branchIndex: Int, workTimeIndex: Int, reducer: (EditableWorkTime) -> EditableWorkTime) =
         updateBranch(branchIndex) { branch ->
-            branch.copy(workTimes = branch.workTimes.mapIndexed { i, wt ->
-                if (i == workTimeIndex) reducer(
-                    wt
-                ) else wt
-            })
+            branch.copy(workTimes = branch.workTimes.mapIndexed { i, wt -> if (i == workTimeIndex) reducer(wt) else wt })
         }
 
     private fun load() = screenModelScope.launch {
@@ -176,26 +130,11 @@ class EditProfileViewModel(
                         id = b.id,
                         name = b.name,
                         address = b.address,
-                        workTimes = weekDays.map { day ->
-                            val existing = b.workTimes.find { wt -> wt.day == day }
-                            EditableWorkTime(
-                                id = existing?.id ?: 0,
-                                day = day,
-                                startTime = existing?.startTime ?: "",
-                                closeTime = existing?.closeTime ?: ""
-                            )
-                        }
+                        workTimes = b.workTimes.map { wt -> EditableWorkTime(wt.id, wt.day, wt.startTime, wt.closeTime) }
                     )
                 } ?: emptyList(),
                 links = provider?.links?.map { l -> EditableLink(l.id, l.link) } ?: emptyList(),
-                offersPassthrough = provider?.offers?.map { o ->
-                    OfferRequest(
-                        o.id,
-                        o.title,
-                        o.description,
-                        o.endDate
-                    )
-                } ?: emptyList()
+                offersPassthrough = provider?.offers?.map { o -> OfferRequest(o.id, o.title, o.description, o.endDate) } ?: emptyList()
             )
         }
 
@@ -213,13 +152,7 @@ class EditProfileViewModel(
         screenModelScope.launch {
             countryUseCase.getCountryList { response ->
                 response.handelState(
-                    onSuccess = { data ->
-                        updateState {
-                            it.copy(
-                                countries = data.data ?: emptyList()
-                            )
-                        }
-                    }
+                    onSuccess = { data -> updateState { it.copy(countries = data.data ?: emptyList()) } }
                 )
             }
         }
@@ -228,13 +161,7 @@ class EditProfileViewModel(
     private fun loadProvinces(countryId: Long, resetChildren: Boolean) {
         if (resetChildren) {
             updateState {
-                it.copy(
-                    selectedCountry = countryId,
-                    provinces = emptyList(),
-                    cities = emptyList(),
-                    selectedProvince = 0,
-                    selectedCity = 0
-                )
+                it.copy(selectedCountry = countryId, provinces = emptyList(), cities = emptyList(), selectedProvince = 0, selectedCity = 0)
             }
         } else {
             updateState { it.copy(selectedCountry = countryId) }
@@ -242,13 +169,7 @@ class EditProfileViewModel(
         screenModelScope.launch {
             countryUseCase.getProvinceByCountryId(countryId) { response ->
                 response.handelState(
-                    onSuccess = { data ->
-                        updateState {
-                            it.copy(
-                                provinces = data.data ?: emptyList()
-                            )
-                        }
-                    }
+                    onSuccess = { data -> updateState { it.copy(provinces = data.data ?: emptyList()) } }
                 )
             }
         }
@@ -256,26 +177,14 @@ class EditProfileViewModel(
 
     private fun loadCities(provinceId: Long, resetChildren: Boolean) {
         if (resetChildren) {
-            updateState {
-                it.copy(
-                    selectedProvince = provinceId,
-                    cities = emptyList(),
-                    selectedCity = 0
-                )
-            }
+            updateState { it.copy(selectedProvince = provinceId, cities = emptyList(), selectedCity = 0) }
         } else {
             updateState { it.copy(selectedProvince = provinceId) }
         }
         screenModelScope.launch {
             countryUseCase.getCitiesByProvinceId(provinceId) { response ->
                 response.handelState(
-                    onSuccess = { data ->
-                        updateState {
-                            it.copy(
-                                cities = data.data ?: emptyList()
-                            )
-                        }
-                    }
+                    onSuccess = { data -> updateState { it.copy(cities = data.data ?: emptyList()) } }
                 )
             }
         }
@@ -285,13 +194,7 @@ class EditProfileViewModel(
         screenModelScope.launch {
             servicesUseCase.getServiceList { response ->
                 response.handelState(
-                    onSuccess = { data ->
-                        updateState {
-                            it.copy(
-                                allServices = data.data ?: emptyList()
-                            )
-                        }
-                    }
+                    onSuccess = { data -> updateState { it.copy(allServices = data.data ?: emptyList()) } }
                 )
             }
         }
@@ -302,10 +205,6 @@ class EditProfileViewModel(
         val user = s.originalUser
         if (user == null || s.firstName.isBlank() || s.lastName.isBlank() || s.email.isBlank() || s.selectedCity == 0L) {
             AppState.toast("Please fill in all required fields", true)
-            return
-        }
-        if (s.role == "PROVIDER" && s.allServices.isNotEmpty() && s.selectedServiceIds.isEmpty()) {
-            AppState.toast("Select at least one service", true)
             return
         }
 
@@ -354,15 +253,7 @@ class EditProfileViewModel(
                             id = b.id,
                             name = b.name,
                             address = b.address,
-                            workTimes = weekDays.map { day ->
-                                val existing = b.workTimes.find { it.day == day }
-                                WorkTimeRequest(
-                                    id = existing?.id ?: 0,
-                                    day = day,
-                                    startTime = existing?.startTime ?: "",
-                                    closeTime = existing?.closeTime ?: "",
-                                )
-                            }
+                            workTimes = b.workTimes.map { wt -> WorkTimeRequest(wt.id, wt.day, wt.startTime, wt.closeTime) }
                         )
                     },
                     links = s.links,

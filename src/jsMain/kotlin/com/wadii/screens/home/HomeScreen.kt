@@ -170,11 +170,12 @@ fun ProviderCard(navigator: Navigator, provider: ProviderModel) {
     var showAddressDialog by remember { mutableStateOf(false) }
 
     Div(attrs = {
+        classes("h-full")
         style { property("cursor", "pointer") }
         onClick { navigator.push(ProviderDetailScreen(provider.id)) }
     }) {
-        Card(classes = "p-5 hover:shadow-neu-md transition-all") {
-            Div(attrs = { classes("flex", "items-center", "gap-4") }) {
+        Card(classes = "p-5 hover:shadow-neu-md transition-all h-full flex flex-col") {
+            Div(attrs = { classes("flex", "items-center", "gap-4", "flex-1") }) {
                 Avatar(initials = provider.name.take(1).uppercase())
                 Div(attrs = { classes("flex-1", "min-w-0") }) {
                     P(attrs = { classes("font-semibold", "text-heading", "truncate") }) { Text(provider.name) }

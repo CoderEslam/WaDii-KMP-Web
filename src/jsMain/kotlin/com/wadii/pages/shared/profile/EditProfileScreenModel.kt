@@ -24,6 +24,10 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+private val WEEK_DAYS = listOf("Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+
+private fun emptyWeekWorkTimes() = WEEK_DAYS.map { day -> EditableWorkTime(id = 0, day = day, startTime = "", closeTime = "") }
+
 class EditProfileViewModel(
     private val userUseCase: UserUseCase,
     private val providerUseCase: ProviderUseCase,
@@ -55,7 +59,7 @@ class EditProfileViewModel(
             }
 
             EditProfileEvent.AddBranch -> updateState {
-                it.copy(branches = it.branches + EditableBranch(id = 0, name = "", address = "", workTimes = emptyList()))
+                it.copy(branches = it.branches + EditableBranch(id = 0, name = "", address = "", workTimes = emptyWeekWorkTimes()))
             }
             is EditProfileEvent.RemoveBranch -> updateState {
                 it.copy(branches = it.branches.filterIndexed { i, _ -> i != event.branchIndex })
@@ -63,13 +67,6 @@ class EditProfileViewModel(
             is EditProfileEvent.SetBranchName -> updateBranch(event.branchIndex) { it.copy(name = event.value) }
             is EditProfileEvent.SetBranchAddress -> updateBranch(event.branchIndex) { it.copy(address = event.value) }
 
-            is EditProfileEvent.AddWorkTime -> updateBranch(event.branchIndex) { branch ->
-                branch.copy(workTimes = branch.workTimes + EditableWorkTime(id = 0, day = "", startTime = "", closeTime = ""))
-            }
-            is EditProfileEvent.RemoveWorkTime -> updateBranch(event.branchIndex) { branch ->
-                branch.copy(workTimes = branch.workTimes.filterIndexed { i, _ -> i != event.workTimeIndex })
-            }
-            is EditProfileEvent.SetWorkTimeDay -> updateWorkTime(event.branchIndex, event.workTimeIndex) { it.copy(day = event.value) }
             is EditProfileEvent.SetWorkTimeStart -> updateWorkTime(event.branchIndex, event.workTimeIndex) { it.copy(startTime = event.value) }
             is EditProfileEvent.SetWorkTimeClose -> updateWorkTime(event.branchIndex, event.workTimeIndex) { it.copy(closeTime = event.value) }
 
@@ -130,7 +127,15 @@ class EditProfileViewModel(
                         id = b.id,
                         name = b.name,
                         address = b.address,
-                        workTimes = b.workTimes.map { wt -> EditableWorkTime(wt.id, wt.day, wt.startTime, wt.closeTime) }
+                        workTimes = WEEK_DAYS.map { day ->
+                            val existing = b.workTimes.find { it.day == day }
+                            EditableWorkTime(
+                                id = existing?.id ?: 0,
+                                day = day,
+                                startTime = existing?.startTime ?: "",
+                                closeTime = existing?.closeTime ?: ""
+                            )
+                        }
                     )
                 } ?: emptyList(),
                 links = provider?.links?.map { l -> EditableLink(l.id, l.link) } ?: emptyList(),

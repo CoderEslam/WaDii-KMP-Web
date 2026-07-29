@@ -120,21 +120,15 @@ class EditProfileScreen : Screen {
                                     Div(attrs = { classes("space-y-2") }) {
                                         branch.workTimes.forEachIndexed { wtIndex, wt ->
                                             Div(attrs = { classes("flex", "items-end", "gap-2") }) {
-                                                InputField("Day", wt.day, placeholder = "Monday") {
-                                                    model.onEvent(EditProfileEvent.SetWorkTimeDay(branchIndex, wtIndex, it))
-                                                }
+                                                P(attrs = { classes("text-sm", "font-medium", "text-heading", "w-24") }) { Text(wt.day) }
                                                 InputField("Open", wt.startTime, type = "time") {
                                                     model.onEvent(EditProfileEvent.SetWorkTimeStart(branchIndex, wtIndex, it))
                                                 }
                                                 InputField("Close", wt.closeTime, type = "time") {
                                                     model.onEvent(EditProfileEvent.SetWorkTimeClose(branchIndex, wtIndex, it))
                                                 }
-                                                GhostButton("🗑️") {
-                                                    model.onEvent(EditProfileEvent.RemoveWorkTime(branchIndex, wtIndex))
-                                                }
                                             }
                                         }
-                                        SecondaryButton("+ Add work time") { model.onEvent(EditProfileEvent.AddWorkTime(branchIndex)) }
                                     }
                                     GhostButton("🗑️ Remove branch") { model.onEvent(EditProfileEvent.RemoveBranch(branchIndex)) }
                                 }

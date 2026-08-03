@@ -48,12 +48,21 @@ class AllProvidersScreen : Screen {
                                     Div(attrs = {
                                         classes(
                                             "flex",
+                                            "flex-col",
+                                            "sm:flex-row",
                                             "items-start",
                                             "justify-between",
                                             "gap-4"
                                         )
                                     }) {
-                                        Div(attrs = { classes("flex", "items-start", "gap-4") }) {
+                                        Div(attrs = {
+                                            classes(
+                                                "flex",
+                                                "items-start",
+                                                "gap-4",
+                                                "min-w-0"
+                                            )
+                                        }) {
                                             val img = provider.user.image
                                             if (img != null) {
                                                 Img(
@@ -65,7 +74,8 @@ class AllProvidersScreen : Screen {
                                                             "rounded-full",
                                                             "object-cover",
                                                             "border",
-                                                            "border-default"
+                                                            "border-default",
+                                                            "shrink-0"
                                                         )
                                                     }
                                                 )
@@ -80,11 +90,12 @@ class AllProvidersScreen : Screen {
                                                         "items-center",
                                                         "justify-center",
                                                         "text-fg-brand-strong",
-                                                        "font-semibold"
+                                                        "font-semibold",
+                                                        "shrink-0"
                                                     )
                                                 }) { Text(provider.name.take(1).uppercase()) }
                                             }
-                                            Div(attrs = { classes("space-y-1") }) {
+                                            Div(attrs = { classes("space-y-1", "min-w-0") }) {
                                                 H3(attrs = {
                                                     classes(
                                                         "font-semibold",
@@ -102,86 +113,117 @@ class AllProvidersScreen : Screen {
                                                     P(attrs = {
                                                         classes(
                                                             "text-sm",
-                                                            "text-body-subtle"
+                                                            "text-body-subtle",
+                                                            "break-words"
                                                         )
                                                     }) { Text("✉️ ${provider.user.email}") }
                                                 }
-                                                provider.branches.takeIf { it.isNotEmpty() }?.let { branches ->
-                                                    branches.forEach { branch ->
-                                                        P(attrs = {
-                                                            classes(
-                                                                "text-sm",
-                                                                "text-body-subtle"
-                                                            )
-                                                        }) { Text("📍 ${branch.name} · ${branch.address}") }
-                                                    }
-                                                }
-                                                provider.services.takeIf { it.isNotEmpty() }?.let { svcs ->
-                                                    Div(attrs = {
-                                                        classes(
-                                                            "flex",
-                                                            "flex-wrap",
-                                                            "gap-1",
-                                                            "mt-2"
-                                                        )
-                                                    }) {
-                                                        svcs.forEach { s ->
-                                                            Span(attrs = {
+                                                provider.branches.takeIf { it.isNotEmpty() }
+                                                    ?.let { branches ->
+                                                        branches.forEach { branch ->
+                                                            P(attrs = {
                                                                 classes(
-                                                                    "px-2",
-                                                                    "py-0.5",
-                                                                    "bg-warning-soft",
-                                                                    "text-fg-warning",
-                                                                    "text-xs",
-                                                                    "rounded-full"
+                                                                    "text-sm",
+                                                                    "text-body-subtle",
+                                                                    "break-words"
                                                                 )
-                                                            }) { Text(s.name) }
+                                                            }) { Text("📍 ${branch.name} · ${branch.address}") }
                                                         }
                                                     }
-                                                }
-                                                provider.links.takeIf { it.isNotEmpty() }?.let { links ->
-                                                    Div(attrs = { classes("space-y-1", "mt-1") }) {
-                                                        links.forEach { link ->
-                                                            A(
-                                                                href = link.link,
-                                                                attrs = {
+                                                provider.services.takeIf { it.isNotEmpty() }
+                                                    ?.let { svcs ->
+                                                        Div(attrs = {
+                                                            classes(
+                                                                "flex",
+                                                                "flex-wrap",
+                                                                "gap-1",
+                                                                "mt-2"
+                                                            )
+                                                        }) {
+                                                            svcs.forEach { s ->
+                                                                Span(attrs = {
                                                                     classes(
-                                                                        "text-sm",
+                                                                        "px-2",
+                                                                        "py-0.5",
+                                                                        "bg-warning-soft",
                                                                         "text-fg-warning",
-                                                                        "hover:underline",
-                                                                        "block"
+                                                                        "text-xs",
+                                                                        "rounded-full"
                                                                     )
-                                                                    attr("target", "_blank")
-                                                                    attr("rel", "noopener noreferrer")
-                                                                }
-                                                            ) { Text("🔗 ${link.link}") }
+                                                                }) { Text(s.name) }
+                                                            }
                                                         }
                                                     }
-                                                }
+                                                provider.links.takeIf { it.isNotEmpty() }
+                                                    ?.let { links ->
+                                                        Div(attrs = {
+                                                            classes(
+                                                                "space-y-1",
+                                                                "mt-1"
+                                                            )
+                                                        }) {
+                                                            links.forEach { link ->
+                                                                A(
+                                                                    href = link.link,
+                                                                    attrs = {
+                                                                        classes(
+                                                                            "text-sm",
+                                                                            "text-fg-warning",
+                                                                            "hover:underline",
+                                                                            "block",
+                                                                            "break-words"
+                                                                        )
+                                                                        attr("target", "_blank")
+                                                                        attr(
+                                                                            "rel",
+                                                                            "noopener noreferrer"
+                                                                        )
+                                                                    }
+                                                                ) { Text("🔗 ${link.link}") }
+                                                            }
+                                                        }
+                                                    }
                                             }
                                         }
                                         Div(attrs = {
                                             classes(
                                                 "flex",
-                                                "flex-col",
-                                                "items-end",
+                                                "flex-row",
+                                                "sm:flex-col",
+                                                "items-center",
+                                                "sm:items-end",
+                                                "justify-between",
+                                                "sm:justify-start",
                                                 "gap-1",
+                                                "w-full",
+                                                "sm:w-auto",
                                                 "shrink-0"
                                             )
                                         }) {
-                                            Span(attrs = {
+                                            Div(attrs = {
                                                 classes(
-                                                    "text-sm",
-                                                    "font-semibold",
-                                                    "text-heading"
+                                                    "flex",
+                                                    "sm:flex-col",
+                                                    "items-center",
+                                                    "sm:items-end",
+                                                    "gap-2",
+                                                    "sm:gap-1"
                                                 )
-                                            }) { Text("⭐ ${provider.rate}") }
-                                            Span(attrs = {
-                                                classes(
-                                                    "text-xs",
-                                                    "text-body-subtle"
-                                                )
-                                            }) { Text("${provider.followersCount} followers") }
+                                            }) {
+                                                Span(attrs = {
+                                                    classes(
+                                                        "text-sm",
+                                                        "font-semibold",
+                                                        "text-heading"
+                                                    )
+                                                }) { Text("⭐ ${provider.rate}") }
+                                                Span(attrs = {
+                                                    classes(
+                                                        "text-xs",
+                                                        "text-body-subtle"
+                                                    )
+                                                }) { Text("${provider.followersCount} followers") }
+                                            }
                                             GhostButton("✏️ Edit") {
                                                 navigator.push(EditProviderScreen(provider))
                                             }

@@ -50,9 +50,12 @@ import com.wadii.domain.usecase.SearchUseCase
 import com.wadii.domain.usecase.UserUseCase
 import com.wadii.pages.shared.call.CallViewModel
 import com.wadii.domain.model.ads.Ads
+import com.wadii.domain.model.provider.ProviderModel
 import com.wadii.pages.admin.ads.AdsScreenModel
 import com.wadii.pages.admin.dashboard.AdminDashboardScreenModel
 import com.wadii.pages.admin.location.LocationsViewModel
+import com.wadii.pages.admin.provider.AllProvidersViewModel
+import com.wadii.pages.admin.provider.EditProviderViewModel
 import com.wadii.pages.admin.provider.ProviderRequestsViewModel
 import com.wadii.pages.admin.reason.ReasonsViewModel
 import com.wadii.pages.admin.service.ServicesViewModel
@@ -162,6 +165,8 @@ val appModule = module {
     factory { RequestProviderViewModel(get(), get()) }
     factory { NotificationsViewModel(get()) }
     factory { ProviderRequestsViewModel(get()) }
+    factory { AllProvidersViewModel(get()) }
+    factory { (provider: ProviderModel) -> EditProviderViewModel(provider, get(), get()) }
     factory { ServicesViewModel(get()) }
     factory { ReasonsViewModel(get()) }
     factory { LocationsViewModel(get()) }

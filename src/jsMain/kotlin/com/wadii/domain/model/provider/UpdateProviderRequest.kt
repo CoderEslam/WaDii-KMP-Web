@@ -19,11 +19,11 @@ data class UpdateProviderRequest(
     @SerialName("serviceIds")
     val serviceIds: List<Int>,
     @SerialName("branches")
-    val branches: List<com.wadii.domain.model.provider.BranchRequest>,
+    val branches: List<BranchRequest>,
     @SerialName("links")
-    val links: List<com.wadii.domain.model.provider.EditableLink>,
+    val links: List<EditableLink>,
     @SerialName("offers")
-    val offers: List<com.wadii.domain.model.provider.OfferRequest>
+    val offers: List<OfferRequest>
 )
 
 @Serializable

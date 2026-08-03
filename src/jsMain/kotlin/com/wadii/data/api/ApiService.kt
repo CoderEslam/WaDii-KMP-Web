@@ -251,7 +251,7 @@ class ApiService(
         response(RequestState.Loading)
         response(
             client.postApiResponse<UpdateProviderRequest, BaseResponse<ProviderModel>>(
-                urlString = "${Constants.UPDATE_PROVIDER}/${request.id}",
+                urlString = Constants.UPDATE_PROVIDER(request.id),
                 body = request
             )
         )

@@ -30,6 +30,7 @@ interface ProviderRepo {
         response: (RequestState<BaseResponse<ProviderModel>>) -> Unit
     )
 
+
     suspend fun getProviderById(
         id: Int,
         response: (RequestState<BaseResponse<ProviderModel>>) -> Unit

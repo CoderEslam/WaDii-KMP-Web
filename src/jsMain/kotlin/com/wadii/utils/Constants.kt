@@ -9,13 +9,13 @@ object Constants {
     const val THEME_KEY = "THEME_KEY"
     const val PORT = ""
 
-    const val IP = "wadii-spring-production.up.railway.app"//"172.28.0.65"
-    const val BASE_URL = "https://$IP"
-    const val WS_URL = "wss://$IP/web-socket"
+//    const val IP = "wadii-spring-production.up.railway.app"//"172.28.0.65"
+//    const val BASE_URL = "https://$IP"
+//    const val WS_URL = "wss://$IP/web-socket"
 
-//    const val IP = "localhost"
-//    const val BASE_URL = "http://$IP:8080"
-//    const val WS_URL = "ws://$IP:8080/web-socket"
+    const val IP = "localhost"
+    const val BASE_URL = "http://$IP:8080"
+    const val WS_URL = "ws://$IP:8080/web-socket"
     const val BASE_URL_USER_IMAGES = "${BASE_URL}/users"
     const val VERSION = ""
     const val euroSign = "\u20AC"
@@ -63,7 +63,7 @@ object Constants {
     fun SERVICE_DELETE(id: Long) = "${BASE_URL}$VERSION/services/delete/$id"
     const val SERVICE_UPDATE = "${BASE_URL}$VERSION/services/insert"
 
-    const val UPDATE_PROVIDER = "${BASE_URL}$VERSION/providers/update-all"
+    fun UPDATE_PROVIDER(providerId: Long) = "${BASE_URL}$VERSION/providers/update-all/$providerId"
 
     //specialties
     const val SPECIALTIES_LIST = "${BASE_URL}$VERSION/specialties/list"
@@ -175,6 +175,7 @@ object Constants {
     const val FIREBASE_STORAGE_BUCKET = "wadii-kmp.firebasestorage.app"
     const val FIREBASE_MESSAGING_SENDER_ID = "1041244088662"
     const val FIREBASE_APP_ID = "1:1041244088662:web:292b831dddb6727ed40ef7"
-    const val FIREBASE_VAPID_KEY = "BCZXCUTLg2DQq9WT9AL6AZxTGq37_s8c8s8gFQSIIdojIPahkUaeXcBBrhk4252YCa5Rg0yyOS9jBn7MHO4RAHE"
+    const val FIREBASE_VAPID_KEY =
+        "BCZXCUTLg2DQq9WT9AL6AZxTGq37_s8c8s8gFQSIIdojIPahkUaeXcBBrhk4252YCa5Rg0yyOS9jBn7MHO4RAHE"
 
 }

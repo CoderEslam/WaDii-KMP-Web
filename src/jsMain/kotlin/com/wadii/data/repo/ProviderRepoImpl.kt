@@ -5,6 +5,7 @@ import com.wadii.domain.model.BaseResponse
 import com.wadii.domain.model.auth.login.User
 import com.wadii.domain.model.follow.FollowProviderResponse
 import com.wadii.domain.model.follow.Followers
+import com.wadii.domain.model.provider.CreateProviderByAdminRequest
 import com.wadii.domain.model.provider.ProviderModel
 import com.wadii.domain.model.provider.ProviderRequest
 import com.wadii.domain.model.provider.ProviderRequestCallback
@@ -31,6 +32,11 @@ class ProviderRepoImpl(private val apiService: ApiService) : ProviderRepo {
         request: UpdateProviderRequest,
         response: (RequestState<BaseResponse<ProviderModel>>) -> Unit
     ) = apiService.updateProvider(request, response)
+
+    override suspend fun createProviderByAdmin(
+        request: CreateProviderByAdminRequest,
+        response: (RequestState<BaseResponse<ProviderModel>>) -> Unit
+    ) = apiService.createProviderByAdmin(request, response)
 
     override suspend fun getProviderById(
         id: Int, response: (RequestState<BaseResponse<ProviderModel>>) -> Unit

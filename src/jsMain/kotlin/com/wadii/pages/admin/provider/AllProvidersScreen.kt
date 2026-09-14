@@ -11,6 +11,7 @@ import com.wadii.ui.Card
 import com.wadii.ui.EmptyState
 import com.wadii.ui.GhostButton
 import com.wadii.ui.LoadingScreen
+import com.wadii.ui.PrimaryButton
 import com.wadii.utils.Constants.BASE_URL_USER_IMAGES
 import org.jetbrains.compose.web.dom.*
 
@@ -31,6 +32,7 @@ class AllProvidersScreen : Screen {
                         "text-heading"
                     )
                 }) { Text("All Providers") }
+                PrimaryButton("+ Add Provider") { navigator.push(AddProviderScreen()) }
             }
 
             when {

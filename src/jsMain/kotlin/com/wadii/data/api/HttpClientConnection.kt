@@ -81,7 +81,7 @@ fun createHttpClientSendFile(): HttpClient {
 
         install(DefaultRequest) {
 //            if (settingsManager.getUser().token.isNotNullOrEmptyString()) {
-                header("Authorization", "Bearer ${AppState.token}")
+            header("Authorization", "Bearer ${AppState.token}")
 //            }
             contentType(ContentType.Application.Json)
         }

@@ -31,6 +31,7 @@ import com.wadii.domain.model.order.OrderCallbackResponse
 import com.wadii.domain.model.order.OrderCancelRequest
 import com.wadii.domain.model.order.OrderModel
 import com.wadii.domain.model.order.OrderRequest
+import com.wadii.domain.model.provider.CreateProviderByAdminRequest
 import com.wadii.domain.model.provider.ProviderModel
 import com.wadii.domain.model.provider.ProviderRequest
 import com.wadii.domain.model.provider.ProviderRequestCallback
@@ -252,6 +253,19 @@ class ApiService(
         response(
             client.postApiResponse<UpdateProviderRequest, BaseResponse<ProviderModel>>(
                 urlString = Constants.UPDATE_PROVIDER(request.id),
+                body = request
+            )
+        )
+    }
+
+    suspend fun createProviderByAdmin(
+        request: CreateProviderByAdminRequest,
+        response: (RequestState<BaseResponse<ProviderModel>>) -> Unit
+    ) {
+        response(RequestState.Loading)
+        response(
+            client.postApiResponse<CreateProviderByAdminRequest, BaseResponse<ProviderModel>>(
+                urlString = Constants.CREATE_PROVIDER_BY_ADMIN,
                 body = request
             )
         )

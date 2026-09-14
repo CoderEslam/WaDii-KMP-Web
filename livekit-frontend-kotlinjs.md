@@ -155,7 +155,7 @@ Ringing/accept/reject/end does **not** go through LiveKit — it rides the same 
 feature already uses:
 
 ```
-ws://{IP}:8080/web-socket/{userId}?token={jwt}
+wss://{IP}/web-socket/{userId}?token={jwt}
 ```
 
 Frames are JSON shaped `{"event": "<SocketEvent>", "data": <CallSignal>}`:

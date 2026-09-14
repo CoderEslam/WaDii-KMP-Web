@@ -7,15 +7,10 @@ object Constants {
     const val APP_LANGUAGE = "APP_LANGUAGE"
     const val USER_KEY = "USER_KEY"
     const val THEME_KEY = "THEME_KEY"
-    const val PORT = ""
-
-//    const val IP = "wadii-spring-production.up.railway.app"//"172.28.0.65"
-//    const val BASE_URL = "https://$IP"
-//    const val WS_URL = "wss://$IP/web-socket"
-
-    const val IP = "localhost"
-    const val BASE_URL = "http://$IP:8080"
-    const val WS_URL = "ws://$IP:8080/web-socket"
+    const val PORT = ":8080"
+    const val IP = "srv1881459.hstgr.cloud"
+    const val BASE_URL = "http://$IP$PORT"
+    const val WS_URL = "ws://$IP$PORT/web-socket"
     const val BASE_URL_USER_IMAGES = "${BASE_URL}/users"
     const val VERSION = ""
     const val euroSign = "\u20AC"
@@ -64,6 +59,7 @@ object Constants {
     const val SERVICE_UPDATE = "${BASE_URL}$VERSION/services/insert"
 
     fun UPDATE_PROVIDER(providerId: Long) = "${BASE_URL}$VERSION/providers/update-all/$providerId"
+    const val CREATE_PROVIDER_BY_ADMIN = "${BASE_URL}$VERSION/providers/create-by-admin"
 
     //specialties
     const val SPECIALTIES_LIST = "${BASE_URL}$VERSION/specialties/list"

@@ -4,6 +4,7 @@ import com.wadii.domain.model.BaseResponse
 import com.wadii.domain.model.auth.login.User
 import com.wadii.domain.model.follow.FollowProviderResponse
 import com.wadii.domain.model.follow.Followers
+import com.wadii.domain.model.provider.CreateProviderByAdminRequest
 import com.wadii.domain.model.provider.ProviderModel
 import com.wadii.domain.model.provider.ProviderRequest
 import com.wadii.domain.model.provider.ProviderRequestCallback
@@ -45,6 +46,11 @@ class ProviderUseCase(private val providerRepo: ProviderRepo) {
         request: UpdateProviderRequest,
         response: (RequestState<BaseResponse<ProviderModel>>) -> Unit
     ) = providerRepo.updateProvider(request, response)
+
+    suspend fun createProviderByAdmin(
+        request: CreateProviderByAdminRequest,
+        response: (RequestState<BaseResponse<ProviderModel>>) -> Unit
+    ) = providerRepo.createProviderByAdmin(request, response)
 
     suspend fun requestProvider(
         providerRequest: ProviderRequest,

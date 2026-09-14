@@ -4,7 +4,7 @@ config.devServer = Object.assign({}, config.devServer, {
     proxy: [
         {
             context: ["/api"],
-            target: "https://srv1881459.hstgr.cloud",
+            target: "https://srv1881459.hstgr.cloud:8080",
             changeOrigin: true,
             pathRewrite: { "^/api": "" }
         }

@@ -7,7 +7,7 @@ object Constants {
     const val APP_LANGUAGE = "APP_LANGUAGE"
     const val USER_KEY = "USER_KEY"
     const val THEME_KEY = "THEME_KEY"
-    const val PORT = ""
+    const val PORT = ":8080"
     const val IP = "srv1881459.hstgr.cloud"
     const val BASE_URL = "https://$IP$PORT"
     const val WS_URL = "wss://$IP$PORT/web-socket"

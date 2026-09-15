@@ -1,6 +1,8 @@
 package com.wadii.domain.model.order
 
 
+import com.wadii.domain.model.city.City
+import com.wadii.domain.model.provider.ProviderModel
 import com.wadii.domain.model.sparePart.SparePart
 import com.wadii.domain.model.sparePart.SparePartsPrice
 import kotlinx.serialization.SerialName
@@ -16,6 +18,10 @@ data class OrderModel(
     val date: String = "",
     @SerialName("id")
     val id: Int = 0,
+    @SerialName("latitude")
+    val latitude: Int = 0,
+    @SerialName("longitude")
+    val longitude: Int = 0,
     @SerialName("status")
     val status: String = "",
     @SerialName("responses")
@@ -43,51 +49,10 @@ data class OrderModel(
         @SerialName("state")
         val state: String = "",
         @SerialName("provider")
-        val provider: Provider = Provider(),
+        val provider: ProviderModel = ProviderModel(),
         @SerialName("sparePartsPrices")
         val sparePartsPrices: List<SparePartsPrice> = listOf()
-    ) {
-        @Serializable
-        data class Provider(
-            @SerialName("followersCount")
-            val followersCount: Int = 0,
-            @SerialName("id")
-            val id: Int = 0,
-            @SerialName("name")
-            val name: String = "",
-            @SerialName("rate")
-            val rate: Double = 0.0,
-            @SerialName("user")
-            val user: User = User()
-        ) {
-            @Serializable
-            data class User(
-                @SerialName("city")
-                val city: com.wadii.domain.model.city.City? = _root_ide_package_.com.wadii.domain.model.city.City(),
-                @SerialName("email")
-                val email: String = "",
-                @SerialName("fcmToken")
-                val fcmToken: String = "",
-                @SerialName("firstName")
-                val firstName: String = "",
-                @SerialName("id")
-                val id: Int = 0,
-                @SerialName("image")
-                val image: String? = null,
-                @SerialName("lastName")
-                val lastName: String = "",
-                @SerialName("password")
-                val password: String = "",
-                @SerialName("phone")
-                val phone: String = "",
-                @SerialName("role")
-                val role: String = "",
-                @SerialName("token")
-                val token: String = ""
-            )
-
-        }
-    }
+    )
 
     @Serializable
     data class Service(
@@ -101,7 +66,7 @@ data class OrderModel(
     @Serializable
     data class User(
         @SerialName("city")
-        val city: com.wadii.domain.model.city.City? = _root_ide_package_.com.wadii.domain.model.city.City(),
+        val city: City? = City(),
         @SerialName("email")
         val email: String = "",
         @SerialName("fcmToken")

@@ -10,5 +10,5 @@ data class SparePartsPrice(
     @SerialName("price")
     val price: Double = 0.0,
     @SerialName("sparePart")
-    val sparePart: com.wadii.domain.model.sparePart.SparePart = _root_ide_package_.com.wadii.domain.model.sparePart.SparePart()
+    val sparePart: SparePart = SparePart()
 )

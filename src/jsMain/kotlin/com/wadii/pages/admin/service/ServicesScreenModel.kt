@@ -5,6 +5,8 @@ import com.wadii.BaseViewModel
 import com.wadii.domain.model.service.InsertService
 import com.wadii.domain.model.service.Service
 import com.wadii.state.AppState
+import com.wadii.utils.RequestValidators
+import com.wadii.utils.firstMessage
 import com.wadii.viewmodel.ServicesUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -59,6 +61,7 @@ class ServicesViewModel(
     }
 
     private fun saveEdit(service: Service) = screenModelScope.launch {
+        RequestValidators.name(_state.value.editName, "Category name", service.id.toLong()).let { if (it.isNotEmpty()) { AppState.toast(it.firstMessage(), true); return@launch } }
         servicesUseCase.updateService(
             insertService = InsertService(
                 id = service.id,
@@ -73,7 +76,7 @@ class ServicesViewModel(
                 load()
             }, onError = { error, code ->
                 updateState { it.copy(error = error, saving = false) }
-                AppState.toast("Failed to update", true)
+                AppState.toast(error.ifBlank { "Couldn't update the category" }, true)
             })
         }
     }
@@ -88,12 +91,13 @@ class ServicesViewModel(
                 load()
             }, onError = { error, code ->
                 updateState { it.copy(error = error, isLoading = false) }
-                AppState.toast("Failed to delete", true)
+                AppState.toast(error.ifBlank { "Couldn't delete the category (it may be in use)" }, true)
             })
         }
     }
 
     private fun add() = screenModelScope.launch {
+        RequestValidators.name(_state.value.newName, "Category name").let { if (it.isNotEmpty()) { AppState.toast(it.firstMessage(), true); return@launch } }
         servicesUseCase.addService(insertService = InsertService(name = _state.value.newName)) { response ->
             response.handelState(onLoading = {
                 updateState { it.copy(isLoading = true) }
@@ -103,7 +107,7 @@ class ServicesViewModel(
                 load()
             }, onError = { error, code ->
                 updateState { it.copy(error = error, isLoading = false) }
-                AppState.toast("Failed to add", true)
+                AppState.toast(error.ifBlank { "Couldn't add the category" }, true)
             })
         }
     }

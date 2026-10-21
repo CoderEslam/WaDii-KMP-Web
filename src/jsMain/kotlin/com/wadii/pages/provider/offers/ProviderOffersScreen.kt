@@ -12,7 +12,9 @@ import com.wadii.ui.BadgeVariant
 import com.wadii.ui.Card
 import com.wadii.ui.EmptyState
 import com.wadii.ui.GhostButton
+import com.wadii.state.AppState
 import com.wadii.ui.InputField
+import com.wadii.utils.RequestValidators
 import com.wadii.ui.LoadingScreen
 import com.wadii.ui.Modal
 import com.wadii.ui.ModalVariant
@@ -139,9 +141,11 @@ private fun OfferModalContent(
         mutableStateOf(services.map { it.id }.toSet())
     }
 
-    InputField("Title", title, required = true) { title = it }
-    TextArea("Description", description, rows = 3) { description = it }
-    InputField("End Date", endDate, type = "date", required = true) { endDate = it }
+    var errors by remember(offer?.id) { mutableStateOf<Map<String, String>>(emptyMap()) }
+
+    InputField("Title", title, required = true, error = errors["title"]) { title = it; errors = errors - "title" }
+    TextArea("Description", description, rows = 3, required = true, error = errors["description"]) { description = it; errors = errors - "description" }
+    InputField("End Date", endDate, type = "date", required = true, error = errors["endDate"]) { endDate = it; errors = errors - "endDate" }
     if (services.isNotEmpty()) {
         Div {
             P(attrs = {
@@ -175,6 +179,10 @@ private fun OfferModalContent(
     Div(attrs = { classes("flex", "gap-3", "pt-2") }) {
         SecondaryButton("Cancel", fullWidth = true) { onClose() }
         PrimaryButton("Save", loading = saving, fullWidth = true) {
+            // Show every problem next to its field; the view model re-checks before sending.
+            val found = RequestValidators.offer(title, description, endDate, AppState.user?.provider?.id ?: 0L, offer?.id)
+            errors = found
+            if (found.isNotEmpty()) return@PrimaryButton
             onSave(
                 title,
                 description,

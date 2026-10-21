@@ -20,7 +20,9 @@ data class AddProviderState(
     val isLoadingOptions: Boolean = false,
     val isSaving: Boolean = false,
     val error: String? = null,
-    val savedSuccessfully: Boolean = false
+    val savedSuccessfully: Boolean = false,
+    /** Per-field messages: firstName, lastName, email, password, phone, city, providerName, rate, branch<i>, wt<i>_<j>, link<i>. */
+    val errors: Map<String, String> = emptyMap()
 )
 
 data class NewBranch(

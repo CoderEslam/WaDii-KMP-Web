@@ -9,6 +9,9 @@ import com.wadii.domain.model.provider.CreateWorkTimeRequest
 import com.wadii.domain.usecase.CountryUseCase
 import com.wadii.domain.usecase.ProviderUseCase
 import com.wadii.state.AppState
+import com.wadii.utils.RequestValidators
+import com.wadii.utils.Validation
+import com.wadii.utils.firstMessage
 import com.wadii.viewmodel.ServicesUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -96,10 +99,31 @@ class AddProviderViewModel(
 
     private fun submit() {
         val s = _state.value
-        if (s.firstName.isBlank() || s.lastName.isBlank() || s.email.isBlank() || s.password.isBlank() ||
-            s.phone.isBlank() || s.cityId == 0L || s.providerName.isBlank()
-        ) {
-            AppState.toast("Please fill in all required fields", true)
+        val errors = buildMap<String, String> {
+            Validation.name(s.firstName, "First name")?.let { put("firstName", it) }
+            Validation.name(s.lastName, "Last name")?.let { put("lastName", it) }
+            putAll(RequestValidators.createProviderByAdmin(
+                s.email, s.password, s.providerName, s.phone, s.cityId.takeIf { it != 0L },
+                s.branches.map { it.name }, s.links.filter { it.isNotBlank() }
+            ))
+            if (s.cityId == 0L) put("city", "Choose an area")
+            if (s.phone.isBlank()) put("phone", "Phone number is required")
+            val rate = s.rate.toDoubleOrNull()
+            if (rate == null || rate < 0 || rate > 5) put("rate", "Rate is a number from 0 to 5")
+            s.branches.forEachIndexed { i, b ->
+                if (b.name.isBlank()) put("branch$i", "Every branch needs a name")
+                b.workTimes.forEachIndexed { j, wt ->
+                    if (wt.startTime.isNotBlank() || wt.closeTime.isNotBlank()) {
+                        RequestValidators.workTime(1, wt.day, wt.startTime, wt.closeTime)
+                            .filterKeys { it == "startTime" || it == "closeTime" }.values.firstOrNull()
+                            ?.let { put("wt${i}_$j", "${wt.day}: $it") }
+                    }
+                }
+            }
+        }
+        updateState { it.copy(errors = errors) }
+        if (errors.isNotEmpty()) {
+            AppState.toast(errors.firstMessage(), true)
             return
         }
         screenModelScope.launch {

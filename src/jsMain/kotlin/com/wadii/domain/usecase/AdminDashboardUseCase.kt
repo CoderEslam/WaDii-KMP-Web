@@ -18,7 +18,8 @@ class AdminDashboardUseCase(private val adminRepo: AdminRepo) {
 
     suspend fun rejectRequest(
         id: Long,
+        reason: String? = null,
         response: (RequestState<BaseResponse<ProviderRequestModel>>) -> Unit
-    ) = adminRepo.rejectRequest(id, response)
+    ) = adminRepo.rejectRequest(id, reason, response)
 
 }

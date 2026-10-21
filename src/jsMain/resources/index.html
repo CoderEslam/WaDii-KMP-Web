@@ -107,9 +107,9 @@
                     borderRadius: {
                         // Namespaced so rounded-lg/xl/2xl/3xl (still used by un-migrated
                         // screens) keep their current Tailwind-default values.
-                        'neu-sm': '2px',
-                        'neu-default': '6px',
-                        'neu-base': '8px',
+                        'neu-sm': '6px',
+                        'neu-default': '10px',
+                        'neu-base': '16px',
                     }
                 }
             }
@@ -360,6 +360,84 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes zoomIn { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
 
+        /* =====================================================================
+           FRIENDLY MOTION SYSTEM
+           Short, springy, purposeful: enter 250-450ms, only transform/opacity
+           are animated, and everything is disabled under prefers-reduced-motion
+           at the bottom of this block.
+           ===================================================================== */
+        :root { --ease-out: cubic-bezier(.22,1,.36,1); --ease-spring: cubic-bezier(.34,1.56,.64,1); }
+
+        @keyframes floaty    { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(255,211,0,.55); } 70% { box-shadow: 0 0 0 16px rgba(255,211,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,211,0,0); } }
+        @keyframes shimmer   { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+        @keyframes popIn     { 0% { opacity: 0; transform: scale(.6); } 60% { transform: scale(1.08); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes shake     { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-5px); } 40%,80% { transform: translateX(5px); } }
+        @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+        @keyframes waveHand  { 0%,60%,100% { transform: rotate(0); } 10%,30% { transform: rotate(14deg); } 20%,40% { transform: rotate(-8deg); } 50% { transform: rotate(10deg); } }
+        @keyframes drift     { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(18px,-14px) scale(1.08); } }
+
+        /* Whole-screen enter: applied to the content wrapper in Layout */
+        .page-enter { animation: fadeUp .45s var(--ease-out) both; }
+
+        /* Cascade children in one after another (lists, grids, stat rows) */
+        .stagger > * { animation: fadeUp .5s var(--ease-out) both; }
+        .stagger > *:nth-child(1) { animation-delay: .02s; } .stagger > *:nth-child(2) { animation-delay: .07s; }
+        .stagger > *:nth-child(3) { animation-delay: .12s; } .stagger > *:nth-child(4) { animation-delay: .17s; }
+        .stagger > *:nth-child(5) { animation-delay: .22s; } .stagger > *:nth-child(6) { animation-delay: .27s; }
+        .stagger > *:nth-child(7) { animation-delay: .32s; } .stagger > *:nth-child(n+8) { animation-delay: .36s; }
+
+        /* Cards lift on hover, press down on click */
+        .card-lift { transition: transform .25s var(--ease-out), box-shadow .25s ease; }
+        .card-lift:hover { transform: translateY(-3px); }
+        .card-lift:active { transform: translateY(0) scale(.99); }
+
+        /* Buttons: tactile press */
+        button:not(:disabled):active { transform: scale(.97); }
+
+        .float { animation: floaty 3.2s ease-in-out infinite; display: inline-block; }
+        .wave  { animation: waveHand 2.4s ease-in-out 1s 2; display: inline-block; transform-origin: 70% 70%; }
+        .pop   { animation: popIn .4s var(--ease-spring) both; }
+        .shake { animation: shake .4s ease; }
+        .fab-pulse { animation: pulseRing 2.4s ease-out infinite; }
+
+        /* Skeleton shimmer */
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface-secondary) 25%, var(--surface-tertiary) 37%, var(--surface-secondary) 63%);
+            background-size: 800px 100%;
+            animation: shimmer 1.4s linear infinite;
+        }
+
+        /* Soft ambient glow behind hero cards */
+        .hero-card { position: relative; overflow: hidden; }
+        .hero-card::before, .hero-card::after {
+            content: ""; position: absolute; border-radius: 50%; pointer-events: none; filter: blur(40px); opacity: .5;
+            animation: drift 9s ease-in-out infinite;
+        }
+        .hero-card::before { width: 180px; height: 180px; right: -40px; top: -60px; background: var(--brand); }
+        .hero-card::after  { width: 140px; height: 140px; left: -30px; bottom: -50px; background: var(--secondary); animation-delay: -4s; opacity: .3; }
+        .hero-card > * { position: relative; z-index: 1; }
+
+        /* Animated success tick */
+        .tick-path { stroke-dasharray: 30; stroke-dashoffset: 30; animation: drawCheck .5s .15s ease forwards; }
+
+        /* Visible keyboard focus everywhere */
+        :focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; border-radius: 10px; }
+
+        /* Field validation */
+        .field-error { color: var(--fg-danger); font-size: 12px; margin-top: 2px; animation: fadeUp .25s var(--ease-out); }
+        .input-invalid, [aria-invalid="true"] { border-color: var(--danger) !important; }
+        .input-invalid { animation: shake .4s ease; }
+
+        /* Order lifecycle dots */
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--surface-quaternary); transition: background .3s, transform .3s var(--ease-spring); }
+        .status-dot.done { background: var(--success); }
+        .status-dot.current { background: var(--brand); transform: scale(1.35); box-shadow: 0 0 0 4px var(--brand-soft); }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+        }
+
         /* ===== IMAGE LIGHTBOX ===== */
         .lightbox-backdrop { animation: fadeIn .18s ease; }
         .lightbox-image { animation: zoomIn .22s cubic-bezier(.34,1.56,.64,1); }
@@ -368,7 +446,7 @@
            raised on hover, matching the sidebar nav item states. */
         .dark-toggle {
             display: flex; align-items: center; gap: 10px;
-            padding: 8px 12px; border-radius: 8px; width: 100%;
+            padding: 10px 12px; border-radius: 12px; width: 100%; min-height: 44px;
             font-size: 14px; font-weight: 500; cursor: pointer;
             background: var(--surface); border: none;
             color: var(--body);
@@ -381,7 +459,7 @@
            buttons so only the wrapper reads as elevated, per button-group.md. */
         .neu-button-group {
             display: inline-flex;
-            border-radius: 8px;
+            border-radius: 14px;
             box-shadow: var(--shadow-sm);
             overflow: hidden;
         }

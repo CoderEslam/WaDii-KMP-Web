@@ -8,7 +8,14 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wadii.domain.model.order.CancelReason
 import com.wadii.screens.orders.detail.OrderDetailScreen
 import com.wadii.screens.orders.edit.EditOrderScreen
+import com.wadii.screens.orders.OrderProgress
+import com.wadii.screens.orders.StageBadge
+import com.wadii.screens.orders.canCancel
+import com.wadii.screens.orders.canDelete
+import com.wadii.screens.orders.canEdit
+import com.wadii.screens.orders.newestFirst
 import com.wadii.screens.orders.new.NewOrderScreen
+import com.wadii.screens.orders.stage
 import com.wadii.ui.Alert
 import com.wadii.ui.AlertVariant
 import com.wadii.ui.Badge
@@ -41,14 +48,14 @@ class OrdersScreen : Screen {
             } else if (state.error != null) {
                 Alert(variant = AlertVariant.Danger, body = state.error!!)
             } else {
-                val orders = state.orders
+                val orders = state.orders.newestFirst()
                 if (orders.isEmpty()) {
                     Div(attrs = { classes("flex", "flex-col", "items-center", "gap-4") }) {
-                        EmptyState("📦", "You haven't placed any orders yet.")
+                        EmptyState("📦", "No orders yet", "Tell sellers which part you need and they'll send you prices.")
                         PrimaryButton("Create your first order") { navigator.push(NewOrderScreen()) }
                     }
                 } else {
-                    Div(attrs = { classes("space-y-3") }) {
+                    Div(attrs = { classes("space-y-3", "stagger") }) {
                         orders.forEach { order ->
                             Div(attrs = {
                                 style { property("cursor", "pointer") }
@@ -67,24 +74,20 @@ class OrdersScreen : Screen {
                                         }
                                         Div(attrs = { classes("text-right") }) {
                                             P(attrs = { classes("text-xs", "text-body-subtle") }) { Text(order.date.take(10)) }
-                                            val latestState = order.responses?.firstOrNull()?.state
-                                            if (latestState != null) {
-                                                val variant = when (latestState) {
-                                                    "ACCEPT" -> BadgeVariant.Success
-                                                    "CANCEL" -> BadgeVariant.Danger
-                                                    else -> BadgeVariant.Warning
-                                                }
-                                                val label = when (latestState) { "ACCEPT" -> "Accepted"; "CANCEL" -> "Declined"; else -> "Pending" }
-                                                Div(attrs = { classes("mt-1") }) { Badge(label, variant = variant, pill = true) }
-                                            }
+                                            Div(attrs = { classes("mt-1") }) { StageBadge(order.stage()) }
                                         }
                                     }
-                                    Div(attrs = {
-                                        classes("flex", "items-center", "gap-2", "mt-4", "pt-4", "border-t", "border-default")
-                                        onClick { it.stopPropagation() }
-                                    }) {
-                                        SecondaryButton("✏️ Edit") { navigator.push(EditOrderScreen(order.id)) }
-                                        DangerButton("✕ Cancel") { model.onEvent(OrdersEvent.OpenCancelDialog(order)) }
+                                    Div(attrs = { classes("mt-3") }) { OrderProgress(order.stage()) }
+                                    if (order.canEdit || order.canCancel || order.canDelete) {
+                                        Div(attrs = {
+                                            classes("flex", "items-center", "gap-2", "mt-4", "pt-4", "border-t", "border-default")
+                                            onClick { it.stopPropagation() }
+                                        }) {
+                                            // Edit only before the first proposal, cancel until work starts, delete for unanswered or cancelled orders.
+                                            if (order.canEdit) SecondaryButton("✏️ Edit") { navigator.push(EditOrderScreen(order.id)) }
+                                            if (order.canCancel) DangerButton("✕ Cancel") { model.onEvent(OrdersEvent.OpenCancelDialog(order)) }
+                                            if (order.canDelete) SecondaryButton("🗑️ Delete") { model.onEvent(OrdersEvent.AskDelete(order)) }
+                                        }
                                     }
                                 }
                             }
@@ -92,6 +95,19 @@ class OrdersScreen : Screen {
                     }
                 }
             }
+        }
+
+        Modal(
+            open = state.deletingOrder != null,
+            title = "Delete order #${state.deletingOrder?.id ?: 0}?",
+            onDismiss = { model.onEvent(OrdersEvent.DismissDelete) },
+            variant = ModalVariant.Form,
+            footer = {
+                SecondaryButton("Keep it", disabled = state.isDeleting) { model.onEvent(OrdersEvent.DismissDelete) }
+                DangerButton("Delete", loading = state.isDeleting, onClick = { model.onEvent(OrdersEvent.ConfirmDelete) })
+            }
+        ) {
+            P(attrs = { classes("text-sm", "text-body") }) { Text("This removes the order for good. This can't be undone.") }
         }
 
         Modal(

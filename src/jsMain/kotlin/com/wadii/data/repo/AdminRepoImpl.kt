@@ -18,6 +18,7 @@ class AdminRepoImpl(private val apiService: ApiService) : AdminRepo {
 
     override suspend fun rejectRequest(
         id: Long,
+        reason: String?,
         response: (RequestState<BaseResponse<ProviderRequestModel>>) -> Unit
-    ) = apiService.rejectRequest(id, response)
+    ) = apiService.rejectRequest(id, reason, response)
 }

@@ -3,5 +3,6 @@ package com.wadii.screens.auth.login
 data class LoginState(
     val email: String = "",
     val password: String = "",
-    val loading: Boolean = false
+    val loading: Boolean = false,
+    val errors: Map<String, String> = emptyMap()
 )

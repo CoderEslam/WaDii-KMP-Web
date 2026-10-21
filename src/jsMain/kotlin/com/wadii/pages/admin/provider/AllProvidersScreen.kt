@@ -7,6 +7,10 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wadii.ui.Alert
 import com.wadii.ui.AlertVariant
+import com.wadii.ui.Badge
+import com.wadii.ui.BadgeVariant
+import com.wadii.ui.DangerButton
+import com.wadii.ui.SecondaryButton
 import com.wadii.ui.Card
 import com.wadii.ui.EmptyState
 import com.wadii.ui.GhostButton
@@ -228,6 +232,13 @@ class AllProvidersScreen : Screen {
                                             }
                                             GhostButton("✏️ Edit") {
                                                 navigator.push(EditProviderScreen(provider))
+                                            }
+                                            val busy = state.busyProviderId == provider.id
+                                            if (provider.active) {
+                                                DangerButton("Suspend", disabled = busy) { model.onEvent(AllProvidersEvent.SetActive(provider.id, false)) }
+                                            } else {
+                                                Badge("Suspended", variant = BadgeVariant.Danger, pill = true)
+                                                SecondaryButton("Reactivate", disabled = busy) { model.onEvent(AllProvidersEvent.SetActive(provider.id, true)) }
                                             }
                                         }
                                     }

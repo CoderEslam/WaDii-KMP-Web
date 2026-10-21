@@ -5,7 +5,11 @@ import com.wadii.BaseViewModel
 import com.wadii.domain.model.offers.NewOfferRequest
 import com.wadii.domain.model.offers.OfferResponse
 import com.wadii.domain.usecase.OfferUseCase
+import com.wadii.domain.model.BaseResponse
 import com.wadii.state.AppState
+import com.wadii.utils.RequestState
+import com.wadii.utils.RequestValidators
+import com.wadii.utils.firstMessage
 import com.wadii.viewmodel.ServicesUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -116,26 +120,35 @@ class ProviderOffersViewModel(
         endDate: String,
         services: Set<Long>
     ) = screenModelScope.launch {
-        offerUseCase.createOffer(
-            request = NewOfferRequest(
-                id = offer?.id ?: 0L,
-                title = title,
-                description = description,
-                endDate = endDate,
-                serviceIds = services,
-                providerId = AppState.user?.provider?.id ?: 0L
-            )
-        ) { response ->
+        val providerId = AppState.user?.provider?.id ?: 0L
+        val errors = RequestValidators.offer(title, description, endDate, providerId, offer?.id)
+        if (errors.isNotEmpty()) {
+            AppState.toast(errors.firstMessage(), true)
+            return@launch
+        }
+        val request = NewOfferRequest(
+            id = offer?.id ?: 0L,
+            title = title.trim(),
+            description = description.trim(),
+            endDate = endDate,
+            serviceIds = services,
+            providerId = providerId
+        )
+        // Editing must hit /offers/update; sending an existing offer to insert created a duplicate deal.
+        val callback: (RequestState<BaseResponse<OfferResponse>>) -> Unit = { response ->
             response.handelState(
                 onLoading = {
                     updateState { it.copy(isLoading = true) }
                 }, onSuccess = {
                     offersList()
                     AppState.toast(if (offer != null) "Offer updated!" else "Offer created!")
-                }, onError = { error, code ->
-                    AppState.toast("Failed to save offer", true)
+                }, onError = { error, _ ->
+                    updateState { it.copy(isLoading = false) }
+                    AppState.toast(error.ifBlank { "Couldn't save the offer. Please try again." }, true)
                 }
             )
         }
+        if (offer != null) offerUseCase.updateOffer(offer.id.toInt(), request, callback)
+        else offerUseCase.createOffer(request, callback)
     }
 }

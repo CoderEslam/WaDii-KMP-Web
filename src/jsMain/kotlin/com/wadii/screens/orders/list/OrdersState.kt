@@ -11,5 +11,7 @@ data class OrdersState(
     val cancelReasons: List<CancelReason> = emptyList(),
     val loadingCancelReasons: Boolean = false,
     val selectedReasonId: Int? = null,
-    val isCancelling: Boolean = false
+    val isCancelling: Boolean = false,
+    val deletingOrder: OrderModel? = null,
+    val isDeleting: Boolean = false
 )

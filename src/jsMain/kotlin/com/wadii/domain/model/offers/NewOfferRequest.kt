@@ -13,7 +13,7 @@ data class NewOfferRequest(
     val description: String = "",
     @SerialName("endDate")
     val endDate: String = "",
-    @SerialName("serviceIds:")
+    @SerialName("serviceIds")
     val serviceIds: Set<Long> = emptySet(),
     @SerialName("providerId")
     val providerId: Long = 0

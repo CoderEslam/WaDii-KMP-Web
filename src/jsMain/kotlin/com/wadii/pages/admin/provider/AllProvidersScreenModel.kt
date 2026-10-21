@@ -2,7 +2,9 @@ package com.wadii.pages.admin.provider
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
+import com.wadii.domain.usecase.MarketplaceUseCase
 import com.wadii.domain.usecase.ProviderUseCase
+import com.wadii.state.AppState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onStart
@@ -10,7 +12,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class AllProvidersViewModel(
-    private val providerUseCase: ProviderUseCase
+    private val providerUseCase: ProviderUseCase,
+    private val marketplaceUseCase: MarketplaceUseCase
 ) : BaseViewModel<AllProvidersState, AllProvidersEvent>() {
 
     override val initialState: AllProvidersState get() = AllProvidersState()
@@ -26,6 +29,24 @@ class AllProvidersViewModel(
     override fun onEvent(event: AllProvidersEvent) {
         when (event) {
             AllProvidersEvent.Load -> load()
+            is AllProvidersEvent.SetActive -> setActive(event.providerId, event.active)
+        }
+    }
+
+    private fun setActive(id: Long, active: Boolean) = screenModelScope.launch {
+        if (_state.value.busyProviderId != null) return@launch
+        updateState { it.copy(busyProviderId = id) }
+        marketplaceUseCase.setProviderActive(id, active) { r ->
+            r.handelState(
+                onSuccess = { data ->
+                    updateState { s -> s.copy(busyProviderId = null, providers = s.providers.map { p -> if (p.id == id) p.copy(active = data.data.active) else p }) }
+                    AppState.toast(if (active) "Provider reactivated" else "Provider suspended: no new orders will reach them")
+                },
+                onError = { error, _ ->
+                    AppState.toast(error.ifBlank { "Couldn't change the provider status" }, true)
+                    updateState { it.copy(busyProviderId = null) }
+                }
+            )
         }
     }
 

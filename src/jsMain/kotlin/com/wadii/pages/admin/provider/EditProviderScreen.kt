@@ -42,8 +42,8 @@ class EditProviderScreen(private val provider: ProviderModel) : Screen {
             Card(classes = "p-6") {
                 H2(attrs = { classes("font-semibold", "text-heading", "mb-4") }) { Text("Overview") }
                 Div(attrs = { classes("grid", "grid-cols-2", "gap-3") }) {
-                    InputField("Rate", s.rate, type = "number") { model.onEvent(EditProviderEvent.SetRate(it)) }
-                    InputField("Followers Count", s.followersCount, type = "number") {
+                    InputField("Rate", s.rate, type = "number", error = s.errors["rate"], hint = "0 to 5") { model.onEvent(EditProviderEvent.SetRate(it)) }
+                    InputField("Followers Count", s.followersCount, type = "number", error = s.errors["followers"]) {
                         model.onEvent(EditProviderEvent.SetFollowersCount(it))
                     }
                 }
@@ -74,7 +74,7 @@ class EditProviderScreen(private val provider: ProviderModel) : Screen {
                     s.branches.forEachIndexed { branchIndex, branch ->
                         Div(attrs = { classes("border", "border-default", "rounded-neu-base", "p-4", "space-y-3") }) {
                             Div(attrs = { classes("grid", "grid-cols-2", "gap-3") }) {
-                                InputField("Branch Name", branch.name) {
+                                InputField("Branch Name", branch.name, required = true, error = s.errors["branch$branchIndex"]) {
                                     model.onEvent(EditProviderEvent.SetBranchName(branchIndex, it))
                                 }
                                 InputField("Address", branch.address) {
@@ -107,7 +107,7 @@ class EditProviderScreen(private val provider: ProviderModel) : Screen {
                     s.links.forEachIndexed { linkIndex, link ->
                         Div(attrs = { classes("flex", "items-end", "gap-2") }) {
                             Div(attrs = { classes("flex-1") }) {
-                                InputField("URL", link.link, type = "url", placeholder = "https://") {
+                                InputField("URL", link.link, type = "url", placeholder = "https://", error = s.errors["link$linkIndex"]) {
                                     model.onEvent(EditProviderEvent.SetLink(linkIndex, it))
                                 }
                             }

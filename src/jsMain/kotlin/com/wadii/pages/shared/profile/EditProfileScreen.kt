@@ -46,11 +46,11 @@ class EditProfileScreen : Screen {
                     H2(attrs = { classes("font-semibold", "text-heading", "mb-4") }) { Text("Personal Info") }
                     Div(attrs = { classes("space-y-4") }) {
                         Div(attrs = { classes("grid", "grid-cols-2", "gap-3") }) {
-                            InputField("First Name", s.firstName, required = true) { model.onEvent(EditProfileEvent.SetFirstName(it)) }
-                            InputField("Last Name", s.lastName, required = true) { model.onEvent(EditProfileEvent.SetLastName(it)) }
+                            InputField("First Name", s.firstName, required = true, error = s.errors["firstName"]) { model.onEvent(EditProfileEvent.SetFirstName(it)) }
+                            InputField("Last Name", s.lastName, required = true, error = s.errors["lastName"]) { model.onEvent(EditProfileEvent.SetLastName(it)) }
                         }
-                        InputField("Email", s.email, type = "email", required = true) { model.onEvent(EditProfileEvent.SetEmail(it)) }
-                        InputField("Phone", s.phone, type = "tel") { model.onEvent(EditProfileEvent.SetPhone(it)) }
+                        InputField("Email", s.email, type = "email", required = true, error = s.errors["email"]) { model.onEvent(EditProfileEvent.SetEmail(it)) }
+                        InputField("Phone", s.phone, type = "tel", required = true, error = s.errors["phone"]) { model.onEvent(EditProfileEvent.SetPhone(it)) }
 
                         if (s.role == "PROVIDER") {
                             Div(attrs = { classes("space-y-1") }) {
@@ -110,7 +110,7 @@ class EditProfileScreen : Screen {
                             s.branches.forEachIndexed { branchIndex, branch ->
                                 Div(attrs = { classes("border", "border-default", "rounded-neu-base", "p-4", "space-y-3") }) {
                                     Div(attrs = { classes("grid", "grid-cols-2", "gap-3") }) {
-                                        InputField("Branch Name", branch.name) {
+                                        InputField("Branch Name", branch.name, required = true, error = s.errors["branch$branchIndex"]) {
                                             model.onEvent(EditProfileEvent.SetBranchName(branchIndex, it))
                                         }
                                         InputField("Address", branch.address) {
@@ -128,6 +128,7 @@ class EditProfileScreen : Screen {
                                                     model.onEvent(EditProfileEvent.SetWorkTimeClose(branchIndex, wtIndex, it))
                                                 }
                                             }
+                                            s.errors["wt${branchIndex}_$wtIndex"]?.let { P(attrs = { classes("field-error"); attr("role", "alert") }) { Text(it) } }
                                         }
                                     }
                                     GhostButton("🗑️ Remove branch") { model.onEvent(EditProfileEvent.RemoveBranch(branchIndex)) }
@@ -143,7 +144,7 @@ class EditProfileScreen : Screen {
                             s.links.forEachIndexed { linkIndex, link ->
                                 Div(attrs = { classes("flex", "items-end", "gap-2") }) {
                                     Div(attrs = { classes("flex-1") }) {
-                                        InputField("URL", link.link, type = "url", placeholder = "https://") {
+                                        InputField("URL", link.link, type = "url", placeholder = "https://", error = s.errors["link$linkIndex"]) {
                                             model.onEvent(EditProfileEvent.SetLink(linkIndex, it))
                                         }
                                     }

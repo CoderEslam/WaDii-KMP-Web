@@ -4,15 +4,21 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
 import com.wadii.domain.model.order.OrderCancelRequest
 import com.wadii.domain.model.order.OrderModel
+import com.wadii.domain.usecase.MarketplaceUseCase
 import com.wadii.domain.usecase.OrderUseCase
 import com.wadii.state.AppState
+import com.wadii.utils.RequestValidators
+import com.wadii.utils.firstMessage
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class OrdersViewModel(private val orderUseCase: OrderUseCase) : BaseViewModel<OrdersState, OrdersEvent>() {
+class OrdersViewModel(
+    private val orderUseCase: OrderUseCase,
+    private val marketplaceUseCase: MarketplaceUseCase
+) : BaseViewModel<OrdersState, OrdersEvent>() {
 
     override val initialState: OrdersState
         get() = OrdersState()
@@ -28,6 +34,9 @@ class OrdersViewModel(private val orderUseCase: OrderUseCase) : BaseViewModel<Or
             OrdersEvent.DismissCancelDialog -> updateState { it.copy(cancelingOrder = null, selectedReasonId = null) }
             is OrdersEvent.SelectCancelReason -> updateState { it.copy(selectedReasonId = event.reasonId) }
             OrdersEvent.ConfirmCancel -> confirmCancel()
+            is OrdersEvent.AskDelete -> updateState { it.copy(deletingOrder = event.order) }
+            OrdersEvent.DismissDelete -> updateState { it.copy(deletingOrder = null) }
+            OrdersEvent.ConfirmDelete -> confirmDelete()
         }
     }
 
@@ -62,27 +71,44 @@ class OrdersViewModel(private val orderUseCase: OrderUseCase) : BaseViewModel<Or
     private fun confirmCancel() = screenModelScope.launch {
         val order = _state.value.cancelingOrder ?: return@launch
         val reasonId = _state.value.selectedReasonId
-        if (reasonId == null) {
-            AppState.toast("Please select a reason for cancelling", true)
+        val cancelErrors = RequestValidators.orderCancel(order.id, reasonId?.toLong())
+        if (cancelErrors.isNotEmpty() || reasonId == null) {
+            AppState.toast(cancelErrors.firstMessage().ifBlank { "Please select a reason for cancelling" }, true)
             return@launch
         }
         orderUseCase.cancelOrder(OrderCancelRequest(orderId = order.id, reasonId = reasonId)) { response ->
             response.handelState(
                 onLoading = { updateState { it.copy(isCancelling = true) } },
                 onSuccess = {
-                    AppState.toast("Order cancelled")
-                    updateState {
-                        it.copy(
-                            orders = it.orders.filter { o -> o.id != order.id },
-                            isCancelling = false,
-                            cancelingOrder = null,
-                            selectedReasonId = null
-                        )
-                    }
+                    AppState.toast("Order cancelled. Sellers who replied have been told.")
+                    // A cancelled order stays in the list as history; it can be deleted from there.
+                    updateState { it.copy(isCancelling = false, cancelingOrder = null, selectedReasonId = null) }
+                    load()
                 },
-                onError = { _, _ ->
-                    AppState.toast("Failed to cancel order", true)
+                onError = { error, _ ->
+                    AppState.toast(error.ifBlank { "Couldn't cancel the order. Please try again." }, true)
                     updateState { it.copy(isCancelling = false) }
+                    load() // the order may have moved on (e.g. work already started)
+                }
+            )
+        }
+    }
+
+    /** DELETE /orders/delete/{id}: only orders nobody answered, or cancelled ones. */
+    private fun confirmDelete() = screenModelScope.launch {
+        val order = _state.value.deletingOrder ?: return@launch
+        if (_state.value.isDeleting) return@launch
+        updateState { it.copy(isDeleting = true) }
+        marketplaceUseCase.deleteOrder(order.id) { response ->
+            response.handelState(
+                onSuccess = {
+                    AppState.toast("Order deleted")
+                    updateState { s -> s.copy(isDeleting = false, deletingOrder = null, orders = s.orders.filter { o -> o.id != order.id }) }
+                },
+                onError = { error, _ ->
+                    AppState.toast(error.ifBlank { "Couldn't delete the order" }, true)
+                    updateState { it.copy(isDeleting = false, deletingOrder = null) }
+                    load()
                 }
             )
         }

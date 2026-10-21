@@ -41,6 +41,7 @@ import com.wadii.domain.model.province.InsertProvince
 import com.wadii.domain.model.province.Province
 import com.wadii.domain.model.response.OrderResponse
 import com.wadii.domain.model.response.ResponseCallback
+import com.wadii.domain.model.response.ResponseDecision
 import com.wadii.domain.model.response.ResponseRequest
 import com.wadii.domain.model.serach.SearchModel
 import com.wadii.domain.model.service.InsertService
@@ -49,6 +50,19 @@ import com.wadii.domain.model.user.UpdateUser
 import com.wadii.state.AppState
 import com.wadii.utils.Constants
 import com.wadii.utils.Constants.BASE_URL
+import com.wadii.utils.putApiResponse
+import com.wadii.domain.model.notification.UserNotification
+import com.wadii.domain.model.notification.AgoraTokenRequest
+import com.wadii.domain.model.notification.AgoraTokenResponse
+import com.wadii.domain.model.notification.ProviderServicesRequest
+import com.wadii.domain.model.rate.RateModel
+import com.wadii.domain.model.shop.AvailabilityRequest
+import com.wadii.domain.model.rate.RateRequest
+import com.wadii.domain.model.shop.BranchRequest
+import com.wadii.domain.model.shop.CommonSparePart
+import com.wadii.domain.model.shop.LinkRequest
+import com.wadii.domain.model.shop.NameRequest
+import com.wadii.domain.model.shop.WorkTimeRequest
 import com.wadii.utils.RequestState
 import com.wadii.utils.deleteApiResponse
 import com.wadii.utils.getApiResponse
@@ -180,9 +194,9 @@ class ApiService(
     }
 
     //delete account
-    suspend fun deleteAccount(response: (RequestState<Boolean>) -> Unit) {
+    suspend fun deleteAccount(id: Long, response: (RequestState<BaseResponse<Boolean>>) -> Unit) {
         response(RequestState.Loading)
-        response(client.postApiResponse<Boolean>(urlString = Constants.DELETE_ACCOUNT))
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = Constants.DELETE_ACCOUNT(id)))
     }
 
 
@@ -427,12 +441,12 @@ class ApiService(
     }
 
     suspend fun acceptResponse(
-        request: OrderResponse,
+        request: ResponseDecision,
         response: (RequestState<BaseResponse<OrderResponse>>) -> Unit
     ) {
         response(RequestState.Loading)
         response(
-            client.postApiResponse<OrderResponse, BaseResponse<OrderResponse>>(
+            client.postApiResponse<ResponseDecision, BaseResponse<OrderResponse>>(
                 urlString = Constants.ACCEPT_RESPONSE,
                 body = request
             )
@@ -440,12 +454,12 @@ class ApiService(
     }
 
     suspend fun rejectResponse(
-        request: OrderResponse,
+        request: ResponseDecision,
         response: (RequestState<BaseResponse<OrderResponse>>) -> Unit
     ) {
         response(RequestState.Loading)
         response(
-            client.postApiResponse<OrderResponse, BaseResponse<OrderResponse>>(
+            client.postApiResponse<ResponseDecision, BaseResponse<OrderResponse>>(
                 urlString = Constants.REJECT_RESPONSE,
                 body = request
             )
@@ -660,7 +674,7 @@ class ApiService(
         response(RequestState.Loading)
         response(
             client.postApiResponse<NewOfferRequest, BaseResponse<OfferResponse>>(
-                urlString = "${Constants.UPDATE_OFFER}/$offerId",
+                urlString = Constants.UPDATE_OFFER, // POST /offers/update takes the id in the body
                 body = request
             )
         )
@@ -817,9 +831,9 @@ class ApiService(
     }
 
     //notifications
-    suspend fun getNotifications(response: (RequestState<BaseResponse<List<String>>>) -> Unit) {
+    suspend fun getNotifications(response: (RequestState<BaseResponse<List<UserNotification>>>) -> Unit) {
         response(RequestState.Loading)
-        response(client.getApiResponse<BaseResponse<List<String>>>(urlString = Constants.NOTIFICATIONS_SHOW_ALL))
+        response(client.getApiResponse<BaseResponse<List<UserNotification>>>(urlString = Constants.NOTIFICATIONS_SHOW_ALL))
     }
 
     suspend fun notificationCount(response: (RequestState<BaseResponse<Int>>) -> Unit) {
@@ -915,14 +929,256 @@ class ApiService(
 
     suspend fun rejectRequest(
         id: Long,
+        reason: String?,
         response: (RequestState<BaseResponse<ProviderRequestModel>>) -> Unit
     ) {
         response(RequestState.Loading)
         response(
             client.postApiResponse<BaseResponse<ProviderRequestModel>>(
-                urlString = Constants.PROVIDER_REQUEST_REJECT(id)
+                urlString = Constants.PROVIDER_REQUEST_REJECT(id),
+                block = { if (!reason.isNullOrBlank()) parameter("reason", reason.trim()) }
             )
         )
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // Endpoints from API_REFERENCE.md. Callers validate the body first (see utils/RequestValidators).
+    // ---------------------------------------------------------------------------------------------
+
+    // orders
+    suspend fun updateOrder(request: OrderRequest, response: (RequestState<BaseResponse<OrderModel>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<OrderRequest, BaseResponse<OrderModel>>(urlString = Constants.ORDER_UPDATE, body = request))
+    }
+
+    suspend fun deleteOrder(id: Int, response: (RequestState<BaseResponse<Boolean>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = Constants.ORDER_DELETE(id)))
+    }
+
+    // responses (proposals)
+    suspend fun updateResponse(request: ResponseRequest, response: (RequestState<BaseResponse<ResponseCallback>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<ResponseRequest, BaseResponse<ResponseCallback>>(urlString = Constants.RESPONSE_UPDATE, body = request))
+    }
+
+    suspend fun deleteResponse(id: Int, response: (RequestState<BaseResponse<Boolean>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = Constants.RESPONSE_DELETE(id)))
+    }
+
+    // notifications
+    suspend fun markNotificationRead(id: Long, response: (RequestState<BaseResponse<UserNotification>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<BaseResponse<UserNotification>>(urlString = Constants.NOTIFICATION_MARK_READ(id)))
+    }
+
+    suspend fun markAllNotificationsRead(response: (RequestState<BaseResponse<List<UserNotification>>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<BaseResponse<List<UserNotification>>>(urlString = Constants.NOTIFICATION_MARK_ALL_READ))
+    }
+
+    suspend fun deleteNotification(id: Long, response: (RequestState<BaseResponse<Boolean>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = Constants.NOTIFICATION_DELETE(id)))
+    }
+
+    // rate
+    suspend fun insertRate(request: RateRequest, response: (RequestState<BaseResponse<RateModel>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<RateRequest, BaseResponse<RateModel>>(urlString = Constants.RATE_INSERT, body = request))
+    }
+
+    suspend fun updateRate(request: RateRequest, response: (RequestState<BaseResponse<RateModel>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<RateRequest, BaseResponse<RateModel>>(urlString = Constants.RATE_UPDATE, body = request))
+    }
+
+    suspend fun getAllUsers(response: (RequestState<BaseResponse<List<User>>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.getApiResponse<BaseResponse<List<User>>>(urlString = Constants.USER_SHOW_ALL))
+    }
+
+    suspend fun startOrder(id: Int, response: (RequestState<BaseResponse<OrderModel>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<BaseResponse<OrderModel>>(urlString = Constants.ORDER_START(id)))
+    }
+
+    suspend fun completeOrder(id: Int, response: (RequestState<BaseResponse<OrderModel>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<BaseResponse<OrderModel>>(urlString = Constants.ORDER_COMPLETE(id)))
+    }
+
+    suspend fun setAvailability(request: AvailabilityRequest, response: (RequestState<BaseResponse<ProviderModel>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<AvailabilityRequest, BaseResponse<ProviderModel>>(urlString = Constants.PROVIDER_AVAILABILITY, body = request))
+    }
+
+    suspend fun setProviderActive(id: Long, active: Boolean, response: (RequestState<BaseResponse<ProviderModel>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<BaseResponse<ProviderModel>>(urlString = Constants.PROVIDER_SET_ACTIVE(id, active)))
+    }
+
+    suspend fun deleteRate(id: Long, response: (RequestState<BaseResponse<Boolean>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = Constants.RATE_DELETE(id)))
+    }
+
+    // car types
+    suspend fun insertCarType(request: NameRequest, response: (RequestState<BaseResponse<com.wadii.domain.model.carTypes.CarType>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<NameRequest, BaseResponse<com.wadii.domain.model.carTypes.CarType>>(urlString = Constants.CAR_TYPE_INSERT, body = request))
+    }
+
+    suspend fun updateCarType(request: NameRequest, response: (RequestState<BaseResponse<com.wadii.domain.model.carTypes.CarType>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<NameRequest, BaseResponse<com.wadii.domain.model.carTypes.CarType>>(urlString = Constants.CAR_TYPE_UPDATE, body = request))
+    }
+
+    suspend fun deleteCarType(id: Long, response: (RequestState<BaseResponse<Boolean>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = Constants.CAR_TYPE_DELETE(id)))
+    }
+
+    // common spare parts
+    suspend fun getCommonSpareParts(response: (RequestState<BaseResponse<List<CommonSparePart>>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.getApiResponse<BaseResponse<List<CommonSparePart>>>(urlString = Constants.COMMON_SPARE_PARTS_SHOW_ALL))
+    }
+
+    suspend fun insertCommonSparePart(request: NameRequest, response: (RequestState<BaseResponse<CommonSparePart>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<NameRequest, BaseResponse<CommonSparePart>>(urlString = Constants.COMMON_SPARE_PARTS_INSERT, body = request))
+    }
+
+    suspend fun updateCommonSparePart(request: NameRequest, response: (RequestState<BaseResponse<CommonSparePart>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<NameRequest, BaseResponse<CommonSparePart>>(urlString = Constants.COMMON_SPARE_PARTS_UPDATE, body = request))
+    }
+
+    suspend fun deleteCommonSparePart(id: Long, response: (RequestState<BaseResponse<Boolean>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = Constants.COMMON_SPARE_PARTS_DELETE(id)))
+    }
+
+    // provider shop: branches, work times, links, services
+    suspend fun branchesByProvider(providerId: Long, response: (RequestState<BaseResponse<List<com.wadii.domain.model.branch.Branche>>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.getApiResponse<BaseResponse<List<com.wadii.domain.model.branch.Branche>>>(urlString = Constants.BRANCH_BY_PROVIDER(providerId)))
+    }
+
+    suspend fun insertBranch(request: BranchRequest, response: (RequestState<BaseResponse<com.wadii.domain.model.branch.Branche>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<BranchRequest, BaseResponse<com.wadii.domain.model.branch.Branche>>(urlString = Constants.BRANCH_INSERT, body = request))
+    }
+
+    suspend fun updateBranch(request: BranchRequest, response: (RequestState<BaseResponse<com.wadii.domain.model.branch.Branche>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<BranchRequest, BaseResponse<com.wadii.domain.model.branch.Branche>>(urlString = Constants.BRANCH_UPDATE, body = request))
+    }
+
+    suspend fun deleteBranch(id: Long, response: (RequestState<BaseResponse<Boolean>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = Constants.BRANCH_DELETE(id)))
+    }
+
+    /** Server quirk: this one is a POST with no body. */
+    suspend fun workTimesByBranch(branchId: Long, response: (RequestState<BaseResponse<List<com.wadii.domain.model.WorkTime>>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<BaseResponse<List<com.wadii.domain.model.WorkTime>>>(urlString = Constants.WORK_TIME_BY_BRANCH(branchId)))
+    }
+
+    suspend fun insertWorkTime(request: WorkTimeRequest, response: (RequestState<BaseResponse<com.wadii.domain.model.WorkTime>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<WorkTimeRequest, BaseResponse<com.wadii.domain.model.WorkTime>>(urlString = Constants.WORK_TIME_INSERT, body = request))
+    }
+
+    suspend fun updateWorkTime(request: WorkTimeRequest, response: (RequestState<BaseResponse<com.wadii.domain.model.WorkTime>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<WorkTimeRequest, BaseResponse<com.wadii.domain.model.WorkTime>>(urlString = Constants.WORK_TIME_UPDATE, body = request))
+    }
+
+    suspend fun deleteWorkTime(id: Long, response: (RequestState<BaseResponse<Boolean>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = Constants.WORK_TIME_DELETE(id)))
+    }
+
+    suspend fun insertLink(request: LinkRequest, response: (RequestState<BaseResponse<com.wadii.domain.model.link.Link>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<LinkRequest, BaseResponse<com.wadii.domain.model.link.Link>>(urlString = Constants.LINK_INSERT, body = request))
+    }
+
+    suspend fun updateLink(request: LinkRequest, response: (RequestState<BaseResponse<com.wadii.domain.model.link.Link>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<LinkRequest, BaseResponse<com.wadii.domain.model.link.Link>>(urlString = Constants.LINK_UPDATE, body = request))
+    }
+
+    suspend fun deleteLink(id: Long, response: (RequestState<BaseResponse<Boolean>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.deleteApiResponse<BaseResponse<Boolean>>(urlString = Constants.LINK_DELETE(id)))
+    }
+
+    suspend fun updateProviderServices(request: ProviderServicesRequest, response: (RequestState<BaseResponse<ProviderModel>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<ProviderServicesRequest, BaseResponse<ProviderModel>>(urlString = Constants.PROVIDER_UPDATE_SERVICES, body = request))
+    }
+
+    suspend fun providersByServices(serviceIds: List<Long>, response: (RequestState<BaseResponse<List<ProviderModel>>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.getApiResponse<BaseResponse<List<ProviderModel>>>(urlString = Constants.PROVIDER_FILTER_BY_SERVICES) {
+            parameter("serviceIds", serviceIds.joinToString(","))
+        })
+    }
+
+    suspend fun offersByServices(serviceIds: List<Long>, response: (RequestState<BaseResponse<List<OfferResponse>>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.getApiResponse<BaseResponse<List<OfferResponse>>>(urlString = Constants.OFFERS_FILTER_BY_SERVICES) {
+            parameter("serviceIds", serviceIds.joinToString(","))
+        })
+    }
+
+    // ads
+    suspend fun setAdStatus(id: Long, status: String, response: (RequestState<BaseResponse<Ads>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.putApiResponse<Unit, BaseResponse<Ads>>(urlString = Constants.ADS_STATUS(id, status)))
+    }
+
+    suspend fun trackAdImpression(id: Long, response: (RequestState<BaseResponse<Ads>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<BaseResponse<Ads>>(urlString = Constants.TRACK_IMPRESSION(id)))
+    }
+
+    suspend fun trackAdClick(id: Long, response: (RequestState<BaseResponse<Ads>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<BaseResponse<Ads>>(urlString = Constants.TRACK_CLICK(id)))
+    }
+
+    // users, presence, calls
+    suspend fun unreadMessageCount(response: (RequestState<BaseResponse<Int>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.getApiResponse<BaseResponse<Int>>(urlString = Constants.USER_UNREAD_MESSAGES))
+    }
+
+    suspend fun isUserOnline(id: Long, response: (RequestState<BaseResponse<Boolean>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.getApiResponse<BaseResponse<Boolean>>(urlString = Constants.USER_ONLINE(id)))
+    }
+
+    suspend fun presence(userIds: List<Long>, response: (RequestState<BaseResponse<Map<String, Boolean>>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.getApiResponse<BaseResponse<Map<String, Boolean>>>(urlString = Constants.PRESENCE) {
+            parameter("userIds", userIds.distinct().joinToString(","))
+        })
+    }
+
+    suspend fun onlineUsers(response: (RequestState<BaseResponse<List<Long>>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.getApiResponse<BaseResponse<List<Long>>>(urlString = Constants.PRESENCE_ONLINE))
+    }
+
+    suspend fun agoraToken(request: AgoraTokenRequest, response: (RequestState<BaseResponse<AgoraTokenResponse>>) -> Unit) {
+        response(RequestState.Loading)
+        response(client.postApiResponse<AgoraTokenRequest, BaseResponse<AgoraTokenResponse>>(urlString = Constants.AGORA_TOKEN, body = request))
     }
 
     suspend fun getOrderById(

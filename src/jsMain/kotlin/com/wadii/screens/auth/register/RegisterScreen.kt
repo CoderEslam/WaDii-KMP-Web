@@ -65,13 +65,15 @@ class RegisterScreen : Screen {
                                 "First Name",
                                 s.firstName,
                                 "John",
-                                required = true
+                                required = true,
+                                error = s.errors["firstName"]
                             ) { model.onEvent(RegisterEvent.SetFirstName(it)) }
                             InputField(
                                 "Last Name",
                                 s.lastName,
                                 "Doe",
-                                required = true
+                                required = true,
+                                error = s.errors["lastName"]
                             ) { model.onEvent(RegisterEvent.SetLastName(it)) }
                         }
 
@@ -80,9 +82,10 @@ class RegisterScreen : Screen {
                             s.email,
                             "you@example.com",
                             "email",
-                            true
+                            true,
+                            error = s.errors["email"]
                         ) { model.onEvent(RegisterEvent.SetEmail(it)) }
-                        InputField("Phone", s.phone, "+1 234 567 8900", "tel") {
+                        InputField("Phone", s.phone, "+20 100 123 4567", "tel", required = true, error = s.errors["phone"]) {
                             model.onEvent(
                                 RegisterEvent.SetPhone(it)
                             )
@@ -92,7 +95,9 @@ class RegisterScreen : Screen {
                             s.password,
                             "••••••••",
                             "password",
-                            true
+                            true,
+                            error = s.errors["password"],
+                            hint = "At least 8 characters, with letters and numbers"
                         ) { model.onEvent(RegisterEvent.SetPassword(it)) }
 
                         if (s.userType == 1) {
@@ -127,6 +132,7 @@ class RegisterScreen : Screen {
                                     s.cities.map { it.id to it.name },
                                     s.selectedCity
                                 ) { model.onEvent(RegisterEvent.SelectCity(it)) }
+                            s.errors["city"]?.let { P(attrs = { classes("field-error"); attr("role", "alert") }) { Text(it) } }
                         }
 
                         PrimaryButton("Create Account", loading = s.loading, fullWidth = true) {

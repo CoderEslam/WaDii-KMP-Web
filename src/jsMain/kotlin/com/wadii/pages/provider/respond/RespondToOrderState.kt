@@ -9,5 +9,10 @@ data class RespondToOrderState(
     val submitting: Boolean = false,
     val submitted: Boolean = false,
     val isLoading: Boolean = false,
-    val error: String = ""
+    val error: String = "",
+    val fieldErrors: Map<String, String> = emptyMap(),
+    /** True while the pending answer is being edited in the form. */
+    val editing: Boolean = false,
+    /** Withdrawing or starting the job. */
+    val busy: Boolean = false
 )

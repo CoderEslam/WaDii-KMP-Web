@@ -37,5 +37,8 @@ data class EditProfileState(
 
     val branches: List<EditableBranch> = emptyList(),
     val links: List<EditableLink> = emptyList(),
-    val offersPassthrough: List<OfferRequest> = emptyList()
+    val offersPassthrough: List<OfferRequest> = emptyList(),
+
+    /** Per-field messages: firstName, lastName, email, phone, city, branch<i>, wt<i>_<j>, link<i>. */
+    val errors: Map<String, String> = emptyMap()
 )

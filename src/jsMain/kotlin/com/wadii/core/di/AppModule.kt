@@ -46,6 +46,9 @@ import com.wadii.domain.usecase.OfferUseCase
 import com.wadii.domain.usecase.OrderUseCase
 import com.wadii.domain.usecase.ProviderUseCase
 import com.wadii.domain.usecase.ResponseUseCase
+import com.wadii.domain.usecase.MarketplaceUseCase
+import com.wadii.domain.repo.MarketplaceRepo
+import com.wadii.data.repo.MarketplaceRepoImpl
 import com.wadii.domain.usecase.SearchUseCase
 import com.wadii.domain.usecase.UserUseCase
 import com.wadii.pages.shared.call.CallViewModel
@@ -60,6 +63,7 @@ import com.wadii.pages.admin.provider.EditProviderViewModel
 import com.wadii.pages.admin.provider.ProviderRequestsViewModel
 import com.wadii.pages.admin.reason.ReasonsViewModel
 import com.wadii.pages.admin.service.ServicesViewModel
+import com.wadii.pages.admin.users.UsersViewModel
 import com.wadii.pages.provider.dashboard.ProviderDashboardViewModel
 import com.wadii.pages.provider.offers.ProviderOffersViewModel
 import com.wadii.pages.provider.orders.ProviderOrdersViewModel
@@ -116,6 +120,7 @@ val appModule = module {
     single<MessagesRepo> { MessagesRepoImpl(get()) }
     single<NotificationRepo> { NotificationRepoImpl(get()) }
     single<UserRepo> { UserRepoImpl(get()) }
+    single<MarketplaceRepo> { MarketplaceRepoImpl(get()) }
 
     // UseCases
     single { LiveKitUseCase(get()) }
@@ -133,15 +138,16 @@ val appModule = module {
     single { MessageUseCase(get()) }
     single { NotificationUseCase(get()) }
     single { UserUseCase(get()) }
+    single { MarketplaceUseCase(get()) }
 
     // ViewModels — screens/
     factory { HomeViewModel(get(), get(), get(), get()) }
     factory { LoginViewModel(get()) }
     factory { RegisterViewModel(get(), get()) }
-    factory { OrdersViewModel(get()) }
-    factory { (orderId: Int) -> OrderDetailViewModel(orderId, get()) }
-    factory { NewOrderViewModel(get(), get()) }
-    factory { (orderId: Int) -> EditOrderViewModel(orderId, get(), get()) }
+    factory { OrdersViewModel(get(), get()) }
+    factory { (orderId: Int) -> OrderDetailViewModel(orderId, get(), get(), get()) }
+    factory { (providerId: Long, offered: List<Long>) -> NewOrderViewModel(providerId, offered, get(), get(), get()) }
+    factory { (orderId: Int) -> EditOrderViewModel(orderId, get(), get(), get()) }
     factory { SearchViewModel(get()) }
     factory { SavedOffersViewModel(get()) }
     factory { (providerId: Int) -> ProviderDetailViewModel(providerId, get()) }
@@ -159,24 +165,26 @@ val appModule = module {
     }
 
     // ViewModels — pages/
-    factory { ProviderDashboardViewModel(get(), get()) }
+    factory { UsersViewModel(get(), get()) }
+    factory { ProviderDashboardViewModel(get(), get(), get()) }
     factory { ProviderOrdersViewModel(get()) }
     factory { ProfileViewModel(get(), get()) }
     factory { EditProfileViewModel(get(), get(), get(), get()) }
     factory { RequestProviderViewModel(get(), get()) }
-    factory { NotificationsViewModel(get()) }
+    factory { NotificationsViewModel(get(), get(), get()) }
     factory { ProviderRequestsViewModel(get()) }
-    factory { AllProvidersViewModel(get()) }
+    factory { AllProvidersViewModel(get(), get()) }
     factory { (provider: ProviderModel) -> EditProviderViewModel(provider, get(), get()) }
     factory { AddProviderViewModel(get(), get(), get()) }
     factory { ServicesViewModel(get()) }
     factory { ReasonsViewModel(get()) }
+    factory { (kind: com.wadii.pages.admin.catalog.CatalogKind) -> com.wadii.pages.admin.catalog.CatalogViewModel(kind, get(), get()) }
     factory { LocationsViewModel(get()) }
     factory { ChatViewModel(get(), get()) }
     factory { ProviderOffersViewModel(get(), get()) }
-    factory { (orderId: Int) -> RespondToOrderViewModel(orderId, get(), get()) }
+    factory { (orderId: Int) -> RespondToOrderViewModel(orderId, get(), get(), get()) }
     factory { AdminDashboardScreenModel(get(), get(), get()) }
-    factory { (ad: Ads?) -> AdsScreenModel(ad, get()) }
+    factory { (ad: Ads?) -> AdsScreenModel(ad, get(), get()) }
 }
 
 fun initializeKoin() {

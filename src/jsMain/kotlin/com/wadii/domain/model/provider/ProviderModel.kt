@@ -32,6 +32,12 @@ data class ProviderModel(
     val rates: List<Rate> = listOf(),
     @SerialName("services")
     val services: List<Service> = listOf(),
+    /** Admin suspension: a suspended provider gets no new orders. */
+    @SerialName("active")
+    val active: Boolean = true,
+    /** The provider's own switch to pause new orders. */
+    @SerialName("acceptingOrders")
+    val acceptingOrders: Boolean = true,
     @SerialName("user")
     val user: User = User()
 ) {

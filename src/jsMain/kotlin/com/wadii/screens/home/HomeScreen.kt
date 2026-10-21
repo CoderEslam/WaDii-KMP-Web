@@ -22,7 +22,14 @@ import com.wadii.ui.Badge
 import com.wadii.ui.BadgeVariant
 import com.wadii.ui.Card
 import com.wadii.ui.EmptyState
+import com.wadii.ui.GhostButton
 import com.wadii.ui.classNames
+import com.wadii.domain.usecase.MarketplaceUseCase
+import com.wadii.utils.Validation
+import kotlinx.coroutines.launch
+import org.koin.mp.KoinPlatform
+import com.wadii.utils.greeting
+import com.wadii.utils.isExpired
 import com.wadii.ui.LoadingScreen
 import com.wadii.ui.LoadingSkeletons
 import com.wadii.ui.Modal
@@ -42,13 +49,24 @@ class HomeScreen : Screen {
         val state by homeViewModel.state.collectAsState()
         val user = AppState.user
 
+        // Count each ad once per visit it is on screen (POST /advertisements/track-impression/{id}).
+        val scope = rememberCoroutineScope()
+        val marketplace = remember { KoinPlatform.getKoin().get<MarketplaceUseCase>() }
+        LaunchedEffect(state.ads.map { it.id }) {
+            state.ads.forEach { ad -> marketplace.trackAdImpression(ad.id) { } }
+        }
+
         Div(attrs = { classes("space-y-8") }) {
-            Card(classes = "p-8") {
-                H1(attrs = { classes("text-3xl", "font-semibold", "text-heading", "mb-2") }) {
-                    Text("Welcome back, ${user?.firstName}!")
+            Card(classes = "p-6 md:p-8 hero-card") {
+                H1(attrs = { classes("text-2xl", "md:text-3xl", "font-semibold", "text-heading", "mb-2") }) {
+                    Text("${greeting()}, ${user?.firstName ?: "there"} ")
+                    Span(attrs = { classes("wave") }) { Text("👋") }
                 }
-                P(attrs = { classes("text-body", "mb-4") }) { Text("Find the best spare parts sellers near you") }
-                PrimaryButton("Search Parts Sellers") { navigator.replaceAll(SearchScreen()) }
+                P(attrs = { classes("text-body", "mb-4") }) { Text("Need a part? Ask once and let sellers near you come to you with prices.") }
+                Div(attrs = { classes("flex", "flex-wrap", "gap-3") }) {
+                    PrimaryButton("Request a part", icon = "📦") { navigator.push(NewOrderScreen()) }
+                    GhostButton("Browse sellers", icon = "🔍") { navigator.replaceAll(SearchScreen()) }
+                }
             }
 
             if (state.services.isNotEmpty()) {
@@ -87,7 +105,11 @@ class HomeScreen : Screen {
                         state.ads.forEach { ad ->
                             Div(attrs = {
                                 style { property("cursor", "pointer") }
-                                onClick { ad.targetUrl?.let { window.open(it, "_blank") } }
+                                // Ads are admin-entered free text; never open anything but a plain http(s) link.
+                                onClick {
+                                    scope.launch { marketplace.trackAdClick(ad.id) { } }
+                                    ad.targetUrl?.takeIf { Validation.url(it) == null }?.let { window.open(it, "_blank", "noopener,noreferrer") }
+                                }
                             }) {
                                 Card(classes = "overflow-hidden hover:shadow-neu-md transition-all") {
                                     ad.imageUrl?.let {
@@ -115,7 +137,7 @@ class HomeScreen : Screen {
                         if (state.selectedService.name.isNotNullOrEmptyString()) "No sellers for this category." else "No sellers available yet."
                     )
                 } else {
-                    Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-3", "gap-4") }) {
+                    Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-3", "gap-4", "stagger") }) {
                         state.filteredProviders.forEach { ProviderCard(navigator, it) }
                     }
                 }
@@ -123,14 +145,16 @@ class HomeScreen : Screen {
 
             Div {
                 P(attrs = { classes("text-lg", "font-semibold", "text-heading", "mb-4") }) { Text("🏷️ Latest Deals") }
-                val visible = state.offers
+                // Expired deals are hidden: buyers should never see a deal they can no longer use.
+                val visible = state.offers.filter { !isExpired(it.endDate) }
                 if (visible.isEmpty()) {
                     EmptyState(
                         "🏷️",
-                        if (state.selectedService.name.isNotNullOrEmptyString()) "No deals for this category." else "No deals available yet."
+                        if (state.selectedService.name.isNotNullOrEmptyString()) "No deals for this category." else "No deals right now",
+                        "Check back soon, sellers add new deals all the time."
                     )
                 } else {
-                    Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-3", "gap-4") }) {
+                    Div(attrs = { classes("grid", "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-3", "gap-4", "stagger") }) {
                         visible.forEach { offer ->
                             OfferCard(
                                 navigator = navigator,
@@ -147,19 +171,21 @@ class HomeScreen : Screen {
             }
         }
 
+        // Labelled so first-time users know what "+" does.
         Button(attrs = {
             classes(
                 "fixed", "bottom-6", "right-6", "z-40",
-                "w-14", "h-14", "rounded-full", "bg-surface", "shadow-neu-lg",
-                "hover:shadow-neu-xl", "active:shadow-neu-inset", "transition-all",
-                "flex", "items-center", "justify-center", "text-fg-brand"
+                "h-14", "pl-4", "pr-5", "rounded-full", "bg-brand", "text-on-brand", "font-semibold", "shadow-neu-lg",
+                "hover:shadow-neu-xl", "transition-all", "fab-pulse",
+                "flex", "items-center", "justify-center", "gap-2"
             )
             style { property("border", "none"); property("cursor", "pointer") }
-            attr("title", "Make an order")
-            attr("aria-label", "Make an order")
+            attr("title", "Request a part")
+            attr("aria-label", "Request a part")
             onClick { navigator.push(NewOrderScreen()) }
         }) {
-            Span(attrs = { classes("text-3xl", "font-bold", "leading-none") }) { Text("+") }
+            Span(attrs = { classes("text-2xl", "font-bold", "leading-none") }) { Text("+") }
+            Span(attrs = { classes("text-sm") }) { Text("New order") }
         }
     }
 }
@@ -180,7 +206,9 @@ fun ProviderCard(navigator: Navigator, provider: ProviderModel) {
                 Div(attrs = { classes("flex-1", "min-w-0") }) {
                     P(attrs = { classes("font-semibold", "text-heading", "truncate") }) { Text(provider.name) }
                     Div(attrs = { classes("flex", "items-center", "gap-3", "mt-1") }) {
-                        Span(attrs = { classes("text-sm", "text-warning") }) { Text("⭐ ${provider.rate.to1dp()}") }
+                        // No ratings yet is "New", not a discouraging 0.0.
+                        if (provider.rate > 0.0) Span(attrs = { classes("text-sm", "text-warning") }) { Text("⭐ ${provider.rate.to1dp()}") }
+                        else Badge("New", variant = BadgeVariant.Success, pill = true)
                         Span(attrs = { classes("text-xs", "text-body-subtle") }) { Text("${provider.followersCount} followers") }
                     }
                     provider.services?.takeIf { it.isNotEmpty() }?.let { svcs ->
@@ -196,7 +224,12 @@ fun ProviderCard(navigator: Navigator, provider: ProviderModel) {
                 classes("flex", "items-center", "gap-2", "mt-4", "pt-4", "border-t", "border-default")
                 onClick { it.stopPropagation() }
             }) {
-                ProviderQuickAction("💬", "Chat") { navigator.push(ChatScreen(provider.toChatContent())) }
+                // Chat only exists after the customer accepts a response, so the shortcut here is a direct quote request.
+                if (provider.active && provider.acceptingOrders && provider.user.id != com.wadii.state.AppState.user?.id) {
+                    ProviderQuickAction("📝", "Quote") {
+                        navigator.push(NewOrderScreen(provider.id, provider.name, provider.services.map { it.id }))
+                    }
+                }
                 ProviderQuickAction("📞", "Call") { showCallDialog = true }
                 ProviderQuickAction("📍", "Address") { showAddressDialog = true }
             }

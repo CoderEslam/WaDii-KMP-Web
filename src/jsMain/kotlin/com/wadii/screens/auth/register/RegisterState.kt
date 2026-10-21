@@ -18,5 +18,7 @@ data class RegisterState(
     val selectedCountry: Long = 0,
     val selectedProvince: Long = 0,
     val selectedCity: Long = 0,
-    val loading: Boolean = false
+    val loading: Boolean = false,
+    /** Per-field messages keyed by field (firstName, lastName, email, phone, password, city). */
+    val errors: Map<String, String> = emptyMap()
 )

@@ -21,5 +21,8 @@ data class RequestProviderState(
     val frontIdImage: File? = null,
     val backIdImage: File? = null,
     val taxCardFront: File? = null,
-    val taxCardBack: File? = null
+    val taxCardBack: File? = null,
+
+    /** Per-field messages keyed by field (name, address, phone, services, links, frontId, backId, taxFront, taxBack). */
+    val errors: Map<String, String> = emptyMap()
 )

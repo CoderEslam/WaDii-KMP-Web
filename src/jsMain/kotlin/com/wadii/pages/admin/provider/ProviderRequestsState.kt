@@ -7,5 +7,8 @@ data class ProviderRequestsState(
     val acceptingId: Long = 0L,
     val rejectingId: Long = 0L,
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    /** Application being rejected: the dialog asks for an optional reason that the applicant will read. */
+    val rejectDraft: ProviderRequestModel? = null,
+    val rejectReason: String = ""
 )

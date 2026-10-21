@@ -212,48 +212,35 @@ class ProfileScreen : Screen {
                             EditProfileScreen()
                         )
                     }
-                    DangerButton("Sign Out", fullWidth = true) { AppState.logout() }
                 }
             }
             if (state.user.role != Role.ADMIN.name) {
-                Div(attrs = {
-                    style {
-                        property("position", "fixed")
-                        property("bottom", "24px")
-                        property("right", "24px")
-                        property("z-index", "50")
-                    }
-                }) {
-                    Button(attrs = {
-                        classes(
-                            "flex",
-                            "items-center",
-                            "justify-center",
-                            "gap-2",
-                            "px-5",
-                            "py-3",
-                            "bg-surface",
-                            "text-fg-brand",
-                            "font-medium",
-                            "rounded-full",
-                            "shadow-neu-sm",
-                            "hover:shadow-neu-md",
-                            "active:shadow-neu-inset",
-                            "transition-all",
-                            "disabled:opacity-60"
-                        )
-                        style { property("border", "none"); property("cursor", "pointer") }
-                        onClick {
-                            if (state.user.role == "PROVIDER" || state.user.provider != null && state.user.provider?.id != 0L) {
-                                model.onEvent(ProfileEvent.SwitchRole)
-                            } else {
-                                navigator.push(RequestProviderScreen())
+                val isSeller = state.user.role == Role.PROVIDER.name
+                // Roles are not self-service: a buyer applies and an admin approves (provider-requests).
+                // Sellers just see their status; only an admin can change a role.
+                Card(classes = "p-6 hero-card") {
+                    Div(attrs = { classes("flex", "flex-col", "sm:flex-row", "sm:items-center", "gap-4") }) {
+                        Span(attrs = { classes("text-4xl", "float") }) { Text(if (isSeller) "🧑‍🔧" else "🏬") }
+                        Div(attrs = { classes("flex-1") }) {
+                            H2(attrs = { classes("font-semibold", "text-heading") }) {
+                                Text(if (isSeller) "You're a seller" else "Sell your spare parts on WaDii")
+                            }
+                            P(attrs = { classes("text-sm", "text-body-subtle", "mt-0.5") }) {
+                                Text(
+                                    if (isSeller) "You can still request parts yourself from My Requests. Manage your shop from the menu."
+                                    else "Apply once. An admin reviews your shop, then buyer requests start reaching you."
+                                )
                             }
                         }
-                        if (state.switchingRole) disabled()
-                    }) {
-                        if (state.switchingRole) Spinner() else {
-                            Text(if (state.user.role == Role.PROVIDER.name) "🧑 Switch to Buyer" else "🏬 Switch to Seller")
+                        if (!isSeller) {
+                            Button(attrs = {
+                                classes(
+                                    "px-6", "py-3", "min-h-11", "rounded-full", "bg-brand", "text-on-brand", "font-semibold",
+                                    "shadow-neu-sm", "hover:shadow-neu-md", "transition-all", "fab-pulse"
+                                )
+                                style { property("border", "none"); property("cursor", "pointer") }
+                                onClick { navigator.push(RequestProviderScreen()) }
+                            }) { Text("Become a Seller") }
                         }
                     }
                 }

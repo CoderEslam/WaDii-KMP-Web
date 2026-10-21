@@ -5,6 +5,9 @@ import com.wadii.BaseViewModel
 import com.wadii.domain.model.ads.Ads
 import com.wadii.domain.model.ads.InsertAds
 import com.wadii.domain.usecase.AdsUseCase
+import com.wadii.domain.usecase.MarketplaceUseCase
+import com.wadii.state.AppState
+import com.wadii.utils.Validation
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onStart
@@ -13,7 +16,8 @@ import kotlinx.coroutines.launch
 
 class AdsScreenModel(
     private val existingAd: Ads?,
-    private val adsUseCase: AdsUseCase
+    private val adsUseCase: AdsUseCase,
+    private val marketplaceUseCase: MarketplaceUseCase
 ) : BaseViewModel<AdsState, AdsEvent>() {
 
     override val initialState: AdsState get() = AdsState()
@@ -46,6 +50,7 @@ class AdsScreenModel(
     override fun onEvent(event: AdsEvent) {
         when (event) {
             is AdsEvent.Delete -> delete(event.adId)
+            is AdsEvent.SetStatus -> setStatus(event.adId, event.status)
             is AdsEvent.SetTitle -> updateState { it.copy(title = event.value) }
             is AdsEvent.SetDescription -> updateState { it.copy(description = event.value) }
             is AdsEvent.SetAdvertiserName -> updateState { it.copy(advertiserName = event.value) }
@@ -75,6 +80,19 @@ class AdsScreenModel(
         }
     }
 
+    // PUT /advertisements/status/{id}/{status}: INACTIVE ads are never touched by the nightly scheduler.
+    private fun setStatus(id: Long, status: String) = screenModelScope.launch {
+        marketplaceUseCase.setAdStatus(id, status) { response ->
+            response.handelState(
+                onSuccess = { data ->
+                    updateState { s -> s.copy(ads = s.ads.map { ad -> if (ad.id == id) data.data else ad }) }
+                    AppState.toast(if (status == "ACTIVE") "Ad is live" else "Ad paused")
+                },
+                onError = { error, _ -> AppState.toast(error.ifBlank { "Couldn't change the ad status" }, true) }
+            )
+        }
+    }
+
     private fun delete(id: Long) = screenModelScope.launch {
         adsUseCase.deleteAds(id) { response ->
             response.handelState(
@@ -90,16 +108,28 @@ class AdsScreenModel(
                         )
                     }
                     ads()
-                }, onError = { error, code ->
-                    updateState {
-                        it.copy(isLoading = false)
-                    }
+                }, onError = { error, _ ->
+                    updateState { it.copy(isLoading = false, error = error) }
+                    AppState.toast(error.ifBlank { "Couldn't delete the advertisement" }, true)
                 }
             )
         }
     }
 
     private fun submit() = screenModelScope.launch {
+        val s = _state.value
+        val errors = buildMap {
+            if (s.title.isBlank()) put("title", "Title is required")
+            if (s.advertiserName.isBlank()) put("advertiser", "Advertiser name is required")
+            Validation.url(s.imageUrl)?.let { put("imageUrl", it) }
+            Validation.url(s.targetUrl)?.let { put("targetUrl", it) }
+            Validation.dateRange(s.startDate, s.endDate)?.let { put("dates", it) }
+            val priority = s.priority.toIntOrNull()
+            if (priority == null || priority !in 0..100) put("priority", "Priority is a whole number from 0 to 100 (higher shows first)")
+        }
+        updateState { it.copy(fieldErrors = errors, error = "") }
+        if (errors.isNotEmpty()) return@launch
+
         if (_state.value.isEdit) {
             updateAds()
         } else {
@@ -132,6 +162,7 @@ class AdsScreenModel(
                         it.copy(isLoading = true)
                     }
                 }, onSuccess = { data ->
+                    AppState.toast("Advertisement saved")
                     updateState {
                         it.copy(
                             ads = _state.value.ads.toMutableList().apply {
@@ -140,10 +171,9 @@ class AdsScreenModel(
                             isLoading = false
                         )
                     }
-                }, onError = { error, code ->
-                    updateState {
-                        it.copy(isLoading = false)
-                    }
+                }, onError = { error, _ ->
+                    updateState { it.copy(isLoading = false, error = error) }
+                    AppState.toast(error.ifBlank { "Couldn't save the advertisement" }, true)
                 }
             )
         }
@@ -158,8 +188,8 @@ class AdsScreenModel(
                 advertiserName = _state.value.advertiserName,
                 imageUrl = _state.value.imageUrl,
                 targetUrl = _state.value.targetUrl,
-                startDate = _state.value.startDate,
-                endDate = _state.value.endDate,
+                startDate = "${_state.value.startDate.take(10)}T00:00:00",
+                endDate = "${_state.value.endDate.take(10)}T00:00:00",
                 priority = _state.value.priority.toIntOrNull() ?: 0
             )
         ) { response ->
@@ -169,6 +199,7 @@ class AdsScreenModel(
                         it.copy(isLoading = true)
                     }
                 }, onSuccess = { data ->
+                    AppState.toast("Advertisement saved")
                     updateState {
                         it.copy(
                             ads = _state.value.ads.toMutableList().map { ad ->
@@ -181,10 +212,9 @@ class AdsScreenModel(
                             isLoading = false
                         )
                     }
-                }, onError = { error, code ->
-                    updateState {
-                        it.copy(isLoading = false)
-                    }
+                }, onError = { error, _ ->
+                    updateState { it.copy(isLoading = false, error = error) }
+                    AppState.toast(error.ifBlank { "Couldn't save the advertisement" }, true)
                 }
             )
         }

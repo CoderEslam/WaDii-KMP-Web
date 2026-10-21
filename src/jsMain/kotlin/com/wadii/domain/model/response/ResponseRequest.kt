@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ResponseRequest(
+    @SerialName("id")
+    val id: Int = 0,
     @SerialName("providerId")
     val providerId: Long = 0,
     @SerialName("orderId")
@@ -24,3 +26,10 @@ data class ResponseRequest(
         @SerialName("price") val price: Double = 0.0
     )
 }
+
+
+/** Body of `POST /responses/accept-response` and `/responses/cancel-response`. */
+@Serializable
+data class ResponseDecision(
+    @SerialName("responseId") val responseId: Long
+)

@@ -8,4 +8,7 @@ sealed class OrdersEvent {
     object DismissCancelDialog : OrdersEvent()
     data class SelectCancelReason(val reasonId: Int) : OrdersEvent()
     object ConfirmCancel : OrdersEvent()
+    data class AskDelete(val order: OrderModel) : OrdersEvent()
+    object DismissDelete : OrdersEvent()
+    object ConfirmDelete : OrdersEvent()
 }

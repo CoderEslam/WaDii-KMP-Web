@@ -6,6 +6,7 @@ import com.wadii.data.firebase.FcmService
 import com.wadii.domain.model.auth.login.LoginRequest
 import com.wadii.domain.usecase.AuthUseCase
 import com.wadii.state.AppState
+import com.wadii.utils.RequestValidators
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -23,8 +24,8 @@ class LoginViewModel(private val authUseCase: AuthUseCase) :
 
     override fun onEvent(event: LoginEvent) {
         when (event) {
-            is LoginEvent.SetEmail -> updateState { it.copy(email = event.value) }
-            is LoginEvent.SetPassword -> updateState { it.copy(password = event.value) }
+            is LoginEvent.SetEmail -> updateState { it.copy(email = event.value, errors = it.errors - "email") }
+            is LoginEvent.SetPassword -> updateState { it.copy(password = event.value, errors = it.errors - "password") }
             LoginEvent.Submit -> {
                 submit()
             }
@@ -34,9 +35,12 @@ class LoginViewModel(private val authUseCase: AuthUseCase) :
     private fun submit() = screenModelScope.launch {
         val current = _state.value
         if (current.loading) return@launch
+        val errors = RequestValidators.login(current.email, current.password)
+        updateState { it.copy(errors = errors) }
+        if (errors.isNotEmpty()) return@launch
         updateState { it.copy(loading = true) }
         console.log("Permission:", permission)
-        val fcmToken = FcmService.fetchToken() ?: "no fcm token"
+        val fcmToken = FcmService.fetchToken() ?: ""
         console.log("FCM token:", fcmToken)
         authUseCase.login(
             LoginRequest(
@@ -57,8 +61,9 @@ class LoginViewModel(private val authUseCase: AuthUseCase) :
                     }
                     updateState { it.copy(loading = false) }
                 },
-                onError = { _, _ ->
-                    AppState.toast("Invalid email or password", true)
+                onError = { error, _ ->
+                    // The server says exactly what's wrong ("Invalid password", "User does not exist...").
+                    AppState.toast(error.ifBlank { "Couldn't sign in. Please try again." }, true)
                     updateState { it.copy(loading = false) }
                 }
             )

@@ -41,11 +41,11 @@ class AddProviderScreen : Screen {
             Card(classes = "p-6") {
                 H2(attrs = { classes("font-semibold", "text-heading", "mb-4") }) { Text("Account") }
                 Div(attrs = { classes("grid", "grid-cols-2", "gap-3") }) {
-                    InputField("First Name", s.firstName, required = true) { model.onEvent(AddProviderEvent.SetFirstName(it)) }
-                    InputField("Last Name", s.lastName, required = true) { model.onEvent(AddProviderEvent.SetLastName(it)) }
-                    InputField("Email", s.email, type = "email", required = true) { model.onEvent(AddProviderEvent.SetEmail(it)) }
-                    InputField("Password", s.password, type = "password", required = true) { model.onEvent(AddProviderEvent.SetPassword(it)) }
-                    InputField("Phone", s.phone, required = true) { model.onEvent(AddProviderEvent.SetPhone(it)) }
+                    InputField("First Name", s.firstName, required = true, error = s.errors["firstName"]) { model.onEvent(AddProviderEvent.SetFirstName(it)) }
+                    InputField("Last Name", s.lastName, required = true, error = s.errors["lastName"]) { model.onEvent(AddProviderEvent.SetLastName(it)) }
+                    InputField("Email", s.email, type = "email", required = true, error = s.errors["email"]) { model.onEvent(AddProviderEvent.SetEmail(it)) }
+                    InputField("Password", s.password, type = "password", required = true, error = s.errors["password"], hint = "At least 8 characters, letters and numbers") { model.onEvent(AddProviderEvent.SetPassword(it)) }
+                    InputField("Phone", s.phone, type = "tel", required = true, error = s.errors["phone"]) { model.onEvent(AddProviderEvent.SetPhone(it)) }
                     if (s.cities.isNotEmpty()) {
                         SelectField(
                             label = "City",
@@ -60,8 +60,8 @@ class AddProviderScreen : Screen {
             Card(classes = "p-6") {
                 H2(attrs = { classes("font-semibold", "text-heading", "mb-4") }) { Text("Overview") }
                 Div(attrs = { classes("grid", "grid-cols-2", "gap-3") }) {
-                    InputField("Provider Name", s.providerName, required = true) { model.onEvent(AddProviderEvent.SetProviderName(it)) }
-                    InputField("Rate", s.rate, type = "number") { model.onEvent(AddProviderEvent.SetRate(it)) }
+                    InputField("Provider Name", s.providerName, required = true, error = s.errors["providerName"]) { model.onEvent(AddProviderEvent.SetProviderName(it)) }
+                    InputField("Rate", s.rate, type = "number", error = s.errors["rate"], hint = "0 to 5") { model.onEvent(AddProviderEvent.SetRate(it)) }
                 }
             }
 
@@ -90,7 +90,7 @@ class AddProviderScreen : Screen {
                     s.branches.forEachIndexed { branchIndex, branch ->
                         Div(attrs = { classes("border", "border-default", "rounded-neu-base", "p-4", "space-y-3") }) {
                             Div(attrs = { classes("grid", "grid-cols-2", "gap-3") }) {
-                                InputField("Branch Name", branch.name) {
+                                InputField("Branch Name", branch.name, required = true, error = s.errors["branch$branchIndex"]) {
                                     model.onEvent(AddProviderEvent.SetBranchName(branchIndex, it))
                                 }
                                 InputField("Address", branch.address) {
@@ -123,7 +123,7 @@ class AddProviderScreen : Screen {
                     s.links.forEachIndexed { linkIndex, link ->
                         Div(attrs = { classes("flex", "items-end", "gap-2") }) {
                             Div(attrs = { classes("flex-1") }) {
-                                InputField("URL", link, type = "url", placeholder = "https://") {
+                                InputField("URL", link, type = "url", placeholder = "https://", error = s.errors["link$linkIndex"]) {
                                     model.onEvent(AddProviderEvent.SetLink(linkIndex, it))
                                 }
                             }

@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.wadii.BaseViewModel
 import com.wadii.domain.model.providerRequests.ProviderRequestModel
 import com.wadii.domain.usecase.AdminDashboardUseCase
+import com.wadii.state.AppState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onStart
@@ -26,24 +27,24 @@ class ProviderRequestsViewModel(
 
     override fun onEvent(event: ProviderRequestsEvent) {
         when (event) {
-            is ProviderRequestsEvent.Accept -> {
-                accept(event.request)
-            }
-            is ProviderRequestsEvent.Reject -> {
-                reject(event.request)
-            }
+            is ProviderRequestsEvent.Accept -> accept(event.request)
+            is ProviderRequestsEvent.Reject -> updateState { it.copy(rejectDraft = event.request, rejectReason = "") }
+            is ProviderRequestsEvent.SetReason -> updateState { it.copy(rejectReason = event.value) }
+            ProviderRequestsEvent.DismissReject -> updateState { it.copy(rejectDraft = null, rejectReason = "") }
+            ProviderRequestsEvent.ConfirmReject -> _state.value.rejectDraft?.let { reject(it, _state.value.rejectReason) }
         }
     }
 
     private fun requests() = screenModelScope.launch {
         adminDashboardUseCase.requests { r ->
             r.handelState(
-                onLoading = { updateState { it.copy(isLoading = true) } },
+                onLoading = { updateState { it.copy(isLoading = it.requests.isEmpty()) } },
                 onSuccess = { data ->
                     updateState {
                         it.copy(
                             requests = data.data ?: emptyList(),
-                            isLoading = false
+                            isLoading = false,
+                            error = null
                         )
                     }
                 },
@@ -52,49 +53,42 @@ class ProviderRequestsViewModel(
         }
     }
 
+    /** Creates the provider, switches the user's role and removes the application; the applicant is notified. */
     private fun accept(req: ProviderRequestModel) = screenModelScope.launch {
+        if (_state.value.acceptingId != 0L || _state.value.rejectingId != 0L) return@launch
+        updateState { it.copy(acceptingId = req.id) }
         adminDashboardUseCase.acceptRequest(id = req.id) { response ->
             response.handelState(
-                onLoading = {
-                    updateState { it.copy(isLoading = true) }
-                }, onSuccess = { data ->
-                    updateState {
-                        it.copy(
-                            requests = it.requests.filter { r -> r.id != req.id },
-                            acceptingId = 0L
-                        )
-                    }
-                }, onError = { error, code ->
-                    updateState {
-                        it.copy(
-                            error = error,
-                            isLoading = false
-                        )
-                    }
+                onSuccess = {
+                    AppState.toast("${req.name} is now a seller")
+                    updateState { it.copy(requests = it.requests.filter { r -> r.id != req.id }, acceptingId = 0L) }
+                },
+                onError = { error, _ ->
+                    AppState.toast(error.ifBlank { "Couldn't accept the application" }, true)
+                    updateState { it.copy(acceptingId = 0L) }
+                    requests() // a 404/409 usually means someone already handled it
                 }
             )
         }
     }
 
-    private fun reject(req: ProviderRequestModel) = screenModelScope.launch {
-        adminDashboardUseCase.rejectRequest(id = req.id) { response ->
+    private fun reject(req: ProviderRequestModel, reason: String) = screenModelScope.launch {
+        if (_state.value.acceptingId != 0L || _state.value.rejectingId != 0L) return@launch
+        updateState { it.copy(rejectingId = req.id) }
+        adminDashboardUseCase.rejectRequest(id = req.id, reason = reason) { response ->
             response.handelState(
-                onLoading = {
-                    updateState { it.copy(rejectingId = req.id) }
-                }, onSuccess = { data ->
+                onSuccess = {
+                    AppState.toast("Application rejected")
                     updateState {
                         it.copy(
                             requests = it.requests.filter { r -> r.id != req.id },
-                            rejectingId = 0L
+                            rejectingId = 0L, rejectDraft = null, rejectReason = ""
                         )
                     }
-                }, onError = { error, code ->
-                    updateState {
-                        it.copy(
-                            error = error,
-                            rejectingId = 0L
-                        )
-                    }
+                },
+                onError = { error, _ ->
+                    AppState.toast(error.ifBlank { "Couldn't reject the application" }, true)
+                    updateState { it.copy(rejectingId = 0L) }
                 }
             )
         }

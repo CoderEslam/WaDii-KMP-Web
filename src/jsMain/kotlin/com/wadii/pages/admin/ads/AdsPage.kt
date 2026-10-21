@@ -77,6 +77,9 @@ class AdsScreen : Screen {
                                 }
                             }
                             Div(attrs = { classes("flex", "gap-1") }) {
+                                GhostButton(if (ad.status == "ACTIVE") "⏸" else "▶") {
+                                    adsScreenModel.onEvent(AdsEvent.SetStatus(ad.id, if (ad.status == "ACTIVE") "INACTIVE" else "ACTIVE"))
+                                }
                                 GhostButton("✏️") { navigator.push(CreateAdScreen(ad)) }
                                 GhostButton("🗑️") { adsScreenModel.onEvent(AdsEvent.Delete(ad.id)) }
                             }

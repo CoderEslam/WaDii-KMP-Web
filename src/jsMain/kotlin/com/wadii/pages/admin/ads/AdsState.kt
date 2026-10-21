@@ -14,7 +14,9 @@ data class AdsState(
     val startDate: String = "",
     val endDate: String = "",
     val priority: String = "0",
-    val error: String = ""
+    val error: String = "",
+    /** Per-field messages keyed by field name (title, advertiser, imageUrl, targetUrl, dates, priority). */
+    val fieldErrors: Map<String, String> = emptyMap()
 ) {
     val isEdit: Boolean get() = id != 0L
 }

@@ -7,6 +7,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.wadii.data.api.to1dp
 import com.wadii.screens.orders.new.NewOrderScreen
+import com.wadii.state.AppState
+import com.wadii.ui.TextArea
 import com.wadii.ui.Alert
 import com.wadii.ui.AlertVariant
 import com.wadii.ui.Avatar
@@ -63,6 +65,9 @@ class ProviderDetailScreen(val providerId: Long) : Screen {
                             Div(attrs = { classes("flex", "items-center", "gap-4", "mt-2", "text-sm", "text-body") }) {
                                 Span { Text("⭐ ${provider.rate.to1dp()} rating") }
                                 Span { Text("👥 ${provider.followersCount} followers") }
+                            }
+                            if (!provider.active || !provider.acceptingOrders) {
+                                Div(attrs = { classes("mt-3") }) { Badge("Not taking new orders", variant = BadgeVariant.Warning, pill = true, icon = "⏸") }
                             }
                             if (provider.services.isNotEmpty()) {
                                 Div(attrs = { classes("flex", "flex-wrap", "gap-2", "mt-4") }) {

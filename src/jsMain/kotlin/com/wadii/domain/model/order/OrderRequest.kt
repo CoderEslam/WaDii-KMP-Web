@@ -14,6 +14,9 @@ data class OrderRequest(
     val date: String = "",
     @SerialName("id")
     val id: String = "",
+    /** Optional: send the order to this provider only (they must offer every requested service). */
+    @SerialName("providerId")
+    val providerId: Long? = null,
     @SerialName("latitude")
     val latitude: Double = 0.0,
     @SerialName("longitude")

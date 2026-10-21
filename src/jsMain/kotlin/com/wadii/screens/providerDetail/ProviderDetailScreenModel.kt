@@ -67,7 +67,7 @@ class ProviderDetailViewModel(
                         updateState { it.copy(following = false) };
                         AppState.toast("Unfollowed")
                     },
-                    onError = { _, _ -> }
+                    onError = { error, _ -> AppState.toast(error.ifBlank { "Something went wrong. Please try again." }, true) }
                 )
             }
         } else {
@@ -78,7 +78,7 @@ class ProviderDetailViewModel(
                         updateState { it.copy(following = true) };
                         AppState.toast("Following!")
                     },
-                    onError = { _, _ -> }
+                    onError = { error, _ -> AppState.toast(error.ifBlank { "Something went wrong. Please try again." }, true) }
                 )
             }
         }

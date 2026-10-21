@@ -8,5 +8,7 @@ data class ProviderDashboardState(
     val provider: ProviderModel? = null,
     val orders: List<OrderModel> = emptyList(),
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    /** True while the availability switch is being saved. */
+    val savingAvailability: Boolean = false
 )

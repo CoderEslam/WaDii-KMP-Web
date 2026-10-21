@@ -16,6 +16,7 @@ import com.wadii.ui.InputField
 import com.wadii.ui.LoadingScreen
 import com.wadii.ui.PrimaryButton
 import com.wadii.ui.SecondaryButton
+import com.wadii.ui.classNames
 import kotlinx.browser.document
 import org.jetbrains.compose.web.dom.*
 import org.w3c.dom.HTMLInputElement
@@ -36,7 +37,7 @@ class RequestProviderScreen : Screen {
         fun pickFile(onFile: (File) -> Unit) {
             val input = document.createElement("input") as HTMLInputElement
             input.type = "file"
-            input.accept = "image/*"
+            input.accept = "image/jpeg,image/png,image/webp"
             input.onchange = { input.files?.asList()?.firstOrNull()?.let(onFile); null }
             input.click()
         }
@@ -55,9 +56,9 @@ class RequestProviderScreen : Screen {
                 Card(classes = "p-6") {
                     H2(attrs = { classes("font-semibold", "text-heading", "mb-4") }) { Text("Shop Info") }
                     Div(attrs = { classes("space-y-4") }) {
-                        InputField("Shop Name", s.name, required = true) { model.onEvent(RequestProviderEvent.SetName(it)) }
-                        InputField("Address", s.address, required = true) { model.onEvent(RequestProviderEvent.SetAddress(it)) }
-                        InputField("Phone Number", s.phoneNumber, type = "tel", required = true) {
+                        InputField("Shop Name", s.name, required = true, error = s.errors["name"]) { model.onEvent(RequestProviderEvent.SetName(it)) }
+                        InputField("Address", s.address, required = true, error = s.errors["address"]) { model.onEvent(RequestProviderEvent.SetAddress(it)) }
+                        InputField("Phone Number", s.phoneNumber, "+20 100 123 4567", type = "tel", required = true, error = s.errors["phone"]) {
                             model.onEvent(RequestProviderEvent.SetPhoneNumber(it))
                         }
                     }
@@ -79,6 +80,7 @@ class RequestProviderScreen : Screen {
                                 }
                             }
                         }
+                        s.errors["services"]?.let { P(attrs = { classes("field-error", "mt-2"); attr("role", "alert") }) { Text(it) } }
                     }
                 }
 
@@ -95,23 +97,27 @@ class RequestProviderScreen : Screen {
                                 GhostButton("🗑️") { model.onEvent(RequestProviderEvent.RemoveLink(linkIndex)) }
                             }
                         }
+                        s.errors["links"]?.let { P(attrs = { classes("field-error"); attr("role", "alert") }) { Text(it) } }
                         SecondaryButton("+ Add link", fullWidth = true) { model.onEvent(RequestProviderEvent.AddLink) }
                     }
                 }
 
                 Card(classes = "p-6") {
-                    H2(attrs = { classes("font-semibold", "text-heading", "mb-4") }) { Text("Verification Documents") }
-                    Div(attrs = { classes("grid", "grid-cols-2", "gap-4") }) {
-                        FilePickerField("Front ID Image", s.frontIdImage?.name) {
+                    H2(attrs = { classes("font-semibold", "text-heading", "mb-1") }) { Text("Verification Documents") }
+                    P(attrs = { classes("text-xs", "text-body-subtle", "mb-4") }) {
+                        Text("JPG, PNG or WebP, up to 5 MB each. Only our review team can see these.")
+                    }
+                    Div(attrs = { classes("grid", "grid-cols-1", "sm:grid-cols-2", "gap-4") }) {
+                        FilePickerField("Front ID Image", s.frontIdImage?.name, s.errors["frontId"]) {
                             pickFile { model.onEvent(RequestProviderEvent.SetFrontIdImage(it)) }
                         }
-                        FilePickerField("Back ID Image", s.backIdImage?.name) {
+                        FilePickerField("Back ID Image", s.backIdImage?.name, s.errors["backId"]) {
                             pickFile { model.onEvent(RequestProviderEvent.SetBackIdImage(it)) }
                         }
-                        FilePickerField("Tax Card Front", s.taxCardFront?.name) {
+                        FilePickerField("Tax Card Front", s.taxCardFront?.name, s.errors["taxFront"]) {
                             pickFile { model.onEvent(RequestProviderEvent.SetTaxCardFront(it)) }
                         }
-                        FilePickerField("Tax Card Back", s.taxCardBack?.name) {
+                        FilePickerField("Tax Card Back", s.taxCardBack?.name, s.errors["taxBack"]) {
                             pickFile { model.onEvent(RequestProviderEvent.SetTaxCardBack(it)) }
                         }
                     }
@@ -129,17 +135,19 @@ class RequestProviderScreen : Screen {
 }
 
 @Composable
-private fun FilePickerField(label: String, fileName: String?, onClick: () -> Unit) {
+private fun FilePickerField(label: String, fileName: String?, error: String?, onClick: () -> Unit) {
     Div(attrs = { classes("space-y-2") }) {
         Label(attrs = { classes("text-sm", "font-medium", "text-heading") }) { Text("$label *") }
         Button(attrs = {
-            classes(
-                "w-full", "px-4", "py-2.5", "border", "border-default-medium", "rounded-neu-base",
+            classes(*classNames(
+                "w-full", "px-4", "py-2.5", "min-h-11", "border", "border-default-medium", "rounded-neu-base",
                 "bg-surface", "shadow-neu-sm", "hover:shadow-neu-md", "active:shadow-neu-inset",
-                "transition-all", "text-sm", "text-body", "text-left", "truncate"
-            )
+                "transition-all", "text-sm", "text-body", "text-left", "truncate",
+                if (error != null) "input-invalid" else null
+            ))
             style { property("cursor", "pointer") }
             onClick { onClick() }
-        }) { Text(fileName ?: "📎 Choose file") }
+        }) { Text(fileName?.let { "✅ $it" } ?: "📎 Choose file") }
+        error?.let { P(attrs = { classes("field-error"); attr("role", "alert") }) { Text(it) } }
     }
 }

@@ -89,16 +89,23 @@ fun <T> SelectField(
     options: List<T>,
     selected: T,
     optionLabel: (T) -> String,
+    required: Boolean = false,
+    error: String? = null,
     onSelect: (T) -> Unit
 ) {
     Div(attrs = { classes("flex", "flex-col", "gap-2") }) {
-        Label(attrs = { classes("text-sm", "font-medium", "text-heading") }) { Text(label) }
+        Label(attrs = { classes("text-sm", "font-medium", "text-heading") }) {
+            Text(label)
+            if (required) Span(attrs = { classes("text-fg-danger", "ml-0.5") }) { Text("*") }
+        }
         Select(attrs = {
-            classes(
-                "w-full", "px-4", "py-2.5", "border", "border-default-medium", "rounded-neu-base",
+            classes(*classNames(
+                "w-full", "px-4", "py-2.5", "min-h-11", "border", "border-default-medium", "rounded-neu-base",
                 "bg-surface", "shadow-neu-inset", "text-sm", "text-heading",
-                "focus:outline-none", "focus:ring-1", "focus:ring-brand", "focus:border-brand"
-            )
+                "focus:outline-none", "focus:ring-2", "focus:ring-brand", "focus:border-brand",
+                if (error != null) "input-invalid" else null
+            ))
+            if (error != null) attr("aria-invalid", "true")
             onChange { event ->
                 val idx = (event.target as? org.w3c.dom.HTMLSelectElement)?.selectedIndex ?: -1
                 if (idx in options.indices) onSelect(options[idx])
@@ -110,5 +117,6 @@ fun <T> SelectField(
                 }
             }
         }
+        if (error != null) P(attrs = { classes("field-error"); attr("role", "alert") }) { Text(error) }
     }
 }

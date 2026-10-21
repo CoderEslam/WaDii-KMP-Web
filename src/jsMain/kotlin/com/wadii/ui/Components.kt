@@ -45,16 +45,17 @@ fun LoadingScreen() {
 fun LoadingSkeletons(count: Int = 4, height: String = "h-24") {
     Div(attrs = { classes("space-y-3") }) {
         repeat(count) {
-            Div(attrs = { classes("bg-surface", "shadow-neu-inset", "rounded-neu-base", height) }) {}
+            Div(attrs = { classes("skeleton", "rounded-neu-base", height) }) {}
         }
     }
 }
 
 @Composable
-fun EmptyState(icon: String, message: String) {
-    Div(attrs = { classes("bg-surface", "shadow-neu-md", "rounded-neu-base", "p-12", "text-center") }) {
-        P(attrs = { classes("text-5xl", "mb-3") }) { Text(icon) }
-        P(attrs = { classes("text-body") }) { Text(message) }
+fun EmptyState(icon: String, message: String, hint: String? = null) {
+    Div(attrs = { classes("bg-surface", "shadow-neu-md", "rounded-neu-base", "p-12", "text-center", "pop") }) {
+        P(attrs = { classes("text-5xl", "mb-3", "float") }) { Text(icon) }
+        P(attrs = { classes("text-heading", "font-medium") }) { Text(message) }
+        if (hint != null) P(attrs = { classes("text-sm", "text-body-subtle", "mt-1") }) { Text(hint) }
     }
 }
 
@@ -89,10 +90,12 @@ fun Toast() {
 
 @Composable
 fun Card(classes: String = "", content: @Composable () -> Unit) {
+    // Cards that already declare a hover shadow are clickable: give them a gentle lift too.
+    val lift = if (classes.contains("hover:shadow-neu-md")) " card-lift" else ""
     Div(attrs = {
         classes("bg-surface", "border", "border-default", "rounded-neu-base", "shadow-neu-md")
         if (classes.isNotEmpty()) attr("class",
-            "bg-surface border border-default rounded-neu-base shadow-neu-md $classes")
+            "bg-surface border border-default rounded-neu-base shadow-neu-md $classes$lift")
     }) { content() }
 }
 
@@ -167,7 +170,7 @@ private fun neuButtonBase(
 ) {
     Button(attrs = {
         classes(*classNames(
-            if (fullWidth) "w-full" else null, "px-5", "py-2.5", "bg-surface", "border", "border-default",
+            if (fullWidth) "w-full" else null, "px-5", "py-2.5", "min-h-11", "bg-surface", "border", "border-default",
             textColorClass, "font-medium", "rounded-neu-base",
             if (ghost) "hover:shadow-neu-sm" else "shadow-neu-sm hover:shadow-neu-md",
             "active:shadow-neu-inset", "transition-all",
@@ -225,10 +228,15 @@ fun InputField(
     required: Boolean = false,
     leadingIcon: String? = null,
     trailingIcon: String? = null,
+    error: String? = null,
+    hint: String? = null,
     onInput: (String) -> Unit
 ) {
     Div(attrs = { classes("flex", "flex-col", "gap-2") }) {
-        Label(attrs = { classes("text-sm", "font-medium", "text-heading") }) { Text(label) }
+        Label(attrs = { classes("text-sm", "font-medium", "text-heading") }) {
+            Text(label)
+            if (required) Span(attrs = { classes("text-fg-danger", "ml-0.5") }) { Text("*") }
+        }
         Div(attrs = { classes("relative") }) {
             if (leadingIcon != null) {
                 Span(attrs = {
@@ -245,15 +253,20 @@ fun InputField(
                     "bg-surface", "shadow-neu-inset", "text-sm", "text-heading",
                     if (leadingIcon != null) "pl-9" else "px-4",
                     if (trailingIcon != null) "pr-9" else null,
-                    "focus:outline-none", "focus:ring-1", "focus:ring-brand",
+                    if (error != null) "input-invalid" else null,
+                    "focus:outline-none", "focus:ring-2", "focus:ring-brand",
                     "focus:border-brand"))
                 attr("type", type)
                 attr("placeholder", placeholder)
+                if (error != null) attr("aria-invalid", "true")
                 value(value)
                 if (required) required()
                 onInput { event -> onInput(event.value) }
             })
         }
+        // Error sits right under the field it belongs to; hint only shows while there is no error.
+        if (error != null) P(attrs = { classes("field-error"); attr("role", "alert") }) { Text(error) }
+        else if (hint != null) P(attrs = { classes("text-xs", "text-body-subtle") }) { Text(hint) }
     }
 }
 
@@ -263,20 +276,28 @@ fun TextArea(
     value: String,
     placeholder: String = "",
     rows: Int = 4,
+    required: Boolean = false,
+    error: String? = null,
     onInput: (String) -> Unit
 ) {
     val v = value
     Div(attrs = { classes("flex", "flex-col", "gap-2") }) {
-        Label(attrs = { classes("text-sm", "font-medium", "text-heading") }) { Text(label) }
+        Label(attrs = { classes("text-sm", "font-medium", "text-heading") }) {
+            Text(label)
+            if (required) Span(attrs = { classes("text-fg-danger", "ml-0.5") }) { Text("*") }
+        }
         org.jetbrains.compose.web.dom.TextArea(attrs = {
-            classes("w-full", "px-4", "py-2.5", "border", "border-default-medium", "rounded-neu-base",
+            classes(*classNames("w-full", "px-4", "py-2.5", "border", "border-default-medium", "rounded-neu-base",
                 "bg-surface", "shadow-neu-inset", "text-sm", "text-heading",
-                "focus:outline-none", "focus:ring-1", "focus:ring-brand", "focus:border-brand", "resize-none")
+                "focus:outline-none", "focus:ring-2", "focus:ring-brand", "focus:border-brand", "resize-none",
+                if (error != null) "input-invalid" else null))
             attr("placeholder", placeholder)
             attr("rows", rows.toString())
+            if (error != null) attr("aria-invalid", "true")
             value(v)
             onInput { event -> onInput(event.value) }
         })
+        if (error != null) P(attrs = { classes("field-error"); attr("role", "alert") }) { Text(error) }
     }
 }
 
@@ -299,7 +320,7 @@ fun StatCard(label: String, value: String, emoji: String, bg: String = "bg-brand
         ))
         if (onClick != null) onClick { onClick() }
     }) {
-        Div(attrs = { classes("inline-flex", "p-3", bg, "rounded-neu-base", "mb-3") }) {
+        Div(attrs = { classes("inline-flex", "p-3", bg, "rounded-neu-base", "mb-3", "pop") }) {
             Span(attrs = { classes("text-xl") }) { Text(emoji) }
         }
         P(attrs = { classes("text-3xl", "font-bold", "text-heading") }) { Text(value) }

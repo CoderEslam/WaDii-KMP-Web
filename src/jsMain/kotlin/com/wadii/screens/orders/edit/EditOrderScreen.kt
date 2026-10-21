@@ -44,8 +44,11 @@ class EditOrderScreen(val orderId: Int) : Screen {
                 else -> {
                     Card(classes = "p-6") {
                         Div(attrs = { classes("space-y-5") }) {
-                            InputField("Vehicle (Make, Model, Year)", state.carModelYear, "Toyota Camry 2022", required = true) {
+                            InputField("Vehicle (Make, Model, Year)", state.carModelYear, "Toyota Camry 2022", required = true, error = state.fieldErrors["car"]) {
                                 model.onEvent(EditOrderEvent.SetCar(it))
+                            }
+                            InputField("Needed by", state.date, type = "date", required = true, error = state.fieldErrors["date"]) {
+                                model.onEvent(EditOrderEvent.SetDate(it))
                             }
                             TextArea("Description", state.comment, "Describe what you need…", 4) {
                                 model.onEvent(EditOrderEvent.SetComment(it))
@@ -99,6 +102,7 @@ class EditOrderScreen(val orderId: Int) : Screen {
                                         style { property("background", "none"); property("border", "none"); property("cursor", "pointer") }
                                         onClick { model.onEvent(EditOrderEvent.AddSparePart) }
                                     }) { Text("+ Add spare part") }
+                                    state.fieldErrors["parts"]?.let { P(attrs = { classes("field-error"); attr("role", "alert") }) { Text(it) } }
                                 }
                             }
 

@@ -2,6 +2,7 @@ package com.wadii.pages.admin.ads
 
 sealed class AdsEvent {
     data class Delete(val adId: Long) : AdsEvent()
+    data class SetStatus(val adId: Long, val status: String) : AdsEvent()
     data class SetTitle(val value: String) : AdsEvent()
     data class SetDescription(val value: String) : AdsEvent()
     data class SetAdvertiserName(val value: String) : AdsEvent()

@@ -3,6 +3,7 @@ package com.wadii.domain.usecase
 import com.wadii.domain.model.BaseResponse
 import com.wadii.domain.model.response.OrderResponse
 import com.wadii.domain.model.response.ResponseCallback
+import com.wadii.domain.model.response.ResponseDecision
 import com.wadii.domain.model.response.ResponseRequest
 import com.wadii.domain.repo.ResponseRepo
 import com.wadii.utils.RequestState
@@ -14,12 +15,12 @@ class ResponseUseCase(private val responseRepo: ResponseRepo) {
         responseRepo.getResponseList(response)
 
     suspend fun acceptResponse(
-        request: OrderResponse,
+        request: ResponseDecision,
         response: (RequestState<BaseResponse<OrderResponse>>) -> Unit
     ) = responseRepo.acceptResponse(request, response)
 
     suspend fun rejectResponse(
-        request: OrderResponse,
+        request: ResponseDecision,
         response: (RequestState<BaseResponse<OrderResponse>>) -> Unit
     ) = responseRepo.rejectResponse(request, response)
 

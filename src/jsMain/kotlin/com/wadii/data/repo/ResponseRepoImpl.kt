@@ -6,6 +6,7 @@ import com.wadii.data.api.ApiService
 import com.wadii.domain.model.BaseResponse
 import com.wadii.domain.model.response.OrderResponse
 import com.wadii.domain.model.response.ResponseCallback
+import com.wadii.domain.model.response.ResponseDecision
 import com.wadii.domain.model.response.ResponseRequest
 import com.wadii.utils.RequestState
 
@@ -14,12 +15,12 @@ class ResponseRepoImpl(private val apiService: ApiService) : ResponseRepo {
         apiService.getResponseList(response)
 
     override suspend fun acceptResponse(
-        request: OrderResponse,
+        request: ResponseDecision,
         response: (RequestState<BaseResponse<OrderResponse>>) -> Unit
     ) = apiService.acceptResponse(request, response)
 
     override suspend fun rejectResponse(
-        request: OrderResponse,
+        request: ResponseDecision,
         response: (RequestState<BaseResponse<OrderResponse>>) -> Unit
     ) = apiService.rejectResponse(request, response)
 

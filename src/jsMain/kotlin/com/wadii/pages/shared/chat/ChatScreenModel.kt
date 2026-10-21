@@ -11,6 +11,8 @@ import com.wadii.domain.model.chat.PageMessages
 import com.wadii.domain.usecase.MessageUseCase
 import com.wadii.state.AppState
 import com.wadii.utils.RequestState
+import com.wadii.utils.RequestValidators
+import com.wadii.utils.firstMessage
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -121,7 +123,13 @@ class ChatViewModel(
     private fun send() {
         val current = _state.value
         val contact = current.selectedContact
-        if (contact.contact.id == 0L || current.messageText.isBlank() || current.sending) return
+        if (current.sending) return
+        val problems = RequestValidators.message(current.messageText, "text", contact.contact.id)
+        if (problems.isNotEmpty()) {
+            // An empty box is just ignored; a missing recipient is worth telling the user about.
+            if (current.messageText.isNotBlank()) AppState.toast(problems.firstMessage(), true)
+            return
+        }
         val text = current.messageText.trim()
         updateState { it.copy(messageText = "", sending = true) }
         screenModelScope.launch {
@@ -156,7 +164,10 @@ class ChatViewModel(
                     r.handelState(
                         onLoading = {},
                         onSuccess = { _ -> restSent = true },
-                        onError = { _, _ -> updateState { it.copy(sending = false) } }
+                        onError = { error, _ ->
+                            updateState { it.copy(sending = false) }
+                            AppState.toast(error.ifBlank { "Message not sent. Please try again." }, true)
+                        }
                     )
                 }
                 if (restSent) {

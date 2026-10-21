@@ -18,6 +18,7 @@ interface AdminRepo {
 
     suspend fun rejectRequest(
         id: Long,
+        reason: String? = null,
         response: (RequestState<BaseResponse<ProviderRequestModel>>) -> Unit
     )
 

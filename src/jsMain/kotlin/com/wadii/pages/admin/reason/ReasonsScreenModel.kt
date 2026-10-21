@@ -5,6 +5,8 @@ import com.wadii.BaseViewModel
 import com.wadii.domain.model.order.CancelReason
 import com.wadii.domain.model.order.InsertReason
 import com.wadii.state.AppState
+import com.wadii.utils.RequestValidators
+import com.wadii.utils.firstMessage
 import com.wadii.viewmodel.ReasonsUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -59,6 +61,7 @@ class ReasonsViewModel(
     }
 
     private fun saveEdit(reason: CancelReason) = screenModelScope.launch {
+        RequestValidators.reason(_state.value.editReason, reason.id.toLong()).let { if (it.isNotEmpty()) { AppState.toast(it.firstMessage(), true); return@launch } }
         reasonsUseCase.updateReason(
             insertReason = InsertReason(
                 id = reason.id,
@@ -73,7 +76,7 @@ class ReasonsViewModel(
                 load()
             }, onError = { error, code ->
                 updateState { it.copy(error = error, saving = false) }
-                AppState.toast("Failed to update", true)
+                AppState.toast(error.ifBlank { "Couldn't update the reason" }, true)
             })
         }
     }
@@ -88,12 +91,13 @@ class ReasonsViewModel(
                 load()
             }, onError = { error, code ->
                 updateState { it.copy(error = error, isLoading = false) }
-                AppState.toast("Failed to delete", true)
+                AppState.toast(error.ifBlank { "Couldn't delete the reason (it may be in use)" }, true)
             })
         }
     }
 
     private fun add() = screenModelScope.launch {
+        RequestValidators.reason(_state.value.newReason).let { if (it.isNotEmpty()) { AppState.toast(it.firstMessage(), true); return@launch } }
         reasonsUseCase.addReason(insertReason = InsertReason(reason = _state.value.newReason)) { response ->
             response.handelState(onLoading = {
                 updateState { it.copy(adding = true) }
@@ -103,7 +107,7 @@ class ReasonsViewModel(
                 load()
             }, onError = { error, code ->
                 updateState { it.copy(error = error, adding = false) }
-                AppState.toast("Failed to add", true)
+                AppState.toast(error.ifBlank { "Couldn't add the reason" }, true)
             })
         }
     }

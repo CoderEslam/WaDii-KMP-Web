@@ -7,10 +7,17 @@ object Constants {
     const val APP_LANGUAGE = "APP_LANGUAGE"
     const val USER_KEY = "USER_KEY"
     const val THEME_KEY = "THEME_KEY"
-    const val PORT = ""
-    const val IP = "eslam.wadii-kmp.online/api"
-    const val BASE_URL = "https://$IP$PORT"
-    const val WS_URL = "wss://$IP$PORT/web-socket"
+
+    const val IP = "localhost"
+    const val PORT = ":8080"
+    const val BASE_URL = "http://$IP$PORT"
+    const val WS_URL = "ws://$IP$PORT/web-socket"
+
+//    const val PORT = ""
+//    const val IP = "eslam.wadii-kmp.online/api"
+//    const val BASE_URL = "https://$IP$PORT"
+//    const val WS_URL = "wss://$IP$PORT/web-socket"
+
     const val BASE_URL_USER_IMAGES = "${BASE_URL}/users"
     const val VERSION = ""
     const val euroSign = "\u20AC"
@@ -27,6 +34,7 @@ object Constants {
 
     const val UPDATE_USER = "${BASE_URL}$VERSION/users/update"
 
+    const val USER_SHOW_ALL = "${BASE_URL}$VERSION/users/show-all"
     const val USER_ME = "${BASE_URL}$VERSION/users/me"
 
     const val UPDATE_USER_IMAGE = "${BASE_URL}$VERSION/users/upload-image"
@@ -56,7 +64,7 @@ object Constants {
     const val SERVICE_LIST = "${BASE_URL}$VERSION/services/show-all"
     const val SERVICE_INSERT = "${BASE_URL}$VERSION/services/insert"
     fun SERVICE_DELETE(id: Long) = "${BASE_URL}$VERSION/services/delete/$id"
-    const val SERVICE_UPDATE = "${BASE_URL}$VERSION/services/insert"
+    const val SERVICE_UPDATE = "${BASE_URL}$VERSION/services/update"
 
     fun UPDATE_PROVIDER(providerId: Long) = "${BASE_URL}$VERSION/providers/update-all/$providerId"
     const val CREATE_PROVIDER_BY_ADMIN = "${BASE_URL}$VERSION/providers/create-by-admin"
@@ -81,12 +89,17 @@ object Constants {
     const val ORDER_SHOW_ALL_ORDER_OF_USER = "${BASE_URL}$VERSION/orders/show-all-order-of-user"
     const val ORDER_INSERT = "${BASE_URL}$VERSION/orders/insert"
     const val ORDER_CANCEL = "${BASE_URL}$VERSION/orders/cancel"
+    fun ORDER_START(id: Int) = "${BASE_URL}$VERSION/orders/start/$id"
+    fun ORDER_COMPLETE(id: Int) = "${BASE_URL}$VERSION/orders/complete/$id"
+    const val PROVIDER_AVAILABILITY = "${BASE_URL}$VERSION/providers/availability"
+    fun PROVIDER_SET_ACTIVE(id: Long, active: Boolean) = "${BASE_URL}$VERSION/providers/set-active/$id/$active"
+    fun PROVIDER_DOCUMENT(requestId: Long, type: String) = "${BASE_URL}$VERSION/provider-requests/$requestId/document/$type"
     const val SHOW_ALL_ORDER_OF_PROVIDER = "${BASE_URL}$VERSION/orders/show-all-order-of-provider"
 
     //cancel reasons
     const val ORDER_CANCEL_REASONS_LIST = "${BASE_URL}$VERSION/reasons/show-all"
     const val REASON_INSERT = "${BASE_URL}$VERSION/reasons/insert"
-    const val REASON_UPDATE = "${BASE_URL}$VERSION/reasons/insert"
+    const val REASON_UPDATE = "${BASE_URL}$VERSION/reasons/update"
     fun REASON_DELETE(id: Int) = "${BASE_URL}$VERSION/reasons/delete/$id"
 
     //offers
@@ -134,7 +147,7 @@ object Constants {
     const val CITY_BY_PROVINCE_ID = "${BASE_URL}$VERSION/cities/by-province"
 
     //delete account
-    const val DELETE_ACCOUNT = "${BASE_URL}$VERSION/users/delete"
+    fun DELETE_ACCOUNT(id: Long) = "${BASE_URL}$VERSION/users/delete/$id"
 
     //ads
     const val ADS_SHOW_ALL = "${BASE_URL}$VERSION/advertisements/show-all"
@@ -145,7 +158,7 @@ object Constants {
 
     //notifications
 
-    const val NOTIFICATIONS_SHOW_ALL = "${BASE_URL}$VERSION/notifications/show-all"
+    const val NOTIFICATIONS_SHOW_ALL = "${BASE_URL}$VERSION/notifications/my"
     const val NOTIFICATIONS_MARK_AS_READ = "${BASE_URL}$VERSION/notifications/mark-all-read"
     const val NOTIFICATIONS_MY_UNREAD = "${BASE_URL}$VERSION/notifications/my/unread"
     const val NOTIFICATIONS_MY_UNREAD_COUNT = "${BASE_URL}$VERSION/notifications/my/unread-count"
@@ -159,6 +172,69 @@ object Constants {
     fun PROVIDER_REQUEST_REJECT(id: Long) = "${BASE_URL}$VERSION/provider-requests/reject/$id"
 
     fun ORDER_SHOW_BY_ID(id: Int) = "${BASE_URL}$VERSION/orders/show/$id"
+    const val ORDER_UPDATE = "${BASE_URL}$VERSION/orders/update"
+    fun ORDER_DELETE(id: Int) = "${BASE_URL}$VERSION/orders/delete/$id"
+
+    // responses (provider proposals)
+    const val RESPONSE_UPDATE = "${BASE_URL}$VERSION/responses/update"
+    fun RESPONSE_DELETE(id: Int) = "${BASE_URL}$VERSION/responses/delete/$id"
+
+    // notifications
+    fun NOTIFICATION_MARK_READ(id: Long) = "${BASE_URL}$VERSION/notifications/mark-read/$id"
+    const val NOTIFICATION_MARK_ALL_READ = "${BASE_URL}$VERSION/notifications/mark-all-read"
+    fun NOTIFICATION_DELETE(id: Long) = "${BASE_URL}$VERSION/notifications/delete/$id"
+
+    // rate
+    const val RATE_INSERT = "${BASE_URL}$VERSION/rate/insert"
+    const val RATE_UPDATE = "${BASE_URL}$VERSION/rate/update"
+    fun RATE_DELETE(id: Long) = "${BASE_URL}$VERSION/rate/delete/$id"
+
+    // car types
+    const val CAR_TYPE_INSERT = "${BASE_URL}$VERSION/car-types/insert"
+    const val CAR_TYPE_UPDATE = "${BASE_URL}$VERSION/car-types/update"
+    fun CAR_TYPE_DELETE(id: Long) = "${BASE_URL}$VERSION/car-types/delete/$id"
+
+    // common spare parts (admin-managed suggestions)
+    const val COMMON_SPARE_PARTS_SHOW_ALL = "${BASE_URL}$VERSION/common-spare-parts/show-all"
+    const val COMMON_SPARE_PARTS_INSERT = "${BASE_URL}$VERSION/common-spare-parts/insert"
+    const val COMMON_SPARE_PARTS_UPDATE = "${BASE_URL}$VERSION/common-spare-parts/update"
+    fun COMMON_SPARE_PARTS_DELETE(id: Long) = "${BASE_URL}$VERSION/common-spare-parts/delete/$id"
+
+    // shop details (provider)
+    const val BRANCH_INSERT = "${BASE_URL}$VERSION/branches/insert"
+    const val BRANCH_UPDATE = "${BASE_URL}$VERSION/branches/update"
+    fun BRANCH_DELETE(id: Long) = "${BASE_URL}$VERSION/branches/delete/$id"
+    fun BRANCH_BY_PROVIDER(providerId: Long) =
+        "${BASE_URL}$VERSION/branches/by-provider/$providerId"
+
+    const val WORK_TIME_INSERT = "${BASE_URL}$VERSION/work-time/insert"
+    const val WORK_TIME_UPDATE = "${BASE_URL}$VERSION/work-time/update"
+    fun WORK_TIME_DELETE(id: Long) = "${BASE_URL}$VERSION/work-time/delete/$id"
+    fun WORK_TIME_BY_BRANCH(branchId: Long) =
+        "${BASE_URL}$VERSION/work-time/get-all-work-time/$branchId"
+
+    const val LINK_INSERT = "${BASE_URL}$VERSION/links/insert"
+    const val LINK_UPDATE = "${BASE_URL}$VERSION/links/update"
+    fun LINK_DELETE(id: Long) = "${BASE_URL}$VERSION/links/delete/$id"
+
+    // ads
+    fun ADS_STATUS(id: Long, status: String) =
+        "${BASE_URL}$VERSION/advertisements/status/$id/$status"
+
+    fun TRACK_IMPRESSION(id: Long) = "${BASE_URL}$VERSION/advertisements/track-impression/$id"
+
+    // providers / offers extras
+    const val PROVIDER_UPDATE_SERVICES = "${BASE_URL}$VERSION/providers/update-services"
+    const val PROVIDER_FILTER_BY_SERVICES = "${BASE_URL}$VERSION/providers/filter-by-services"
+    const val OFFERS_FILTER_BY_SERVICES = "${BASE_URL}$VERSION/offers/filter-by-services"
+
+    // users / presence / calls
+    const val USER_UNREAD_MESSAGES = "${BASE_URL}$VERSION/users/me/unread-count"
+    fun USER_ONLINE(id: Long) = "${BASE_URL}$VERSION/users/$id/online"
+    const val PRESENCE = "${BASE_URL}$VERSION/presence"
+    const val PRESENCE_ONLINE = "${BASE_URL}$VERSION/presence/online"
+    const val AGORA_TOKEN = "${BASE_URL}$VERSION/agora/token"
+    const val AGORA_REJECT = "${BASE_URL}$VERSION/agora/reject"
 
     //firebase (web config — public, safe to ship client-side; NOT the admin.json service account)
     //project_id came from wadii.json; the rest isn't in that file at all — it's not a

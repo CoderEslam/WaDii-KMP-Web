@@ -6,6 +6,7 @@ import com.wadii.core.readBytes
 import com.wadii.domain.model.provider.ProviderRequest
 import com.wadii.domain.usecase.ProviderUseCase
 import com.wadii.state.AppState
+import com.wadii.utils.Validation
 import com.wadii.viewmodel.ServicesUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -69,12 +70,20 @@ class RequestProviderViewModel(
     private fun submit() {
         val s = _state.value
         val userId = AppState.user?.id
-        if (userId == null || s.name.isBlank() || s.address.isBlank() || s.phoneNumber.isBlank() || s.selectedServiceIds.isEmpty()) {
-            AppState.toast("Please fill in all required fields", true)
-            return
+        val errors = buildMap {
+            if (s.name.isBlank()) put("name", "Shop name is required")
+            if (s.address.isBlank()) put("address", "Address is required")
+            Validation.phone(s.phoneNumber)?.let { put("phone", it) }
+            if (s.selectedServiceIds.isEmpty()) put("services", "Pick at least one service you sell")
+            s.links.firstNotNullOfOrNull { Validation.url(it) }?.let { put("links", it) }
+            Validation.image(s.frontIdImage, "Front ID image")?.let { put("frontId", it) }
+            Validation.image(s.backIdImage, "Back ID image")?.let { put("backId", it) }
+            Validation.image(s.taxCardFront, "Tax card front")?.let { put("taxFront", it) }
+            Validation.image(s.taxCardBack, "Tax card back")?.let { put("taxBack", it) }
         }
-        if (s.frontIdImage == null || s.backIdImage == null || s.taxCardFront == null || s.taxCardBack == null) {
-            AppState.toast("Please upload all required documents", true)
+        updateState { it.copy(errors = errors) }
+        if (userId == null || errors.isNotEmpty()) {
+            AppState.toast("Please fix the highlighted fields", true)
             return
         }
 
@@ -83,10 +92,10 @@ class RequestProviderViewModel(
             val request = ProviderRequest(
                 name = s.name,
                 userId = userId,
-                frontIdImage = s.frontIdImage.readBytes(),
-                backIdImage = s.backIdImage.readBytes(),
-                taxCardFront = s.taxCardFront.readBytes(),
-                taxCardBack = s.taxCardBack.readBytes(),
+                frontIdImage = s.frontIdImage!!.readBytes(),
+                backIdImage = s.backIdImage!!.readBytes(),
+                taxCardFront = s.taxCardFront!!.readBytes(),
+                taxCardBack = s.taxCardBack!!.readBytes(),
                 address = s.address,
                 phoneNumber = s.phoneNumber,
                 serviceIds = s.selectedServiceIds.toList(),

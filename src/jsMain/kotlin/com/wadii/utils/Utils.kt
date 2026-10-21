@@ -35,12 +35,12 @@ suspend inline fun <reified Body, reified Response> HttpClient.postApiResponse(
                 RequestState.Success(parsedBody)
             } catch (e: Exception) {
                 RequestState.Error(
-                    "Failed to parse response: ${e.message}",
+                    response.parseFailureMessage(e),
                     response.getStatusCode()
                 )
             }
         } else {
-            RequestState.Error(response.bodyAsText(), response.getStatusCode())
+            RequestState.Error(response.apiErrorMessage(), response.getStatusCode())
         }
     } catch (e: CancellationException) {
         throw e
@@ -65,12 +65,12 @@ suspend inline fun <reified Response> HttpClient.postApiResponse(
                 RequestState.Success(parsedBody)
             } catch (e: Exception) {
                 RequestState.Error(
-                    "Failed to parse response: ${e.message}",
+                    response.parseFailureMessage(e),
                     response.getStatusCode()
                 )
             }
         } else {
-            RequestState.Error(response.bodyAsText(), response.getStatusCode())
+            RequestState.Error(response.apiErrorMessage(), response.getStatusCode())
         }
     } catch (e: CancellationException) {
         throw e
@@ -95,12 +95,12 @@ suspend inline fun <reified Response> HttpClient.getApiResponse(
                 RequestState.Success(parsedBody)
             } catch (e: Exception) {
                 RequestState.Error(
-                    "Failed to parse response: ${e.message}",
+                    response.parseFailureMessage(e),
                     response.getStatusCode()
                 )
             }
         } else {
-            RequestState.Error(response.bodyAsText(), response.getStatusCode())
+            RequestState.Error(response.apiErrorMessage(), response.getStatusCode())
         }
     } catch (e: CancellationException) {
         throw e
@@ -124,12 +124,12 @@ suspend inline fun <reified Response> HttpClient.deleteApiResponse(
                 RequestState.Success(parsedBody)
             } catch (e: Exception) {
                 RequestState.Error(
-                    "Failed to parse response: ${e.message}",
+                    response.parseFailureMessage(e),
                     response.getStatusCode()
                 )
             }
         } else {
-            RequestState.Error(response.bodyAsText(), response.getStatusCode())
+            RequestState.Error(response.apiErrorMessage(), response.getStatusCode())
         }
     } catch (e: CancellationException) {
         throw e
@@ -140,12 +140,12 @@ suspend inline fun <reified Response> HttpClient.deleteApiResponse(
 
 suspend inline fun <reified Body, reified Response> HttpClient.putApiResponse(
     urlString: String,
-    body: Body,
+    body: Body? = null,
     block: HttpRequestBuilder.() -> Unit = {},
 ): RequestState<Response> {
     return try {
         val response: HttpResponse = this.put(urlString) {
-            setBody(body)
+            body?.let { setBody(it) }
             block()
         }
 
@@ -155,16 +155,47 @@ suspend inline fun <reified Body, reified Response> HttpClient.putApiResponse(
                 RequestState.Success(parsedBody)
             } catch (e: Exception) {
                 RequestState.Error(
-                    "Failed to parse response: ${e.message}",
+                    response.parseFailureMessage(e),
                     response.getStatusCode()
                 )
             }
         } else {
-            RequestState.Error(response.bodyAsText(), response.getStatusCode())
+            RequestState.Error(response.apiErrorMessage(), response.getStatusCode())
         }
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
         RequestState.Error("Network error: ${e.message}")
     }
+}
+/**
+ * The backend wraps every result in `{ data, message, statusCode }`, except auth failures which are
+ * `{ "error": "..." }`. Users should read the sentence, not the JSON.
+ */
+private val messageField = Regex("\"(?:message|error)\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\"")
+
+fun extractServerMessage(raw: String): String? =
+    messageField.find(raw)?.groupValues?.get(1)
+        ?.replace("\\\"", "\"")?.replace("\\n", "\n")?.trim()
+        ?.takeIf { it.isNotEmpty() }
+
+suspend fun HttpResponse.apiErrorMessage(): String {
+    val raw = try { bodyAsText() } catch (e: Exception) { "" }
+    return extractServerMessage(raw)
+        ?: when (status.value) {
+            401 -> "Your session has expired. Please sign in again."
+            403 -> "You don't have permission to do that."
+            404 -> "We couldn't find what you asked for."
+            in 500..599 -> "The server had a problem. Please try again in a moment."
+            else -> raw.take(200).ifBlank { "Something went wrong (code ${status.value})." }
+        }
+}
+
+/**
+ * Several endpoints answer HTTP 200 with `data: null` and the reason in `message` (for example a failed
+ * role check). Our typed models can't hold a null `data`, so surface that message instead of a parse error.
+ */
+suspend fun HttpResponse.parseFailureMessage(cause: Exception): String {
+    val raw = try { bodyAsText() } catch (e: Exception) { "" }
+    return extractServerMessage(raw) ?: "We couldn't read the server's answer (${cause.message ?: "unknown error"})."
 }

@@ -28,8 +28,8 @@ class LoginScreen : Screen {
                 Div(attrs = { classes("bg-surface", "rounded-neu-base", "shadow-neu-lg", "p-8", "border", "border-default") }) {
                     H2(attrs = { classes("text-xl", "font-semibold", "text-heading", "mb-6") }) { Text("Sign In") }
                     Div(attrs = { classes("space-y-5") }) {
-                        InputField("Email", state.email, "you@example.com", "email", true) { model.onEvent(LoginEvent.SetEmail(it)) }
-                        InputField("Password", state.password, "••••••••", "password", true) { model.onEvent(LoginEvent.SetPassword(it)) }
+                        InputField("Email", state.email, "you@example.com", "email", true, error = state.errors["email"]) { model.onEvent(LoginEvent.SetEmail(it)) }
+                        InputField("Password", state.password, "••••••••", "password", true, error = state.errors["password"]) { model.onEvent(LoginEvent.SetPassword(it)) }
 
                         PrimaryButton("Sign In", loading = state.loading, fullWidth = true) {
                             model.onEvent(LoginEvent.Submit)

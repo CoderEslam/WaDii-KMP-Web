@@ -31,7 +31,6 @@ class ProfileViewModel(
         when (event) {
             is ProfileEvent.UploadAvatar -> uploadAvatar(event.file)
             is ProfileEvent.UploadBackground -> uploadBackground(event.file)
-            is ProfileEvent.SwitchRole -> switchRole()
         }
     }
 
@@ -107,41 +106,4 @@ class ProfileViewModel(
         }
     }
 
-    private fun switchRole() = screenModelScope.launch {
-        val user = _state.value.user ?: return@launch
-        val hasProviderProfile = user.provider != null && user.provider.id != 0L
-        updateState { it.copy(switchingRole = true) }
-        val onResult: (RequestState<BaseResponse<User>>) -> Unit = { r ->
-            r.handelState(
-                onSuccess = { data ->
-                    val updated = data.data
-                    if (updated != null) {
-                        AppState.saveUser(updated, AppState.token ?: "")
-                        updateState {
-                            it.copy(
-                                user = updated,
-                                switchingRole = false,
-                            )
-                        }
-                        AppState.toast(if (updated.role == "PROVIDER") "Switched to Seller mode" else "Switched to Buyer mode")
-                        load()
-                    } else {
-                        updateState { it.copy(switchingRole = false) }
-                    }
-                },
-                onError = { e, _ ->
-                    updateState { it.copy(switchingRole = false) }
-                    AppState.toast("Failed to switch role", true)
-                }
-            )
-        }
-
-        if (user.role == "PROVIDER") {
-            providerUseCase.putItUser(user.id, onResult)
-        } else if (hasProviderProfile) {
-            providerUseCase.putItProvider(user.id, onResult)
-        } else {
-            updateState { it.copy(switchingRole = false) }
-        }
-    }
 }

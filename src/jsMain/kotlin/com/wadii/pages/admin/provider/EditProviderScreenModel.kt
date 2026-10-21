@@ -12,6 +12,9 @@ import com.wadii.domain.model.provider.UpdateProviderRequest
 import com.wadii.domain.model.provider.WorkTimeRequest
 import com.wadii.domain.usecase.ProviderUseCase
 import com.wadii.state.AppState
+import com.wadii.utils.RequestValidators
+import com.wadii.utils.Validation
+import com.wadii.utils.firstMessage
 import com.wadii.viewmodel.ServicesUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -123,6 +126,34 @@ class EditProviderViewModel(
 
     private fun submit() {
         val s = _state.value
+        val errors = buildMap<String, String> {
+            Validation.name(s.user.firstName, "First name")?.let { put("firstName", it) }
+            Validation.name(s.user.lastName, "Last name")?.let { put("lastName", it) }
+            Validation.email(s.user.email)?.let { put("email", it) }
+            Validation.phone(s.user.phone, required = false)?.let { put("phone", it) }
+            if (s.id <= 0) put("id", "We couldn't identify this provider")
+            val rate = s.rate.toDoubleOrNull()
+            if (rate == null || rate < 0 || rate > 5) put("rate", "Rate is a number from 0 to 5")
+            val followers = s.followersCount.toLongOrNull()
+            if (followers == null || followers < 0) put("followers", "Followers is a whole number, 0 or more")
+            if (s.selectedServiceIds.isEmpty()) put("services", "Pick at least one service")
+            s.branches.forEachIndexed { i, b ->
+                if (b.name.isBlank()) put("branch$i", "Every branch needs a name")
+                b.workTimes.forEachIndexed { j, wt ->
+                    if (wt.startTime.isNotBlank() || wt.closeTime.isNotBlank()) {
+                        RequestValidators.workTime(1, wt.day, wt.startTime, wt.closeTime)
+                            .filterKeys { it == "startTime" || it == "closeTime" }.values.firstOrNull()
+                            ?.let { put("wt${i}_$j", "${wt.day}: $it") }
+                    }
+                }
+            }
+            s.links.forEachIndexed { i, l -> Validation.url(l.link, required = true)?.let { put("link$i", it) } }
+        }
+        updateState { it.copy(errors = errors) }
+        if (errors.isNotEmpty()) {
+            AppState.toast(errors.firstMessage(), true)
+            return
+        }
         screenModelScope.launch {
             updateState { it.copy(isSaving = true, error = null) }
             providerUseCase.updateProvider(

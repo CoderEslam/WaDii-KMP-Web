@@ -21,5 +21,7 @@ data class EditProviderState(
     val isLoadingServices: Boolean = false,
     val isSaving: Boolean = false,
     val error: String? = null,
-    val savedSuccessfully: Boolean = false
+    val savedSuccessfully: Boolean = false,
+    /** Per-field messages: email, phone, firstName, lastName, rate, followers, branch<i>, wt<i>_<j>, link<i>. */
+    val errors: Map<String, String> = emptyMap()
 )

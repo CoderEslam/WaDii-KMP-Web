@@ -17,6 +17,9 @@ import com.wadii.domain.usecase.CountryUseCase
 import com.wadii.domain.usecase.ProviderUseCase
 import com.wadii.domain.usecase.UserUseCase
 import com.wadii.state.AppState
+import com.wadii.utils.RequestValidators
+import com.wadii.utils.Validation
+import com.wadii.utils.firstMessage
 import com.wadii.viewmodel.ServicesUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -208,8 +211,27 @@ class EditProfileViewModel(
     private fun submit() {
         val s = _state.value
         val user = s.originalUser
-        if (user == null || s.firstName.isBlank() || s.lastName.isBlank() || s.email.isBlank() || s.selectedCity == 0L) {
-            AppState.toast("Please fill in all required fields", true)
+        val errors = buildMap<String, String> {
+            putAll(RequestValidators.updateUser(user?.id ?: 0L, s.selectedCity, s.firstName, s.lastName, s.phone))
+            Validation.email(s.email)?.let { put("email", it) }
+            if (s.role == "PROVIDER") {
+                s.branches.forEachIndexed { i, b ->
+                    if (b.name.isBlank()) put("branch$i", "Every branch needs a name")
+                    b.workTimes.forEachIndexed { j, wt ->
+                        // A day left empty means "closed" and is skipped; a half-filled day is an error.
+                        if (wt.startTime.isNotBlank() || wt.closeTime.isNotBlank()) {
+                            RequestValidators.workTime(1, wt.day, wt.startTime, wt.closeTime)
+                                .filterKeys { it == "startTime" || it == "closeTime" }.values.firstOrNull()
+                                ?.let { put("wt${i}_$j", "${wt.day}: $it") }
+                        }
+                    }
+                }
+                s.links.forEachIndexed { i, l -> Validation.url(l.link, required = true)?.let { put("link$i", it) } }
+            }
+        }
+        updateState { it.copy(errors = errors) }
+        if (user == null || errors.isNotEmpty()) {
+            AppState.toast(errors.firstMessage().ifBlank { "Please sign in again" }, true)
             return
         }
 
@@ -235,7 +257,7 @@ class EditProfileViewModel(
                     },
                     onError = { e, _ ->
                         updateState { it.copy(saving = false, error = e) }
-                        AppState.toast("Failed to update profile", true)
+                        AppState.toast(e.ifBlank { "Couldn't update your profile. Please try again." }, true)
                     }
                 )
             }
